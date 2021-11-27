@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<project name="DHC Installer" default="mk_installer" basedir=".">
+	
+	<property name="dir.buildfile" value="."/>
+	<property name="dir.workspace" value="${dir.buildfile}/../.."/>
+	<property name="dir.jarfile" value="${dir.buildfile}/target"/>
+	<property name="dir.repository" value="C:/Users/user/.m2/repository"/>
+
+	<property name="install.file" location="izpack\installer\install.xml" />
+	<property name="image.dir" location="izpack\installer\images" />
+	<property name="izpack.lib" location="Z:\IzPack\lib" />
+ 
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/dhc.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.dhc.Main"/>
+                <attribute name="Class-Path" value=". lib/derby-10.15.2.0.jar lib/derbyshared-10.15.2.0.jar lib/args4j-2.33.jar lib/gson-2.8.6.jar lib/bcprov-jdk15on-1.65.01.jar lib/tinylog-impl-2.1.2.jar lib/tinylog-api-2.1.2.jar"/>
+            </manifest>
+            <fileset dir="${dir.jarfile}/classes"/>
+        </jar>
+        <delete dir="${dir.jarfile}/lib"/>
+        <mkdir dir="${dir.jarfile}/lib"/>
+        <copy file="${dir.repository}/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.repository}/org/apache/derby/derbyshared/10.15.2.0/derbyshared-10.15.2.0.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.repository}/args4j/args4j/2.33/args4j-2.33.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.repository}/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.repository}/org/bouncycastle/bcprov-jdk15on/1.65.01/bcprov-jdk15on-1.65.01.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.repository}/org/tinylog/tinylog-impl/2.1.2/tinylog-impl-2.1.2.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.repository}/org/tinylog/tinylog-api/2.1.2/tinylog-api-2.1.2.jar" todir="${dir.jarfile}/lib"/>
+    </target>
+	
+  <taskdef name="mkinstaller" classname="com.izforge.izpack.ant.IzPackTask">
+  	<classpath>
+  	    <fileset dir="${izpack.lib}" includes="*.jar" />
+  	  </classpath>
+  </taskdef>
+	 
+  <target name="mk_installer" depends="create_run_jar">
+	    <mkinstaller input="${install.file}"
+	        output="izpack\output\installer.jar"
+	        basedir="izpack\installer"/>
+  	    <delete dir="${dir.jarfile}/lib"/>
+  	    <delete file="${dir.jarfile}/dhc.jar"/>
+  </target>
+ 
+</project> 

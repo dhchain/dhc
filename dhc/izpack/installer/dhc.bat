@@ -1,0 +1,1 @@
+java -Xmx512m -cp dhc.jar org.dhc.Main -d "data" -p "7000" -pr "config/proof" -k "config/key.csv"
