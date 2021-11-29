@@ -444,11 +444,11 @@ public class Peer {
 	}
 	
 	public static List<Peer> getPeersByNetworkIdentifier(String networkIdentifier) {
-		
-		List<Peer> result = new ArrayList<Peer>();
 		if(networkIdentifier == null) {
-			return result;
+			return null; //calls to this method expect not null identifiers, returning empty array would cause adding peer with null identifier which will create more problems if peer inetaddress is invalid
 		}
+		List<Peer> result = new ArrayList<Peer>();
+		
 		for(Peer peer: getPeers()) {
 			if(networkIdentifier.equals(peer.getNetworkIdentifier())) {
 				result.add(peer);

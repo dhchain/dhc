@@ -7,10 +7,12 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
 import org.dhc.util.DhcAddress;
@@ -22,6 +24,7 @@ public class Bootstrap {
 	
 	private String peersFile = "config/peers.config";
 	private volatile boolean running;
+	private Set<Peer> candidatePeers = Collections.newSetFromMap(new ConcurrentHashMap<Peer, Boolean>());
 	
 	private static Bootstrap instance =  new Bootstrap();
 	
@@ -33,8 +36,8 @@ public class Bootstrap {
 		
 	}
 	
-	private List<Peer> getBootstrapPeers() {
-		List<Peer> list = new ArrayList<Peer>();
+	private Set<Peer> getBootstrapPeers() {
+		Set<Peer> set = new HashSet<Peer>();
 		try (
 			InputStream is = new FileInputStream(peersFile);
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
@@ -52,7 +55,7 @@ public class Bootstrap {
 					InetSocketAddress inetSocketAddress = new InetSocketAddress(InetAddress.getByName(ip), port);
 					Peer peer = Peer.getInstance(inetSocketAddress);
 					peer.setType(PeerType.TO);
-					list.add(peer);
+					set.add(peer);
 				} catch (Exception e) {
 					logger.trace(e.getMessage(), e);
 				}
@@ -60,7 +63,7 @@ public class Bootstrap {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		return list;
+		return set;
 	}
 	
 	public void bootstrap() {
@@ -91,10 +94,11 @@ public class Bootstrap {
 
 	private void connectPeers() {
 		logger.info("START");
-		List<Peer> list = getBootstrapPeers();
-		connect(list);
-		list = Peer.getPeers();
-		logger.info("number of bootstrap peers {}", list.size());
+		Set<Peer> set = getBootstrapPeers();
+		set.addAll(getCandidatePeers());
+		connect(set);
+		set = new HashSet<>(Peer.getPeers());
+		logger.info("number of bootstrap peers {}", set.size());
 	}
 	
 	private void navigate(Peer bootPeer, DhcAddress dhcAddress) {
@@ -121,14 +125,14 @@ public class Bootstrap {
 		ForkJoinPool.commonPool().invokeAll(calls);
 	}
 
-	private void connect(List<Peer> list) {
-		if(list.isEmpty()) {
+	private void connect(Set<Peer> set) {
+		if(set.isEmpty()) {
 			return;
 		}
 		DhcAddress dhcAddress = DhcAddress.getMyDhcAddress();
-		logger.info("Connecting to number of peers {}", list.size());
+		logger.info("Connecting to number of peers {}", set.size());
 		List<Callable<Boolean>> calls = new ArrayList<>();
-		for (Peer peer : list) {
+		for (Peer peer : set) {
 			calls.add(new Callable<Boolean>() {
 
 				@Override
@@ -184,6 +188,10 @@ public class Bootstrap {
 			
 		}
 		ForkJoinPool.commonPool().invokeAll(calls);
+	}
+
+	public Set<Peer> getCandidatePeers() {
+		return candidatePeers;
 	}
 
 }
