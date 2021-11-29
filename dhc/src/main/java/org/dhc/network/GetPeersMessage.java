@@ -1,8 +1,6 @@
 package org.dhc.network;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.dhc.util.Message;
 
@@ -15,9 +13,8 @@ public class GetPeersMessage extends Message {
 		if(!dontSkip && alreadySent(peer.getNetworkIdentifier())) {
 			return;
 		}
-		Set<Peer> peers = new HashSet<>(Bootstrap.getInstance().getCandidatePeers());
-		peers.addAll(Peer.getAllToPeers());
-		peer.send(new GetPeersReplyMessage(new ArrayList<Peer>(peers)));
+		List<Peer> allPeers = Peer.getAllToPeers();
+		peer.send(new GetPeersReplyMessage(allPeers));
 	}
 
 	public void setDontSkip(boolean dontSkip) {
