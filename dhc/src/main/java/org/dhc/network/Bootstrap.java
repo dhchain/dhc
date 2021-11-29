@@ -164,7 +164,11 @@ public class Bootstrap {
 		
 		List<Callable<Boolean>> calls = new ArrayList<>();
 		for (Peer p : foundPeers) {
-			if(!Peer.getPeersByNetworkIdentifier(p.getNetworkIdentifier()).isEmpty()) {
+			String networkIdentifier = p.getNetworkIdentifier();
+			if(networkIdentifier == null) {
+				continue;
+			}
+			if(!Peer.getPeersByNetworkIdentifier(networkIdentifier).isEmpty()) {
 				continue;
 			}
 			Peer foundPeer = Peer.getInstance(p.getInetSocketAddress());
