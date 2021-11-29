@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +23,7 @@ public class Bootstrap {
 	
 	private String peersFile = "config/peers.config";
 	private volatile boolean running;
+	private Set<Peer> candidatePeers = new HashSet<>();
 	
 	private static Bootstrap instance =  new Bootstrap();
 	
@@ -91,7 +93,10 @@ public class Bootstrap {
 
 	private void connectPeers() {
 		logger.info("START");
-		List<Peer> list = getBootstrapPeers();
+		Set<Peer> set = new HashSet<>(candidatePeers);
+		candidatePeers.clear();
+		set.addAll(getBootstrapPeers());
+		List<Peer> list = new ArrayList<>(set);
 		connect(list);
 		list = Peer.getPeers();
 		logger.info("number of bootstrap peers {}", list.size());
@@ -180,6 +185,28 @@ public class Bootstrap {
 			
 		}
 		ForkJoinPool.commonPool().invokeAll(calls);
+	}
+
+	public void addToCandidates(Peer peer, int serverPort) {
+		if(serverPort == 0) {
+			return;
+		}
+		String ip = peer.getSocket().getInetAddress().getHostAddress();
+		InetSocketAddress inetSocketAddress;
+		try {
+			inetSocketAddress = new InetSocketAddress(InetAddress.getByName(ip), serverPort);
+			Peer candidate = Peer.getInstance(inetSocketAddress);
+			candidate.setType(PeerType.TO);
+			candidatePeers.add(candidate);
+		} catch (UnknownHostException e) {
+			
+		}
+		
+		
+	}
+
+	public Set<Peer> getCandidatePeers() {
+		return candidatePeers;
 	}
 
 

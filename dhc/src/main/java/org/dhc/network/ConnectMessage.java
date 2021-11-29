@@ -9,8 +9,11 @@ public class ConnectMessage extends Message {
 
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	
+	private int serverPort;
+	
 	public ConnectMessage() {
 		logger.trace("ConnectMessage init");
+		serverPort = Network.getInstance().getPort();
 	}
 
 	@Override
@@ -29,6 +32,7 @@ public class ConnectMessage extends Message {
 		message.setCorrelationId(getCorrelationId());
 		message.setCallbackId(getCallbackId());
 		peer.send(message);
+		Bootstrap.getInstance().addToCandidates(peer, serverPort);
 		logger.trace("ConnectMessage - SUCCESS");
 	}
 

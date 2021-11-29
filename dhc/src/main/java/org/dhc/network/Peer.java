@@ -51,6 +51,8 @@ public class Peer {
 	private transient long lastSeen;// process(Message message), don't set it here.
 	private transient long timeAdded;
 	private transient Socket socket;
+	
+
 	private transient volatile boolean receiverStarted = false;
 	private transient JsonWriter writer;
     private transient JsonReader reader;
@@ -441,7 +443,11 @@ public class Peer {
 	}
 	
 	public static List<Peer> getPeersByNetworkIdentifier(String networkIdentifier) {
+		
 		List<Peer> result = new ArrayList<Peer>();
+		if(networkIdentifier == null) {
+			return result;
+		}
 		for(Peer peer: getPeers()) {
 			if(networkIdentifier.equals(peer.getNetworkIdentifier())) {
 				result.add(peer);
@@ -545,6 +551,10 @@ public class Peer {
 	 */
 	public void setInUse(Boolean inUse) {
 		this.inUse = inUse;
+	}
+	
+	public Socket getSocket() {
+		return socket;
 	}
 
 }
