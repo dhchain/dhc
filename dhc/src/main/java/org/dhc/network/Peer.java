@@ -400,6 +400,7 @@ public class Peer {
 			message.setPossiblePower(Network.getInstance().getPossiblePower());
 			getWriter();
 			gsonUtil.write(message, writer);
+			message.successfullySent(this);
 			removeExcessPeer();
 		} catch (Exception e) {
 			//logger.trace(e.getMessage(), e);

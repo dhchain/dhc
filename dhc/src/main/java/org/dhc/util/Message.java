@@ -127,4 +127,9 @@ public abstract class Message {
 		return thin;
 	}
 
+	public void successfullySent(Peer peer) {
+		
+		
+	}
+
 }

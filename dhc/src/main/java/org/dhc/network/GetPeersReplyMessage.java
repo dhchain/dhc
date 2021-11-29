@@ -2,7 +2,9 @@ package org.dhc.network;
 
 import java.util.List;
 
+import org.dhc.util.DhcRunnable;
 import org.dhc.util.Message;
+import org.dhc.util.ThreadExecutor;
 
 public class GetPeersReplyMessage extends Message {
 
@@ -14,9 +16,18 @@ public class GetPeersReplyMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
-		Bootstrap bootstrap = Bootstrap.getInstance();
-		bootstrap.addPeers(allPeers);
-		PeersFinder.getInstance().peerComplete(peer);
+		
+		
+		ThreadExecutor.getInstance().execute(new DhcRunnable("GetPeersReplyMessage") {
+			public void doRun() {
+				Bootstrap bootstrap = Bootstrap.getInstance();
+				bootstrap.addPeers(allPeers);
+				PeersFinder.getInstance().peerComplete(peer);
+			}
+		});
+		
 	}
+	
+	
 
 }

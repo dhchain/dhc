@@ -84,7 +84,12 @@ public class Buckets {
 			}
 
 			if(possiblePower > getPower() || possiblePower < Blockchain.getInstance().getLastAveragePower()) {
-				Bootstrap.getInstance().navigate(getAllPeers(), dhcAddress);
+				ThreadExecutor.getInstance().execute(new DhcRunnable("navigate") {
+					public void doRun() {
+						Bootstrap.getInstance().navigate(getAllPeers(), dhcAddress);
+					}
+				});
+				
 				expiringMap.clear();
 			}
 			
@@ -125,6 +130,7 @@ public class Buckets {
 			long duration = System.currentTimeMillis() - start;
 			if(duration > Constants.SECOND * 10) {
 				logger.info("took {} ms", duration);
+				logger.info("", new RuntimeException());
 			}
 			//logger.trace("unlock");
 			logger.trace("END Reload buckets power={}, took {} ms", getPower(), System.currentTimeMillis() - start);
