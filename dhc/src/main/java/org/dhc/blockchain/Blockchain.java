@@ -90,206 +90,10 @@ public class Blockchain {
 			
 			int i = 0;
 			
-			TransactionOutput output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			TransactionOutput output = new TransactionOutput(myAddresses.get(i++), new Coin(Long.MAX_VALUE / 2));
 			output.setOutputId("DNiMXMBFXw4vPSSVYsRmKDgFaSvfyT4RGx6yZWwYdbkx");
 			transaction.getOutputs().add(output);
 			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("6PYyPvY9LiM8rWVvjiWpc8onVJiA7J6tvuwFBn2e4daj");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("CUhgqbPNk72BpVEWzqiYPMdf4dK9PKVnbvSgt3au8V98");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("Av55WA5ed1fixLjVTc1r1JrRE9VaSwaFLbzUEZBwUcFt");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("EeE7L3nu2iLbtLEPj3XfUDd6QbTkhLrJvBYb93LNjb25");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("BAg3xhro4XvaeXpG9BbVNVCf5cafqT3McpsiMR4s7GM5");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("4Y5CqPJ1dyKLSCEwn63hMJSGi6HVfA3bDomDzmqX4qoy");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("GgcemwSPjrsTyYwR9F8QjsE3tmuDsegMLmRzT9goLhiX");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("82n7H7SartN39soihEZzwvQ9sWpAX8gRSyJQJvPwS3ys");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("Etc8sTEiqfLPMf8A8ftC8XBnH4FHUHvHeBNsQb2spd9k");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("HxuxPhQmozKfrmXA4CJnKJUGZwYbe41HxfvrTqinAZUz");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("D9CGB6QvPvaaPUZZqzHhombBLYCs29Sw5Cs27UiuKAKw");		
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("ArEuNqdiGpDsV9FCez7dNSKyXPFCab4nUnXkAQz1AWdq");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("BLyAEwQF2juDk6SCAnpq6n52RFUQtU3iMmPPkuvgDxGq");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("C51koCct1wQYgQRMcLmPra7psU8oNiXUy7xHLcy2edz7");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("8gmJ6DBHbP12LwVuHPWjh9dDdzVGsuxwyrpRXiJhnMoW");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("ExukyYSevo9Q7Ucqkwrr8kV3BUoGiYK3voG1A1tbZoGC");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("FNA2MX9euGaWUmid1XdXvFXLfcrYVXRyJvELCvw4Kx3n");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("GbTNXUnHCwxLjL1jTyoAEfaYpEpYCSdZTtAc6gJagYkZ");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("8Pr5bzVfdFHZtc7Ca86Rio1xJusNJREjbYfgcSAXogyM");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("C6atr81yHsA1jfhPfkY8GyLAwGHE1fZkxdh3kngakUWW");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("FxtVbJ3XymAFAoqY2jTfUMxwfEbaaZrccxnEBUgaZyFG");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("6fZaDYrhG51ZkD9gGWQ3i1V4YhJpgH9fbVyrvV6hNndc");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("HgorqbfsorPj1Q49vR7jKkTVRngoXTQRYA3BvhLu2aFg");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("5ck6zH5oSMWhCPHC8ZuxXM6ReaU2AmtsBsow2M3tXdTi");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("CuBjyTCMBQqMHv1tsbxzDwbF5FTPHyRMPNN1AKfhY7iJ");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("5hJyTRX9pnDT3wRJ6hTZhNXMYXnbhN3DLinDsPzpdXbT");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("EGaknhdWrRMvY1AxFxyNJufUJTgaURv2ZzGshuSzRFro");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("61mDVzd6DUuENtCM9LRDEyydAQxCfG8GbStU4VhLSmDP");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("9f6QUXFdbSinwPRoTCGh1nmzooET34W7j2k2b2wAphAi");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("EdaKEwCQbrHTLhJ6becjrwNKbHfYovrdKQpCrQyi5nSK");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("8ARKHyFaTBPjEysaFPVXbSL2sHguicdvG8mYg2mW6CEV");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("9ARdLMN8E76kpAcjngZ3nKnMnFE1XqK98Y7nNM5QaKnh");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("AinRMM8TxcVbmDmspgHt6QWNVdUKeVZQA49wQw3qSVQN");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("DZ66TnAMrngc91L7mhqUuAKz4YeH4StBNXGYHc5ME3ZF");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("Bc13VvBrNy7vhbKcHjyhoRKpAn7QqZ2gzhjC8qDiWdZx");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("EzGmKGm19VavAL62ULR9q5FBBJ3UGiAd9QonG2Etu2yk");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("3TLeTjjMZFnJJCswwxD885WsKWYg9sxsWBXwbZDsJcwT");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("JBTRf3cyjpiKtvFswxnjZf3EJHSdBHm4EixULMnEAX3b");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("AvrsdxUcsyys7fzoWEn3SGbowwQhe5oexoU89rakbbxi");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("7ZsdaTZQ3GW51muhvDxzqMBZSDQhQAXyc5RJpgwQEZwR");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("9rszy4Ax3f1A5SwBJcbJK4mPKgAjB8YcLM54CTwHiVXs");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("DgyLh5HU1RQVxubYWCj5sKDjT15yxU6UUVF8tjyFZTz4");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("3tfHxowQjSjQmLfG7hJB8wuB2MZ8Zkksfg3g7gHrQxNz");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("CghyUnuK6R1YKaykcqPcpyxDVenEpbXUSLZGzVDcyVA7");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("DQZTsDpGbJ9WrVfACVRdZ8gfQ6vh3eAefstbPRXx5oTL");
-			transaction.getOutputs().add(output);
-
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("9yyNAsiADMwSRQkwiAzbqTDLwbCcqHxjydu7UbSNnjLV");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("ZAedjvohoYkWmBWKSGkerp9yhiJnpFJoH5KJFwa4qAc");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("4T9khLhAoLLt3QL5HDvVEPYhck4fTyNJqxpxAoAGqJfU");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("FzpypsERB7kKwBRYe7nmJmr8MrnC7J7tP51unpFxyNUG");
-			transaction.getOutputs().add(output);
-
 			transaction.setValue(transaction.getOutputsValue());
 			transaction.setFee(Coin.ZERO);
 			transaction.setBlockHash(block.getBlockHash(), block.getIndex());
@@ -298,10 +102,12 @@ public class Blockchain {
 			// comment out START
 				//transaction.signTransaction(Wallet.getInstance().getPrivateKey());
 				//transaction.setTransactionId();
-			    //logger.info("signature={}", transaction.getSignature());
+			    //logger.info("transaction signature={}", transaction.getSignature());
 			// comment out END
-			transaction.setSignature("iKx1CJMpGMdZZjsszCrtdDkh5MJytSr6aUCxntL2Acn567C9XQEHBDwhSoTMWPonhZfidZK7KHrN3qTHUGKSZ9cM3faHaeGTsQ");
+			transaction.setSignature("AN1rKpkSbrkSjmL1qDo69mSj2Zs3ypn1xgqJpsVzPp7VWrBkzgu6k9aNHWtVCpCvkwU3sbSRNUatRQbsM9JXX3efWfbin8CUA");
 			transaction.setTransactionId();
+
+			logger.info("transaction signature valid={}", transaction.verifySignature());
 			
 			BucketHash buckethash = new BucketHash();
 			buckethash.setBinaryStringKey("");
@@ -317,7 +123,7 @@ public class Blockchain {
 				//logger.info("block signature={}", block.getMinerSignature());
 				//logger.info("block signature valid={}", block.verifySignature());
 			// comment out END
-			block.setMinerSignature("iKx1CJNXqvN3cKXRSdwKeeti9KPtYmtYRHHnBJ9Wd9XeUvWtCCgAs89c7NNWBgcXZG4u1xp3U1TY2tYnSpT74sCiQbZTcL6EFQ");
+			block.setMinerSignature("AN1rKrcoratxEioVxWBrmgcDgL8Dr4ghT2V3P5Y5ThKjEzvU5Hj8XwXMKLqktw9FqvNEtNB2m1Mqoyxi6GyEtDXWHfWMAubDx");
 			block.setBlockHash();
 			buckethash.setPreviousBlockHash(block.getPreviousHash());
 			

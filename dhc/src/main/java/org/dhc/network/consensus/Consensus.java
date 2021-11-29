@@ -13,7 +13,6 @@ import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.BucketHashes;
 import org.dhc.blockchain.MissingBlock;
 import org.dhc.blockchain.MyAddresses;
-import org.dhc.blockchain.SendTransactionMessage;
 import org.dhc.blockchain.Transaction;
 import org.dhc.blockchain.TransactionMemoryPool;
 import org.dhc.network.BucketKey;
@@ -24,11 +23,11 @@ import org.dhc.util.BlockEvent;
 import org.dhc.util.Callback;
 import org.dhc.util.Coin;
 import org.dhc.util.Constants;
-import org.dhc.util.Registry;
-import org.dhc.util.SharedLock;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.Listeners;
+import org.dhc.util.Registry;
+import org.dhc.util.SharedLock;
 import org.dhc.util.Wallet;
 
 public class Consensus {
@@ -263,26 +262,6 @@ public class Consensus {
 			throw new ResetMiningException("bucketHashes are not valid " + bucketHashes);
 		}
 		return bucketHashes;
-	}
-	
-	@SuppressWarnings("unused")
-	private void createAndSendTransaction(Block block) {
-
-		try {
-			Coin balance = blockchain.sumByRecipient(DhcAddress.getMyDhcAddress().toString(), block);
-			if(balance.less(Coin.ONE.add(Coin.SATOSHI))) {
-				return;
-			}
-			Transaction transaction = new Transaction();
-			transaction.create(myAddresses.getRandomAddress(), Coin.ONE, Coin.SATOSHI, null, null, block);
-			if (TransactionMemoryPool.getInstance().add(transaction)) {
-				network.sendToAllMyPeers(new SendTransactionMessage(transaction));
-			}
-		} catch (Exception e) {
-			logger.trace(e.getMessage(), e);
-			//System.exit(0);
-		}
-		
 	}
 
 	private Block complete() {

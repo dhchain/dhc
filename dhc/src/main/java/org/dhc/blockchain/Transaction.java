@@ -116,6 +116,7 @@ public class Transaction {
 			return true;
 		}
 		String preHash = getPreHash();
+		//logger.info("verifySignature() preHash={}", preHash);
 		boolean result = CryptoUtil.verifyECDSASig(sender, preHash, Base58.decode(signature));
 		if(result) {
 			return true;
@@ -125,8 +126,10 @@ public class Transaction {
 	
 	public void signTransaction(PrivateKey privateKey) {
 		String preHash = getPreHash();
+		//logger.info("signTransaction() preHash={}", preHash);
 		byte[] signature = CryptoUtil.applyECDSASig(privateKey, preHash);
 		this.signature = Base58.encode(signature);
+		//logger.info("signTransaction() signature={}", this.signature);
 	}
 	
 	private String getPreHash() {
