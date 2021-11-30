@@ -136,10 +136,10 @@ public class TransactionStore {
 		logger.trace("Saved transaction {}", transaction);
 		DhcAddress myAddress = DhcAddress.getMyDhcAddress();
 		if(myAddress.equals(transaction.getReceiver())) {
-			logger.info("Received {} coins from {}", transaction.getValue().toNumberOfCoins(), transaction.getSenderDhcAddress());
+			logger.trace("Received {} coins from {}", transaction.getValue().toNumberOfCoins(), transaction.getSenderDhcAddress());
 		}
 		if(myAddress.equals(transaction.getSenderDhcAddress())) {
-			logger.info("Send {} coins to {}", transaction.getValue().toNumberOfCoins(), transaction.getReceiver());
+			logger.trace("Send {} coins to {}", transaction.getValue().toNumberOfCoins(), transaction.getReceiver());
 		}
 		Registry.getInstance().getMissingOutputsForTransaction().process(transaction.getTransactionId(), transaction.getBlockHash());
 		Listeners.getInstance().sendEvent(new JoinTransactionEvent(transaction));
