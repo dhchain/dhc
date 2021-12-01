@@ -74,7 +74,6 @@ public class ShowTransactions extends AbstractAction implements Caller {
 					table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 					TableColumnAdjuster tca = new TableColumnAdjuster(table);
 					tca.adjustColumns();
-					tca.adjustScroll();
 					table.addMouseListener(new TransactionMouseAdapter(table, new ArrayList<Transaction>(set), main));
 
 					JScrollPane scroll = new JScrollPane (table);

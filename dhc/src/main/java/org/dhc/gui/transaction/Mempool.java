@@ -73,7 +73,6 @@ public class Mempool extends AbstractAction implements Caller {
 					table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 					TableColumnAdjuster tca = new TableColumnAdjuster(table);
 					tca.adjustColumns();
-					tca.adjustScroll();
 					table.addMouseListener(new MempoolMouseAdapter(table, list, main));
 
 					JScrollPane scroll = new JScrollPane (table);

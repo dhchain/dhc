@@ -1,7 +1,6 @@
 package org.dhc.gui.util;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -72,16 +71,6 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 		for (int i = 0; i < tcm.getColumnCount(); i++) {
 			adjustColumn(i);
 		}
-	}
-	
-	public void adjustScroll() {
-		int width = (int) table.getPreferredSize().getWidth();
-		int height = (int) table.getPreferredSize().getHeight();
-		height = height + table.getRowHeight();
-		Dimension dim = new Dimension(width, height);
-
-		table.setPreferredScrollableViewportSize(dim);
-		table.setFillsViewportHeight(true);
 	}
 
 	/*

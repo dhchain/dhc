@@ -74,7 +74,6 @@ public class ShowOutputs extends AbstractAction implements Caller {
 					table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 					TableColumnAdjuster tca = new TableColumnAdjuster(table);
 					tca.adjustColumns();
-					tca.adjustScroll();
 					table.addMouseListener(new OutputMouseAdapter(table, new ArrayList<TransactionOutput>(set), main));
 
 					JScrollPane scroll = new JScrollPane (table);
