@@ -74,6 +74,7 @@ public class ConnectMessage extends Message {
 
 	@Override
 	public void failedToSend(Peer peer, Exception e) {
+		//this method will not be triggered by connectCandidate() but can be triggered from Bootstrap.connectPeers()
 		Bootstrap.getInstance().getCandidatePeers().remove(peer);
 		logger.trace("Failed to connect to candidate {}", peer.getInetSocketAddress());
 		logger.trace(e.getMessage(), e);
