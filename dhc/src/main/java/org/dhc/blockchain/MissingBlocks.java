@@ -57,9 +57,6 @@ public class MissingBlocks {
 			foundBlocks.put(blockhash, map);
 		}
 		map.put(key, block);
-		if(block.getPower() == 0) {
-			return;
-		}
 		BucketKey bucketKey = new BucketKey(block.getBucketKey());
 		Block otherBlock = null;
 		Block combinedBlock = null;

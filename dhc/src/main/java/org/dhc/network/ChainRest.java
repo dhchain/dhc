@@ -137,9 +137,6 @@ public class ChainRest {
 	
 	private void doBlock(Block block) throws Exception {
 		logger.trace("doBlock() block {}", block);
-		if(Network.getInstance().getPower() == 0) {
-			return;
-		}
 		if(block.getPower() <= Network.getInstance().getPower()) {
 			return;
 		}

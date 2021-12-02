@@ -356,10 +356,6 @@ public class BlockStore {
 					int counter = 0;
 					while (rs.next()) {
 						counter++;
-						if(network.getPower() == 0) {
-							logger.info("network power is 0");
-							break;
-						}
 						if (power < network.getPower()) {// network power increased so we need to rerun the query
 							logger.info("network power increased from {} to {} so we need to rerun the query", power + 1, network.getPower());
 							break;
