@@ -32,6 +32,7 @@ public class Block {
 	private String consensus;
 	private long timeStamp;
 	private int nonce;
+	private int difficulty;
 	
 	public void prune() {
 		bucketHashes = null;
@@ -61,6 +62,7 @@ public class Block {
 		clone.consensus = consensus;
 		clone.timeStamp = timeStamp;
 		clone.nonce = nonce;
+		clone.difficulty = difficulty;
 		return clone;
 	}
 
@@ -618,6 +620,14 @@ public class Block {
 
 	public void setNonce(int nonce) {
 		this.nonce = nonce;
+	}
+
+	public int getDifficulty() {
+		return difficulty;
+	}
+
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
 	}
 	
 
