@@ -110,7 +110,7 @@ public class BlockStore {
 
 		new DBExecutor() {
 			public void doWork() throws Exception {
-				String sql = "insert into block (block_id, blockHash, miner, index, previousHash, receivedTime, power, coinbaseTransactionId, minerSignature, consensus, coinbaseHash, timeStamp) "
+				String sql = "insert into block (block_id, blockHash, miner, index, previousHash, receivedTime, power, coinbaseTransactionId, minerSignature, consensus, timeStamp, nonce) "
 						+ " values (?,?,?,?,?,?,?,?,?,?,?,?)";
 
 				ps = conn.prepareStatement(sql);
@@ -141,8 +141,8 @@ public class BlockStore {
 				ps.setString(i++, block.getCoinbaseTransactionId());
 				ps.setString(i++, block.getMinerSignature());
 				ps.setString(i++, block.getConsensus());
-				ps.setString(i++, block.getCoinbaseHash());
 				ps.setLong(i++, block.getTimeStamp());
+				ps.setInt(i++, block.getNonce());
 				long start = System.currentTimeMillis();
 				ps.executeUpdate();
 				logger.trace("Query doSaveBlock took {} ms. '{}' ", System.currentTimeMillis() - start, sql);
@@ -246,8 +246,8 @@ public class BlockStore {
 		block.setCoinbaseTransactionId(rs.getString("coinbaseTransactionId"));
 		block.setMinerSignature(rs.getString("minerSignature"));
 		block.setConsensus(rs.getString("consensus"));
-		block.setCoinbaseHash(rs.getString("coinbaseHash"));
 		block.setTimeStamp(rs.getLong("timeStamp"));
+		block.setNonce(rs.getInt("nonce"));
 		
 		return block;
 	}
@@ -315,7 +315,7 @@ public class BlockStore {
 					s.execute("create table block ( block_id bigint NOT NULL CONSTRAINT block_PK PRIMARY KEY, blockHash varchar(64) NOT NULL, "
 							+ "miner varchar(256), index bigint NOT NULL, previousHash varchar(64), receivedTime bigint, "
 							+ "power int NOT NULL, coinbaseTransactionId varchar(64), minerSignature varchar(256), "
-							+ "consensus varchar(64) NOT NULL, coinbaseHash varchar(64) NOT NULL, timeStamp bigint)");
+							+ "consensus varchar(64) NOT NULL, timeStamp bigint, nonce int)");
 
 					s.execute("ALTER TABLE block ADD CONSTRAINT block_blockHash UNIQUE (blockhash)");
 					s.execute("CREATE INDEX block_index ON block(index)");

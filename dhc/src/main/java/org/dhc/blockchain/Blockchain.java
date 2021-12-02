@@ -100,11 +100,11 @@ public class Blockchain {
 			transaction.setSender(block.getMiner());
 			transaction.setReceiver(transaction.getSenderDhcAddress());
 			// comment out START
-				//transaction.signTransaction(Wallet.getInstance().getPrivateKey());
-				//transaction.setTransactionId();
-			    //logger.info("transaction signature={}", transaction.getSignature());
+/*				transaction.signTransaction(Wallet.getInstance().getPrivateKey());
+				transaction.setTransactionId();
+			    logger.info("transaction signature={}", transaction.getSignature());*/
 			// comment out END
-			transaction.setSignature("AN1rKpkSbrkSjmL1qDo69mSj2Zs3ypn1xgqJpsVzPp7VWrBkzgu6k9aNHWtVCpCvkwU3sbSRNUatRQbsM9JXX3efWfbin8CUA");
+			transaction.setSignature("iKx1CJMqLzqWaCp1SCFFKKDMTkPArUVtrXwdBYcxbX6NCVJEcqEPPysagv8u2ofpaD8XhVfaLokzTJBAYAnMKiEdr2U3rWa667");
 			transaction.setTransactionId();
 
 			logger.info("transaction signature valid={}", transaction.verifySignature());
@@ -119,11 +119,11 @@ public class Blockchain {
 			block.setBucketHashes(bucketHashes);
 			
 			// comment out START
-			    //block.sign();
-				//logger.info("block signature={}", block.getMinerSignature());
-				//logger.info("block signature valid={}", block.verifySignature());
+/*			    block.sign();
+				logger.info("block signature={}", block.getMinerSignature());
+				logger.info("block signature valid={}", block.verifySignature());*/
 			// comment out END
-			block.setMinerSignature("AN1rKrcoratxEioVxWBrmgcDgL8Dr4ghT2V3P5Y5ThKjEzvU5Hj8XwXMKLqktw9FqvNEtNB2m1Mqoyxi6GyEtDXWHfWMAubDx");
+			block.setMinerSignature("381yXZNCezAutdTLLfR89b9LmcEcex5JBQoQsUNLoapq498TqYzjZMe19ji4J8n7pHsVCAmjXrpeGU6yQ7RJCvEwqAPYz7SA");
 			block.setBlockHash();
 			buckethash.setPreviousBlockHash(block.getPreviousHash());
 			

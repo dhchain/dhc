@@ -30,8 +30,8 @@ public class Block {
 	private String coinbaseTransactionId = "";
 	private String minerSignature;
 	private String consensus;
-	private String coinbaseHash = "";
 	private long timeStamp;
+	private int nonce;
 	
 	public void prune() {
 		bucketHashes = null;
@@ -59,8 +59,8 @@ public class Block {
 		clone.coinbaseTransactionId = coinbaseTransactionId;
 		clone.minerSignature = minerSignature;
 		clone.consensus = consensus;
-		clone.coinbaseHash = coinbaseHash;
 		clone.timeStamp = timeStamp;
+		clone.nonce = nonce;
 		return clone;
 	}
 
@@ -179,8 +179,7 @@ public class Block {
 	}
 
 	private String calculateHash() {
-		setCoinbaseHash(CryptoUtil.getHashBase58Encoded(coinbaseTransactionId + minerSignature));
-		return CryptoUtil.getHashBase58Encoded(getPreviousHash() + getConsensus() + getCoinbaseHash());
+		return CryptoUtil.getHashBase58Encoded(getPreHash() + minerSignature);
 	}
 	
 	public void sign() {
@@ -206,12 +205,12 @@ public class Block {
 	}
 	
 	private String getPreHash() {
-		return getPreviousHash() + getConsensus() + coinbaseTransactionId;
+		return getPreviousHash() + getConsensus() + getCoinbaseTransactionId() + getTimeStamp() + getNonce();
 	}
 
 	public boolean isValid() {
 		
-		if(isPruned() && blockHash.equals(CryptoUtil.getHashBase58Encoded(getPreviousHash() + getConsensus() + getCoinbaseHash()))) {
+		if(isPruned() && blockHash.equals(calculateHash())) {
 			return true;
 		}
 
@@ -567,14 +566,6 @@ public class Block {
 		}
 	}
 
-	public String getCoinbaseHash() {
-		return coinbaseHash;
-	}
-
-	public void setCoinbaseHash(String coinbaseHash) {
-		this.coinbaseHash = coinbaseHash;
-	}
-
 	public boolean isPruned() {
 		return miner == null;
 	}
@@ -619,6 +610,14 @@ public class Block {
 
 	public void setTimeStamp(long timeStamp) {
 		this.timeStamp = timeStamp;
+	}
+
+	public int getNonce() {
+		return nonce;
+	}
+
+	public void setNonce(int nonce) {
+		this.nonce = nonce;
 	}
 	
 
