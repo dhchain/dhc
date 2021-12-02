@@ -18,7 +18,7 @@ import org.dhc.util.DhcRunnable;
 public class Buckets {
 
 	private static final DhcLogger logger = DhcLogger.getLogger();
-	private static final ExpiringMap<String, Object> expiringMap =  new ExpiringMap<String, Object>(Constants.MINUTE * 5);
+	private static final ExpiringMap<String, String> expiringMap =  new ExpiringMap<>(Constants.MINUTE * 5);
 
 	private List<Bucket> buckets = new CopyOnWriteArrayList<Bucket>();
 	private final SharedLock readWriteLock = SharedLock.getInstance();
