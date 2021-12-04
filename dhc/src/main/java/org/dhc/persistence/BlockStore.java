@@ -143,7 +143,7 @@ public class BlockStore {
 				ps.setString(i++, block.getConsensus());
 				ps.setLong(i++, block.getTimeStamp());
 				ps.setInt(i++, block.getNonce());
-				ps.setInt(i++, block.getDifficulty());
+				ps.setLong(i++, block.getBits());
 				long start = System.currentTimeMillis();
 				ps.executeUpdate();
 				logger.trace("Query doSaveBlock took {} ms. '{}' ", System.currentTimeMillis() - start, sql);
@@ -249,7 +249,7 @@ public class BlockStore {
 		block.setConsensus(rs.getString("consensus"));
 		block.setTimeStamp(rs.getLong("timeStamp"));
 		block.setNonce(rs.getInt("nonce"));
-		block.setDifficulty(rs.getInt("difficulty"));
+		block.setBits(rs.getLong("difficulty"));
 		return block;
 	}
 
