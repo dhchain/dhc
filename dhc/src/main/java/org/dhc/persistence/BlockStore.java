@@ -110,8 +110,8 @@ public class BlockStore {
 
 		new DBExecutor() {
 			public void doWork() throws Exception {
-				String sql = "insert into block (block_id, blockHash, miner, index, previousHash, receivedTime, power, coinbaseTransactionId, minerSignature, consensus, timeStamp, nonce, difficulty) "
-						+ " values (?,?,?,?,?,?,?,?,?,?,?,?)";
+				String sql = "insert into block (block_id, blockHash, miner, index, previousHash, receivedTime, power, coinbaseTransactionId, minerSignature, consensus, timeStamp, nonce, bits) "
+						+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 				ps = conn.prepareStatement(sql);
 				int i = 1;
@@ -249,7 +249,7 @@ public class BlockStore {
 		block.setConsensus(rs.getString("consensus"));
 		block.setTimeStamp(rs.getLong("timeStamp"));
 		block.setNonce(rs.getInt("nonce"));
-		block.setBits(rs.getLong("difficulty"));
+		block.setBits(rs.getLong("bits"));
 		return block;
 	}
 
@@ -316,7 +316,7 @@ public class BlockStore {
 					s.execute("create table block ( block_id bigint NOT NULL CONSTRAINT block_PK PRIMARY KEY, blockHash varchar(64) NOT NULL, "
 							+ "miner varchar(256), index bigint NOT NULL, previousHash varchar(64), receivedTime bigint, "
 							+ "power int NOT NULL, coinbaseTransactionId varchar(64), minerSignature varchar(256), "
-							+ "consensus varchar(64) NOT NULL, timeStamp bigint, nonce int, difficulty int)");
+							+ "consensus varchar(64) NOT NULL, timeStamp bigint, nonce int, bits bigint)");
 
 					s.execute("ALTER TABLE block ADD CONSTRAINT block_blockHash UNIQUE (blockhash)");
 					s.execute("CREATE INDEX block_index ON block(index)");

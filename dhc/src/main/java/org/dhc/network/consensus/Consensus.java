@@ -2,7 +2,6 @@ package org.dhc.network.consensus;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -34,6 +33,7 @@ public class Consensus {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	private static final Consensus instance = new Consensus();
+	@SuppressWarnings("unused")
 	private static final long WAIT_TIME = Constants.MINUTE * 60;
 	
 	private final SharedLock readWriteLock = SharedLock.getInstance();
@@ -296,8 +296,6 @@ public class Consensus {
 		block.removeCoinbase();
 		block.addTransaction(coinbase);
 		block.setCoinbaseTransactionId(coinbase.getTransactionId());
-		block.sign();
-		block.setBlockHash();
 
 		if(!block.getBucketHashes().isFeeValid()) {
 			logger.info("Fee is not valid");
@@ -334,6 +332,7 @@ public class Consensus {
 		Registry.getInstance().getCompactor().addPrunings();
 		//createAndSendTransaction(previousBlock);
 		
+		block.setTimeStamp(System.currentTimeMillis());
 		waitForMiningLock();
 		
 		if(blockchainIndex != blockchain.getIndex()) {
@@ -341,31 +340,27 @@ public class Consensus {
 			throw new ResetMiningException(str);
 		}
 		
-		block.setTimeStamp(System.currentTimeMillis());
+		block.setBlockHash();
 		return block;
 	}
 	
 	private void waitForMiningLock() {
-		long waitTime = ThreadLocalRandom.current().nextLong(1, WAIT_TIME);// Have to start with one because if 0 then the lock will wait forever.
-		
+
 		long index = blockchain.getIndex();
 		if (blockchainIndex != index) {
 			throw new ResetMiningException("Blockchain index is stale");
 		}
 
-		miningLock.lock();
 		try {
 
 			
-			logger.trace("Before miningLockCondition.await blockchain.getIndex()={}, waitTime={}", index, waitTime);
-			miningLockCondition.await(waitTime, TimeUnit.MILLISECONDS);
+			logger.trace("Before blockToMine.mine() blockchain.getIndex()={}", index);
+			blockToMine.mine();
 
-			logger.trace("After miningLockCondition.await");
-		} catch (InterruptedException e) {
-			logger.error(e.getMessage(), e);
+			logger.trace("After blockToMine.mine()");
 		} finally {
 			blockToMine = null;
-			miningLock.unlock();
+
 		}
 	}
 	

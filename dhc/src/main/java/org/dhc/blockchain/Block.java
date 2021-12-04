@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.dhc.network.ChainSync;
 import org.dhc.network.consensus.BucketHash;
+import org.dhc.network.consensus.ResetMiningException;
 import org.dhc.persistence.BlockStore;
 import org.dhc.util.Base58;
 import org.dhc.util.CryptoUtil;
@@ -33,7 +34,7 @@ public class Block {
 	private String consensus;
 	private long timeStamp;
 	private int nonce;
-	private long bits = 0x1d00ffff;
+	private long bits = 0x6400ffff;
 	
 	public void prune() {
 		bucketHashes = null;
@@ -72,13 +73,14 @@ public class Block {
 	}
 
 	public void setBlockHash() {
-		if (isGenesis() && blockHash != null) {
+		if (isGenesis()) {
+			getBucketHashes().getLastBucketHash().setBlockHash(blockHash, getIndex());
 			return;
 		}
 		if(isPruned()) {
 			return;
 		}
-		blockHash = calculateHash();
+		//blockHash = calculateHash();
 		getBucketHashes().getLastBucketHash().setBlockHash(blockHash, getIndex());
 	}
 
@@ -133,7 +135,7 @@ public class Block {
 					+ " hash=" + blockHash + " previous="
 					+ previousHash + " miner=" + getDhcAddress() + " " + hashes
 					+ ", fee=" + (hashes == null ? "": hashes.getFirstBucketHash().getFee().toNumberOfCoins())
-					;
+					+ ", nonce=" + nonce + ", difficulty=" + getDifficulty();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return e.getMessage();
@@ -208,7 +210,7 @@ public class Block {
 	}
 	
 	private String getPreHash() {
-		return getPreviousHash() + getConsensus() + getCoinbaseTransactionId() + getTimeStamp() + getNonce();
+		return getPreviousHash() + getConsensus() + getCoinbaseTransactionId() + getBits() + getTimeStamp() + getNonce();
 	}
 
 	public boolean isValid() {
@@ -633,7 +635,10 @@ public class Block {
 	
 	public BigInteger getTarget() {
 		String hex = Long.toString(getBits(), 16);
+		//logger.info("hex={}", hex);
 		int size = Integer.parseInt(hex.substring(0, 2), 16);
+		//logger.info("size={} {}", size, hex.substring(0, 2));
+		//logger.info("size= {}, {} {} {}", size, hex.substring(0, 2), hex.substring(2), hex);
 		BigInteger word = new BigInteger(hex.substring(2), 16);
 		BigInteger result = word.multiply(new BigInteger("2").pow(8 * (size-3)));
 		return result;
@@ -667,6 +672,28 @@ public class Block {
 		int exponent_diff  = (int)(8 * (0x1D - ((getBits() >> 24) & 0xFF)));
 		double significand = getBits() & 0xFFFFFF; 
 		return Math.scalb(0x00FFFF / significand, exponent_diff);
+	}
+
+	public void mine() {
+		do {
+			long index = Blockchain.getInstance().getIndex();
+			if (getIndex() != index + 1) {
+				throw new ResetMiningException("Blockchain index is stale");
+			}
+			if(nonce % 10000 == 0) {
+				//logger.info("nonce= {}, target={}", nonce, getTarget().toString(2));
+				//BigInteger hash = new BigInteger(CryptoUtil.getBinaryRepresentation(getBlockHash()));
+				//logger.info("hash= {}", hash.toString(2));
+			}
+			nonce++;
+			if(nonce == Integer.MAX_VALUE) {
+				nonce = 0;
+				timeStamp++;
+			}
+			sign();
+			setBlockHash(calculateHash());
+		} while(!checkProofOfWork());
+		
 	}
 	
 
