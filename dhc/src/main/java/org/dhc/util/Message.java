@@ -111,7 +111,7 @@ public abstract class Message {
 		this.dhcAddress = dhcAddress;
 	}
 
-	public void failedToSend(Peer peer, Exception e) {
+	public void failedToSend(@SuppressWarnings("unused") Peer peer, @SuppressWarnings("unused") Exception e) {
 		
 	}
 
@@ -127,7 +127,7 @@ public abstract class Message {
 		return thin;
 	}
 
-	public void successfullySent(Peer peer) {
+	public void successfullySent(@SuppressWarnings("unused") Peer peer) {
 		
 		
 	}

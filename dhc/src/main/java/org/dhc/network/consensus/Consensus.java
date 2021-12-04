@@ -509,6 +509,7 @@ public class Consensus {
 		return true;
 	}
 	
+	@SuppressWarnings("unused")
 	public void processPropose(BucketHash bucketHash, boolean noReply, Peer peer, long index) {
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();

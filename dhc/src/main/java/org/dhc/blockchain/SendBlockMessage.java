@@ -18,6 +18,7 @@ public class SendBlockMessage extends Message {
 		this.block = block;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void process(Peer peer) {
 		logger.trace("START SendBlockMessage block {}", block);
