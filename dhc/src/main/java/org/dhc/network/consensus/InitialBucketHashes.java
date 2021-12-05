@@ -33,9 +33,13 @@ public class InitialBucketHashes {
 		logger.info("wait   buckethash={} blockchainIndex={} hashcode={}", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode());
 		long start = System.currentTimeMillis();
 		bucketHash.mine();
-		logger.info("done   buckethash={} blockchainIndex={} hashcode={} {}ms", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), System.currentTimeMillis() - start);
+		logger.info("done   buckethash={} blockchainIndex={} hashcode={} isMined={} {}ms", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), bucketHash.isMined(), System.currentTimeMillis() - start);
 
 		result = findExisting(bucketHash, blockchainIndex);
+		if(result != null && bucketHash.isMined()) {
+			result.setTimestamp(bucketHash.getTimestamp());
+			result.setNonce(bucketHash.getNonce());
+		}
 		return result;
 	}
 	
@@ -75,8 +79,14 @@ public class InitialBucketHashes {
 		if(foundBucketHash == null) {
 			return;
 		}
+		foundBucketHash.setTimestamp(bucketHash.getTimestamp());
+		foundBucketHash.setNonce(bucketHash.getNonce());
 		foundBucketHash.stopMining();
-		logger.info("notify buckethash={} blockchainIndex={} hashcode={}", foundBucketHash.getKeyHash(), blockchainIndex, foundBucketHash.getRealHashCode());
+		logger.info("notify buckethash={} blockchainIndex={} hashcode={} bucketHash.isMined={}", 
+				foundBucketHash.getKeyHash(), blockchainIndex, foundBucketHash.getRealHashCode(), bucketHash.isMined());
+		if(!bucketHash.isMined()) {
+			logger.info("", new RuntimeException());
+		}
 	}
 	
 	private synchronized BucketHash get(BucketHash bucketHash, long blockchainIndex) {

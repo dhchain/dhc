@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
@@ -16,12 +15,12 @@ import org.dhc.util.Constants;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Difficulty;
 
 public class BucketHash {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	private static final BigDecimal TWO = new BigDecimal(2);
-	private static final long WAIT_TIME = Constants.SECOND * 10;
 	
 	private BucketKey key;
 	private String hash;
@@ -31,6 +30,9 @@ public class BucketHash {
 	private BigDecimal averagePower = BigDecimal.ZERO;
 	private String previousBlockHash;
 	private Coin fee = Coin.ZERO;
+	private long timestamp = System.currentTimeMillis();
+	private int nonce;
+	private transient volatile boolean stop;
 	
 	public BucketHash() {
 		
@@ -48,6 +50,8 @@ public class BucketHash {
 		clone.averagePower = averagePower;
 		clone.previousBlockHash = previousBlockHash;
 		clone.setFee(getFee());
+		clone.timestamp = timestamp;
+		clone.nonce = nonce;
 
 		return clone;
 	}
@@ -62,6 +66,8 @@ public class BucketHash {
 		clone.averagePower = averagePower;
 		clone.previousBlockHash = previousBlockHash;
 		clone.setFee(getFee());
+		clone.timestamp = timestamp;
+		clone.nonce = nonce;
 
 		return clone;
 	}
@@ -557,18 +563,60 @@ public class BucketHash {
 	public Object getRealHashCode() {
 		return super.hashCode();
 	}
-
-	public synchronized void mine() {
-		long waitTime = ThreadLocalRandom.current().nextLong(1, WAIT_TIME);//Have to start with one because if 0 then the lock will wait forever, if not notified.
-		try {
-			wait(waitTime);
-		} catch (InterruptedException e) {
-			logger.info(e.getMessage(), e);
-		}
+	
+	public long getBits() {
+		return Constants.INITIAL_BITS;
 	}
 
-	public synchronized void stopMining() {
-		notifyAll();
+	public synchronized void mine() {
+		long timestamp = this.timestamp;
+		int nonce = this.nonce;
+		String miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
+		long bits = getBits();
+		if(Difficulty.checkProofOfWork(bits, miningHash)) {
+			return;
+		}
+		do {
+			if(stop) {
+				break;
+			}
+			nonce++;
+			if(nonce == Integer.MAX_VALUE) {
+				nonce = 0;
+				timestamp++;
+			}
+			miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
+		} while(!Difficulty.checkProofOfWork(bits, miningHash));
+		if(!stop) {
+			this.timestamp = timestamp;
+			this.nonce = nonce;
+		}
+	}
+	
+	public boolean isMined() {
+		String miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
+		long bits = getBits();
+		return Difficulty.checkProofOfWork(bits, miningHash);
+	}
+
+	public void stopMining() {
+		stop = true;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public int getNonce() {
+		return nonce;
+	}
+
+	public void setNonce(int nonce) {
+		this.nonce = nonce;
 	}
 
 

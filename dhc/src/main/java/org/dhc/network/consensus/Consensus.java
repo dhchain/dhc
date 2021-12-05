@@ -357,15 +357,6 @@ public class Consensus {
 		return bucketHash;
 	}
 	
-	private void sendBucketHash(BucketHash bucketHash, BucketHash consensus) {
-		//logger.trace("bucketHash {} consensus {}", bucketHash.toStringFull(), consensus.toStringFull());
-		
-		BucketHash nextBucketHash = new BucketHash(bucketHash, consensus);
-
-		network.sendToKey(nextBucketHash.getBinaryStringKey(), new SendBucketHashMessage(nextBucketHash, blockchainIndex));
-		//logger.trace("SendBucketHashMessage \"{}\"-{}", nextBucketHash.getKey(), nextBucketHash.getHash());
-	}
-	
 	private void sendNextProposal(BucketHash bucketHash) {
 		
 		if("".equals(bucketHash.getBinaryStringKey())) {
@@ -408,7 +399,7 @@ public class Consensus {
 			return;
 		}
 		
-		sendBucketHash(consensusHash, bucketHash);
+		network.sendToKey(parentBucketHash.getBinaryStringKey(), new SendBucketHashMessage(parentBucketHash, blockchainIndex));
 		
 		int i = bucketHash.getBinaryStringKey().length() - 1;
 		put(parentBucketHash);
