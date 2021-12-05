@@ -13,7 +13,6 @@ import org.dhc.network.consensus.BucketHash;
 import org.dhc.network.consensus.ResetMiningException;
 import org.dhc.persistence.BlockStore;
 import org.dhc.util.Base58;
-import org.dhc.util.Constants;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
@@ -35,7 +34,7 @@ public class Block {
 	private String consensus;
 	private long timeStamp;
 	private int nonce;
-	private long bits = Constants.INITIAL_BITS;
+	private long bits = Difficulty.INITIAL_BITS;
 	
 	public void prune() {
 		bucketHashes = null;

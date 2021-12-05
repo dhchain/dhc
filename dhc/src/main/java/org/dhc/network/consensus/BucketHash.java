@@ -11,7 +11,6 @@ import org.dhc.blockchain.Transaction;
 import org.dhc.network.BucketKey;
 import org.dhc.network.Network;
 import org.dhc.util.Coin;
-import org.dhc.util.Constants;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
@@ -565,7 +564,8 @@ public class BucketHash {
 	}
 	
 	public long getBits() {
-		return Constants.INITIAL_BITS;
+		long bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(Difficulty.INITIAL_BITS) / Math.pow(2, getPower()));
+		return bits;
 	}
 
 	public synchronized void mine() {

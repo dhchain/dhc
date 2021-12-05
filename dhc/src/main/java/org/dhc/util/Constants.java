@@ -19,7 +19,6 @@ public class Constants {
 	public static String DATABASE;
 	public static PublicKey PUBLIC_KEY = getPublicKey();
 	public static final boolean showSum = configurator.getBooleanProperty("org.dhc.util.Constants.showSum");
-	public static final long INITIAL_BITS = 0x6300ffff;
 	
 	private static PublicKey getPublicKey() {
 		try {
