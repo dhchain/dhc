@@ -24,7 +24,15 @@ public class InitialBucketHashes {
 		if(result != null) {
 			return result;
 		}
-		put(bucketHash, blockchainIndex);
+		synchronized(this) {
+			BucketHash alreadyWatingBucketHash = get(bucketHash, blockchainIndex);
+			if(alreadyWatingBucketHash != null) {
+				bucketHash = alreadyWatingBucketHash;
+			} else {
+				put(bucketHash, blockchainIndex);
+			}
+		}
+		
 		synchronized (bucketHash) {
 			try {
 				long waitTime = ThreadLocalRandom.current().nextLong(1, WAIT_TIME);//Have to start with one because if 0 then the lock will wait forever, if not notified.
@@ -71,18 +79,18 @@ public class InitialBucketHashes {
 		return result;
 	}
 	
-	public void notifyForBucketHash(BucketHash bucketHash, long blockchainIndex) {
+	public synchronized void notifyForBucketHash(BucketHash bucketHash, long blockchainIndex) {
 		BucketHash foundBucketHash = get(bucketHash, blockchainIndex);
 		if(foundBucketHash == null) {
 			return;
 		}
 		synchronized (foundBucketHash) {
-			foundBucketHash.notify();
+			foundBucketHash.notifyAll();
 			logger.info("notify buckethash={} blockchainIndex={} hashcode={}", foundBucketHash.getKeyHash(), blockchainIndex, foundBucketHash.getRealHashCode());
 		}
 	}
 	
-	private BucketHash get(BucketHash bucketHash, long blockchainIndex) {
+	private synchronized BucketHash get(BucketHash bucketHash, long blockchainIndex) {
 		Map<String, Map<String, Map<String, BucketHash>>> mapByIndex = bucketHashes.get(blockchainIndex);
 		if(mapByIndex == null) {
 			return null;
@@ -99,7 +107,7 @@ public class InitialBucketHashes {
 		return result;
 	}
 	
-	private void put(BucketHash bucketHash, long blockchainIndex) {
+	private synchronized void put(BucketHash bucketHash, long blockchainIndex) {
 		Map<String, Map<String, Map<String, BucketHash>>> mapByIndex = bucketHashes.get(blockchainIndex);
 		if(mapByIndex == null) {
 			mapByIndex = new HashMap<>();
