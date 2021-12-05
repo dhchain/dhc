@@ -5,16 +5,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
-import org.dhc.util.Constants;
-import org.dhc.util.Registry;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Registry;
 
 public class InitialBucketHashes {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
-	private static final long WAIT_TIME = Constants.SECOND * 10;
 	
 	// Multi key map to store BucketHash by index, previousBlockHash, key, hash
 	private Map<Long, Map<String, Map<String, Map<String, BucketHash>>>> bucketHashes =  new LinkedHashMap<>();
@@ -32,18 +29,12 @@ public class InitialBucketHashes {
 				put(bucketHash, blockchainIndex);
 			}
 		}
-		
-		synchronized (bucketHash) {
-			try {
-				long waitTime = ThreadLocalRandom.current().nextLong(1, WAIT_TIME);//Have to start with one because if 0 then the lock will wait forever, if not notified.
-				logger.info("wait   buckethash={} blockchainIndex={} hashcode={}", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode());
-				long start = System.currentTimeMillis();
-				bucketHash.wait(waitTime);
-				logger.info("done   buckethash={} blockchainIndex={} hashcode={} {}ms", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), System.currentTimeMillis() - start);
-			} catch (InterruptedException e) {
-				logger.info(e.getMessage(), e);
-			}
-		}
+
+		logger.info("wait   buckethash={} blockchainIndex={} hashcode={}", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode());
+		long start = System.currentTimeMillis();
+		bucketHash.mine();
+		logger.info("done   buckethash={} blockchainIndex={} hashcode={} {}ms", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), System.currentTimeMillis() - start);
+
 		result = findExisting(bucketHash, blockchainIndex);
 		return result;
 	}
@@ -84,10 +75,8 @@ public class InitialBucketHashes {
 		if(foundBucketHash == null) {
 			return;
 		}
-		synchronized (foundBucketHash) {
-			foundBucketHash.notifyAll();
-			logger.info("notify buckethash={} blockchainIndex={} hashcode={}", foundBucketHash.getKeyHash(), blockchainIndex, foundBucketHash.getRealHashCode());
-		}
+		foundBucketHash.stopMining();
+		logger.info("notify buckethash={} blockchainIndex={} hashcode={}", foundBucketHash.getKeyHash(), blockchainIndex, foundBucketHash.getRealHashCode());
 	}
 	
 	private synchronized BucketHash get(BucketHash bucketHash, long blockchainIndex) {

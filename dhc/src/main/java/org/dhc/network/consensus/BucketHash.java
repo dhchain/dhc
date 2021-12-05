@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
@@ -11,6 +12,7 @@ import org.dhc.blockchain.Transaction;
 import org.dhc.network.BucketKey;
 import org.dhc.network.Network;
 import org.dhc.util.Coin;
+import org.dhc.util.Constants;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
@@ -19,6 +21,7 @@ public class BucketHash {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	private static final BigDecimal TWO = new BigDecimal(2);
+	private static final long WAIT_TIME = Constants.SECOND * 10;
 	
 	private BucketKey key;
 	private String hash;
@@ -553,6 +556,19 @@ public class BucketHash {
 
 	public Object getRealHashCode() {
 		return super.hashCode();
+	}
+
+	public synchronized void mine() {
+		long waitTime = ThreadLocalRandom.current().nextLong(1, WAIT_TIME);//Have to start with one because if 0 then the lock will wait forever, if not notified.
+		try {
+			wait(waitTime);
+		} catch (InterruptedException e) {
+			logger.info(e.getMessage(), e);
+		}
+	}
+
+	public synchronized void stopMining() {
+		notifyAll();
 	}
 
 
