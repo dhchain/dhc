@@ -551,5 +551,9 @@ public class BucketHash {
 		return true;
 	}
 
+	public Object getRealHashCode() {
+		return super.hashCode();
+	}
+
 
 }

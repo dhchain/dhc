@@ -117,21 +117,23 @@ public class Blockchain {
 			BucketHashes bucketHashes = new BucketHashes();
 			bucketHashes.put(buckethash);
 			block.setBucketHashes(bucketHashes);
-			//block.setBlockHash(CryptoUtil.getHashBase58Encoded(""));
-			//block.setTimeStamp(System.currentTimeMillis());
-			//block.mine();
-			
-			block.setBlockHash("11A59vNZGamUSwe13bkTpK9Skswt1EJvxqPnb6Qf8Ls");
-			block.setTimeStamp(1638606848147L);
-			block.setNonce(189019);
 			
 			// comment out START
-			    //block.sign();
-//				logger.info("block signature={}", block.getMinerSignature());
-//				logger.info("block signature valid={}", block.verifySignature());
-//				logger.info("nonce={}, timestamp={}", block.getNonce(), block.getTimeStamp());
+				//block.setBlockHash(CryptoUtil.getHashBase58Encoded(""));
+				//block.setTimeStamp(System.currentTimeMillis());
+				//block.mine();
 			// comment out END
-			block.setMinerSignature("AN1rKqqudEBmgLs8F7E3maX2suottRgMuDTQMtZ4agXgfdyde2Vx8uKA2PTBjiZ554YZjr9PFXTLXAQrKiT3BDBQVLU1SukAa");
+			
+			block.setBlockHash("11237YewcAGzRzVPXRoCpaRqRCeeP6cN4XTTHrBaCkL");
+			block.setTimeStamp(1638712239108L);
+			block.setNonce(262805);
+			
+			// comment out START
+				//logger.info("block signature={}", block.getMinerSignature());
+				//logger.info("block signature valid={}", block.verifySignature());
+				//logger.info("nonce={}, timestamp={}", block.getNonce(), block.getTimeStamp());
+			// comment out END
+			block.setMinerSignature("381yXYx5nquSWY8sNdDSKGo7Xp3cpCRHrsywFeMqQLyAbSLrdnbpbQK3G4nL1xMQr6jGTvZfHZ4QrD1AkukfVDfyyv5S3uqo");
 			block.setBlockHash();
 			buckethash.setPreviousBlockHash(block.getPreviousHash());
 			

@@ -88,18 +88,6 @@ public class Consensus {
 		nextConsensuses = new BucketHashesMap(dhcAddress);
 		blockchainIndex = blockchain.getIndex();
 	}
-
-	
-	private void sendInitialBucketHash(BucketHash bucketHash) {
-		network.sendToAllMyPeers(new SendBucketHashMessage(bucketHash, blockchainIndex));
-		
-		BucketHash otherBucketHash = consensuses.get(bucketHash.getKey().getOtherBucketKey().getKey(), bucketHash.getPreviousBlockHash());
-		if(otherBucketHash != null) {
-			logger.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-			logger.info("otherBucketHash={}",otherBucketHash.toStringFull());
-			sendNextProposal(otherBucketHash);
-		}
-	}
 	
 	private void initiate() {
 
@@ -181,7 +169,7 @@ public class Consensus {
 			message.setReply(true);
 			network.sendToAllPeersInBucket(power - 1, message);
 		}
-		sendInitialBucketHash(bucketHash);
+		network.sendToAllMyPeers(new SendBucketHashMessage(bucketHash, blockchainIndex));
 	}
 	
 	private void notifyConsensusReady() {

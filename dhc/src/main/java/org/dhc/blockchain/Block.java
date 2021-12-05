@@ -636,9 +636,11 @@ public class Block {
 
 	public void mine() {
 		do {
-			long index = Blockchain.getInstance().getIndex();
-			if (getIndex() != index + 1) {
-				throw new ResetMiningException("Blockchain index is stale");
+			if(!isGenesis()) {
+				long index = Blockchain.getInstance().getIndex();
+				if (getIndex() != index + 1) {
+					throw new ResetMiningException("Blockchain index is stale");
+				}
 			}
 			nonce++;
 			if(nonce == Integer.MAX_VALUE) {

@@ -28,7 +28,10 @@ public class InitialBucketHashes {
 		synchronized (bucketHash) {
 			try {
 				long waitTime = ThreadLocalRandom.current().nextLong(1, WAIT_TIME);//Have to start with one because if 0 then the lock will wait forever, if not notified.
+				logger.info("wait   buckethash={} blockchainIndex={} hashcode={}", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode());
+				long start = System.currentTimeMillis();
 				bucketHash.wait(waitTime);
+				logger.info("done   buckethash={} blockchainIndex={} hashcode={} {}ms", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), System.currentTimeMillis() - start);
 			} catch (InterruptedException e) {
 				logger.info(e.getMessage(), e);
 			}
@@ -75,6 +78,7 @@ public class InitialBucketHashes {
 		}
 		synchronized (foundBucketHash) {
 			foundBucketHash.notify();
+			logger.info("notify buckethash={} blockchainIndex={} hashcode={}", foundBucketHash.getKeyHash(), blockchainIndex, foundBucketHash.getRealHashCode());
 		}
 	}
 	
