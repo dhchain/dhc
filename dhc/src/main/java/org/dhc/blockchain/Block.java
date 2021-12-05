@@ -1,6 +1,5 @@
 package org.dhc.blockchain;
 
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -18,6 +17,7 @@ import org.dhc.util.Constants;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Difficulty;
 import org.dhc.util.Wallet;
 
 public class Block {
@@ -136,7 +136,7 @@ public class Block {
 					+ " hash=" + blockHash + " previous="
 					+ previousHash + " miner=" + getDhcAddress() + " " + hashes
 					+ ", fee=" + (hashes == null ? "": hashes.getFirstBucketHash().getFee().toNumberOfCoins())
-					+ ", nonce=" + nonce + ", difficulty=" + getDifficulty();
+					+ ", nonce=" + nonce + ", difficulty=" + Difficulty.getDifficulty(getBits());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return e.getMessage();
@@ -633,58 +633,12 @@ public class Block {
 	public void setBits(long bits) {
 		this.bits = bits;
 	}
-	
-	public BigInteger getTarget() {
-		String hex = Long.toString(getBits(), 16);
-		//logger.info("hex={}", hex);
-		int size = Integer.parseInt(hex.substring(0, 2), 16);
-		//logger.info("size={} {}", size, hex.substring(0, 2));
-		//logger.info("size= {}, {} {} {}", size, hex.substring(0, 2), hex.substring(2), hex);
-		BigInteger word = new BigInteger(hex.substring(2), 16);
-		BigInteger result = word.multiply(new BigInteger("2").pow(8 * (size-3)));
-		return result;
-	}
-	
-	public long convertDifficultyToBits(double difficulty) { 
-		long word;
-		int shiftBytes;
-	    for (shiftBytes = 1; true; shiftBytes++) {
-	        word = (long) ((0x00ffff * Math.pow(0x100, shiftBytes)) / difficulty);
-	        if (word >= 0xffff) break;
-	    }
-
-	    word &= 0xffffff;
-	    int size = 0x1d - shiftBytes;
-
-	    if ((word & 0x800000) != 0) {
-	        word >>= 8;
-	        size++;
-	    }
-	    long bits = (size << 24) | word;
-	    return bits;
-	}
-	
-	public boolean checkProofOfWork() {
-		BigInteger hash = new BigInteger(CryptoUtil.getBinaryRepresentation(getBlockHash()));
-		return getTarget().compareTo(hash) >= 0;
-	}
-	
-	public double getDifficulty() {
-		int exponent_diff  = (int)(8 * (0x1D - ((getBits() >> 24) & 0xFF)));
-		double significand = getBits() & 0xFFFFFF; 
-		return Math.scalb(0x00FFFF / significand, exponent_diff);
-	}
 
 	public void mine() {
 		do {
 			long index = Blockchain.getInstance().getIndex();
 			if (getIndex() != index + 1) {
 				throw new ResetMiningException("Blockchain index is stale");
-			}
-			if(nonce % 10000 == 0) {
-				//logger.info("nonce= {}, target={}", nonce, getTarget().toString(2));
-				//BigInteger hash = new BigInteger(CryptoUtil.getBinaryRepresentation(getBlockHash()));
-				//logger.info("hash= {}", hash.toString(2));
 			}
 			nonce++;
 			if(nonce == Integer.MAX_VALUE) {
@@ -693,7 +647,7 @@ public class Block {
 			}
 			sign();
 			setBlockHash(calculateHash());
-		} while(!checkProofOfWork());
+		} while(!Difficulty.checkProofOfWork(getBits(), getBlockHash()));
 		
 	}
 	
