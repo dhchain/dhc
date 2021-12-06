@@ -568,7 +568,7 @@ public class BucketHash {
 		return bits;
 	}
 
-	public synchronized void mine() {
+	public synchronized void mine(long blockchainIndex) {
 		long timestamp = this.timestamp;
 		int nonce = this.nonce;
 		String miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
@@ -578,6 +578,10 @@ public class BucketHash {
 		}
 		do {
 			if(stop) {
+				break;
+			}
+			long index = Blockchain.getInstance().getIndex();
+			if(blockchainIndex < index) {
 				break;
 			}
 			nonce++;

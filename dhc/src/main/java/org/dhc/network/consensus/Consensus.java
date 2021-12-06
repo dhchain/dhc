@@ -374,7 +374,15 @@ public class Consensus {
 		BucketHash parentBucketHash = new BucketHash(consensusHash, bucketHash);
 		
 		logger.trace("sendNextProposal parentBucketHash {}", parentBucketHash.toStringFull());
+/*		logger.info("sendNextProposal parentBucketHash={} blockchainIndex={} hashcode={} parentBucketHash.isMined={}", 
+				parentBucketHash.getKeyHash(), blockchainIndex, parentBucketHash.getRealHashCode(), parentBucketHash.isMined());*/
 		BucketHash earlierBucketHash = findEarlierBuckethashWithTheSameKey(parentBucketHash);
+/*		if(earlierBucketHash != null) {
+			logger.info("sendNextProposal earlierBucketHash={} blockchainIndex={} hashcode={} earlierBucketHash.isMined={}", 
+					earlierBucketHash.getKeyHash(), blockchainIndex, earlierBucketHash.getRealHashCode(), earlierBucketHash.isMined());
+		} else {
+			logger.info("findEarlierBuckethashWithTheSameKey returned null for parentBucketHash.getRealHashCode()={}", parentBucketHash.getRealHashCode());
+		}*/
 		if(earlierBucketHash != null && earlierBucketHash.hasBothChildren()) {
 			if(earlierBucketHash.hasChild(consensusHash)) {
 				logger.trace("sendNextProposal replace with earlier {}", earlierBucketHash.toStringFull());
@@ -573,7 +581,7 @@ public class Consensus {
 
 	private void waitForConsensusReady() {
 		try {
-			long waitTime = Constants.SECOND * 60;
+			long waitTime = Constants.MINUTE * 5;
 			logger.trace("Consensus before consensusReadyCondition.await.");
 			boolean waitExpired = false;
 			lock.lock();
