@@ -36,7 +36,7 @@ public class InitialBucketHashes {
 		long start = System.currentTimeMillis();
 		bucketHash.mine(blockchainIndex);
 		
-		if(!bucketHash.isMined()) {
+		if(!bucketHash.isMined() && blockchainIndex == Blockchain.getInstance().getIndex()) {
 			logger.info("done   buckethash={} blockchainIndex={} hashcode={} isMined={} {}ms", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), bucketHash.isMined(), System.currentTimeMillis() - start);
 			logger.info("", new RuntimeException());
 		}
