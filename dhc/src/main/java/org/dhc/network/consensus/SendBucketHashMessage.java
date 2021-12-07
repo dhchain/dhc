@@ -38,6 +38,12 @@ public class SendBucketHashMessage extends Message {
 		if(!bucketHash.isBranchValid()) {
 			return;
 		}
+		if(!bucketHash.isMined()) {
+			logger.trace(
+					"Not mined bucketHash.getKeyHash()={} index={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
+					bucketHash.getKeyHash(), index, bucketHash.getRealHashCode(), bucketHash.isMined());
+			return;
+		}
 		logger.trace("Received SendBucketHashMessage bucketHash {} {}", index, bucketHash.toStringFull());
 		
 		if(bucketHash.hasOnlyOneChild()) {

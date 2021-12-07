@@ -97,7 +97,7 @@ public class InitialBucketHashes {
 			foundBucketHash.setNonce(bucketHash.getNonce());
 			foundBucketHash.stopMining();
 		}
-		if (!bucketHash.isMined() && Blockchain.getInstance().getIndex() == blockchainIndex) {
+/*		if (!bucketHash.isMined() && Blockchain.getInstance().getIndex() == blockchainIndex) {
 			logger.info(
 					"notify bucketHash.getKeyHash()={} blockchainIndex={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
 					bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), bucketHash.isMined());
@@ -106,7 +106,7 @@ public class InitialBucketHashes {
 					foundBucketHash.getKeyHash(), blockchainIndex, foundBucketHash.getRealHashCode(),
 					foundBucketHash.isMined());
 			logger.info("", new RuntimeException());
-		}
+		}*/
 	}
 	
 	private synchronized BucketHash get(BucketHash bucketHash, long blockchainIndex) {
