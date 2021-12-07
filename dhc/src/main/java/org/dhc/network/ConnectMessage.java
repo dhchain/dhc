@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import org.dhc.util.Constants;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
 import org.dhc.util.Message;
@@ -32,6 +33,11 @@ public class ConnectMessage extends Message {
 		if(!list.isEmpty()) {
 			logger.trace("ConnectMessage - Already connected to this peer");
 			throw new DisconnectException("ConnectMessage - Already connected to this peer");
+		}
+		if(Math.abs(System.currentTimeMillis() - getTimestamp()) > Constants.MINUTE * 10) {
+			String str = String.format("ConnectMessage - The difference in time is greater than 10 minutes, disconnecting from peer %s", peer);
+			logger.info(str);
+			throw new DisconnectException(str);
 		}
 		Message message = new ConnectReplyMessage();
 		peer.send(message);

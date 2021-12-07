@@ -3,6 +3,7 @@ package org.dhc.network;
 import java.util.List;
 
 import org.dhc.util.Message;
+import org.dhc.util.Constants;
 import org.dhc.util.DhcLogger;
 
 public class ConnectReplyMessage extends Message {
@@ -24,6 +25,11 @@ public class ConnectReplyMessage extends Message {
 		if(!list.isEmpty()) {
 			logger.trace("ConnectReplyMessage - Already connected to this peer");
 			throw new DisconnectException("ConnectReplyMessage - Already connected to this peer");
+		}
+		if(Math.abs(System.currentTimeMillis() - getTimestamp()) > Constants.MINUTE * 10) {
+			String str = String.format("ConnectReplyMessage - The difference in time is greater than 10 minutes, disconnecting from peer %s", peer);
+			logger.info(str);
+			throw new DisconnectException(str);
 		}
 		logger.trace("ConnectReplyMessage - SUCCESS");
 	}
