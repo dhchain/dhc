@@ -92,21 +92,19 @@ public class InitialBucketHashes {
 			return;
 		}
 
-		if(!foundBucketHash.isMined()) {
-			foundBucketHash.setTimestamp(bucketHash.getTimestamp());
-			foundBucketHash.setNonce(bucketHash.getNonce());
-			foundBucketHash.stopMining();
+		if(foundBucketHash.isMined()) {
+			return;
 		}
-/*		if (!bucketHash.isMined() && Blockchain.getInstance().getIndex() == blockchainIndex) {
-			logger.info(
-					"notify bucketHash.getKeyHash()={} blockchainIndex={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
+		if(!bucketHash.isMined()) {
+			logger.trace(
+					"notify skip bucketHash.getKeyHash()={} blockchainIndex={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
 					bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), bucketHash.isMined());
-			logger.info(
-					"notify foundBucketHash.getKeyHash()={} blockchainIndex={} foundBucketHash.getRealHashCode()={} foundBucketHash.isMined={}",
-					foundBucketHash.getKeyHash(), blockchainIndex, foundBucketHash.getRealHashCode(),
-					foundBucketHash.isMined());
-			logger.info("", new RuntimeException());
-		}*/
+			logger.trace("", new RuntimeException());
+			return;
+		}
+		foundBucketHash.setTimestamp(bucketHash.getTimestamp());
+		foundBucketHash.setNonce(bucketHash.getNonce());
+		foundBucketHash.stopMining();
 	}
 	
 	private synchronized BucketHash get(BucketHash bucketHash, long blockchainIndex) {
