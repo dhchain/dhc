@@ -135,7 +135,7 @@ public class Block {
 					+ " hash=" + blockHash + " previous="
 					+ previousHash + " miner=" + getDhcAddress() + " " + hashes
 					+ ", fee=" + (hashes == null ? "": hashes.getFirstBucketHash().getFee().toNumberOfCoins())
-					+ ", nonce=" + nonce + ", difficulty=" + Difficulty.getDifficulty(getBits());
+					+ ", nonce=" + nonce + ", bits=" + Long.toString(getBits(), 16) + ", isMined=" + isMined();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return e.getMessage();
@@ -648,8 +648,15 @@ public class Block {
 			}
 			sign();
 			setBlockHash(calculateHash());
-		} while(!Difficulty.checkProofOfWork(getBits(), getBlockHash()));
+		} while(!isMined());
 		
+	}
+	
+	public boolean isMined() {
+		if(getBits() == 0 || getBlockHash() == null) {
+			return false;
+		}
+		return Difficulty.checkProofOfWork(getBits(), getBlockHash());
 	}
 	
 
