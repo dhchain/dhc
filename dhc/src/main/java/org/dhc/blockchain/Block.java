@@ -34,7 +34,7 @@ public class Block {
 	private String consensus;
 	private long timeStamp;
 	private int nonce;
-	private long bits = Difficulty.INITIAL_BITS;
+	private long bits;
 	
 	public void prune() {
 		bucketHashes = null;

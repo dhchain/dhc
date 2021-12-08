@@ -24,6 +24,7 @@ import org.dhc.util.Coin;
 import org.dhc.util.Constants;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Difficulty;
 import org.dhc.util.Listeners;
 import org.dhc.util.Registry;
 import org.dhc.util.SharedLock;
@@ -56,6 +57,7 @@ public class Consensus {
 	private InitialBucketHashes initialBucketHashes = new InitialBucketHashes();
 	private ReadyBucketHashes readyConsensuses = new ReadyBucketHashes();
 	private MyAddresses myAddresses = new MyAddresses();
+	private long bits;
 	
 	public static Consensus getInstance() {
 		return instance;
@@ -133,10 +135,13 @@ public class Consensus {
 			// if previous blocks has higher power (smaller shards) then new mining block might contain inputs that were already spent
 			// in shards that not in our blockchain. So we can not mine a block which have wider shard than any previous blocks
 		}
+		
+		bits = Difficulty.getBits();
+		logger.info("bits={}", Long.toString(bits, 16));
 	}
 	
 	private BucketHash findEarlierBuckethashWithTheSameKey(BucketHash bucketHash) {
-		return initialBucketHashes.waitForBucketHash(bucketHash, blockchainIndex);
+		return initialBucketHashes.waitForBucketHash(bucketHash, blockchainIndex, bits);
 	}
 	
 	private void initiatePerLastBlock(Block block, String key) {
@@ -284,6 +289,7 @@ public class Consensus {
 		block.removeCoinbase();
 		block.addTransaction(coinbase);
 		block.setCoinbaseTransactionId(coinbase.getTransactionId());
+		block.setBits(bits);
 
 		if(!block.getBucketHashes().isFeeValid()) {
 			logger.info("Fee is not valid");

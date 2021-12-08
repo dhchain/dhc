@@ -24,6 +24,7 @@ import org.dhc.util.Constants;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
+import org.dhc.util.Difficulty;
 import org.dhc.util.DoubleMap;
 import org.dhc.util.Listeners;
 import org.dhc.util.Registry;
@@ -81,6 +82,7 @@ public class Blockchain {
 		Block block = new Block();
 		block.setIndex(0);
 		block.setMiner(Constants.PUBLIC_KEY);
+		block.setBits(Difficulty.INITIAL_BITS);
 
 		try {
 			
@@ -774,6 +776,38 @@ public class Blockchain {
 		long start = System.currentTimeMillis();
 		try {
 			return tree.getJoinLines(address);
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
+	public long getAverageMiningTime() {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return tree.getAverageMiningTime();
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+	
+	public long getAverageBits() {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return tree.getAverageBits();
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;

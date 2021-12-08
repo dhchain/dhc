@@ -32,6 +32,7 @@ public class BucketHash {
 	private long timestamp = System.currentTimeMillis();
 	private int nonce;
 	private transient volatile boolean stop;
+	private long bits;
 	
 	public BucketHash() {
 		
@@ -51,6 +52,7 @@ public class BucketHash {
 		clone.setFee(getFee());
 		clone.timestamp = timestamp;
 		clone.nonce = nonce;
+		clone.bits = bits;
 
 		return clone;
 	}
@@ -67,6 +69,7 @@ public class BucketHash {
 		clone.setFee(getFee());
 		clone.timestamp = timestamp;
 		clone.nonce = nonce;
+		clone.bits = bits;
 
 		return clone;
 	}
@@ -564,15 +567,14 @@ public class BucketHash {
 	}
 	
 	public long getBits() {
-		long bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(Difficulty.INITIAL_BITS) / Math.pow(2, getPower()));
 		return bits;
 	}
 
-	public synchronized void mine(long blockchainIndex) {
+	public synchronized void mine(long blockchainIndex, long newBits) {
 		long timestamp = this.timestamp;
 		int nonce = this.nonce;
 		String miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
-		long bits = getBits();
+		bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(newBits) / Math.pow(2, getPower()));
 		if(Difficulty.checkProofOfWork(bits, miningHash)) {
 			return;
 		}
@@ -598,8 +600,11 @@ public class BucketHash {
 	}
 	
 	public boolean isMined() {
-		String miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
 		long bits = getBits();
+		if(bits == 0) {
+			return false;
+		}
+		String miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
 		return Difficulty.checkProofOfWork(bits, miningHash);
 	}
 

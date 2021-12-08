@@ -2,6 +2,8 @@ package org.dhc.util;
 
 import java.math.BigInteger;
 
+import org.dhc.blockchain.Blockchain;
+
 public class Difficulty {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
@@ -49,6 +51,18 @@ public class Difficulty {
 		int exponent_diff  = (int)(8 * (SIZE - ((bits >> 24) & 0xFF)));
 		double significand = bits & 0xFFFFFF; 
 		return Math.scalb(0x00FFFF / significand, exponent_diff);
+	}
+	
+	public static long getBits() {
+		Blockchain blockchain = Blockchain.getInstance();
+		if(blockchain.getIndex() == 0) {
+			return INITIAL_BITS;
+		}
+		long time = blockchain.getAverageMiningTime();
+		long averageBits = blockchain.getAverageBits();
+		double averageDificulty = getDifficulty(averageBits);
+		double newDifficulty = averageDificulty / time * Constants.MINUTE;
+		return convertDifficultyToBits(newDifficulty);
 	}
 
 }

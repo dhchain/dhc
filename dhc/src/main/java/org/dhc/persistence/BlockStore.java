@@ -24,6 +24,7 @@ import org.dhc.util.BoundedMap;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.Registry;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Difficulty;
 
 public class BlockStore {
 
@@ -763,6 +764,58 @@ public class BlockStore {
 			logger.error(e.getMessage(), e);
 		}
 
+		return result[0];
+	}
+
+	public long getAverageMiningTime() {
+		long lastIndex = getLastIndex();
+		long firstIndex = Math.max(0, lastIndex - 100);
+		List<Long> timestamps = new ArrayList<Long>();
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select min(timeStamp) timeStamp from block where index in (?, ?) group by index";
+					ps = conn.prepareStatement(sql);
+					int i = 1;
+					ps.setLong(i++, lastIndex);
+					ps.setLong(i++, firstIndex);
+					rs = ps.executeQuery();
+					while (rs.next()) {
+						timestamps.add(rs.getLong("timeStamp"));
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		
+		return Math.abs(timestamps.get(0) - timestamps.get(1)) / (lastIndex - firstIndex);
+	}
+	
+	public long getAverageBits() {
+		long lastIndex = getLastIndex();
+		long firstIndex = Math.max(0, lastIndex - 100);
+		long[] result = new long[1];
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select min(bits) bits from block where index <= ? and index >= ? group by index";
+					ps = conn.prepareStatement(sql);
+					int i = 1;
+					ps.setLong(i++, lastIndex);
+					ps.setLong(i++, firstIndex);
+					rs = ps.executeQuery();
+					double sum = 0;
+					while (rs.next()) {
+						sum = sum + Difficulty.getDifficulty(rs.getLong("bits"));
+					}
+					result[0] = Difficulty.convertDifficultyToBits(sum / (lastIndex - firstIndex));
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		
 		return result[0];
 	}
 

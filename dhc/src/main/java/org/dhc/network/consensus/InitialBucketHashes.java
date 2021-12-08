@@ -17,7 +17,7 @@ public class InitialBucketHashes {
 	// Multi key map to store BucketHash by index, previousBlockHash, key, hash
 	private Map<Long, Map<String, Map<String, Map<String, BucketHash>>>> bucketHashes =  new LinkedHashMap<>();
 	
-	public BucketHash waitForBucketHash(BucketHash bucketHashParameter, long blockchainIndex) {
+	public BucketHash waitForBucketHash(BucketHash bucketHashParameter, long blockchainIndex, long bits) {
 		BucketHash bucketHash = bucketHashParameter;
 		BucketHash result = findExisting(bucketHash, blockchainIndex);
 		if(result != null && result.isMined()) {
@@ -34,7 +34,7 @@ public class InitialBucketHashes {
 
 		//logger.info("wait   buckethash={} blockchainIndex={} hashcode={}", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode());
 		long start = System.currentTimeMillis();
-		bucketHash.mine(blockchainIndex);
+		bucketHash.mine(blockchainIndex, bits);
 		
 		if(!bucketHash.isMined() && blockchainIndex == Blockchain.getInstance().getIndex()) {
 			logger.info("done   buckethash={} blockchainIndex={} hashcode={} isMined={} {}ms", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), bucketHash.isMined(), System.currentTimeMillis() - start);

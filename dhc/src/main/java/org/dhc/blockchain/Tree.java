@@ -553,4 +553,36 @@ public class Tree {
 		}
 	}
 
+	public long getAverageMiningTime() {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return BlockStore.getInstance().getAverageMiningTime();
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+	
+	public long getAverageBits() {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return BlockStore.getInstance().getAverageBits();
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
 }

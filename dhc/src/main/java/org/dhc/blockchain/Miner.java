@@ -47,8 +47,8 @@ public class Miner {
 						}
 						mine();
 					} catch (ResetMiningException e) {
-						logger.trace("\n");
-						logger.trace("{}\n", e.getMessage());
+						logger.info("\n");
+						logger.info("{}\n", e.getMessage());
 					} catch (Throwable e) {
 						logger.error(e.getMessage(), e);
 					}
