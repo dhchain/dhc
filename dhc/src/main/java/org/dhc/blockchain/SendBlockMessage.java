@@ -26,6 +26,12 @@ public class SendBlockMessage extends Message {
 			return;
 		}
 		
+		if(!block.isMined()) {
+			logger.info("*********************************************************");
+			logger.info("Block is not mined {}", block);
+			return;
+		}
+		
 		if(Registry.getInstance().getBannedBlockhashes().contains(block.getBlockHash())) {
 			return;
 		}

@@ -58,6 +58,11 @@ public class SyncReplyMessage extends Message {
 				synchronizer.incNotify(peer, String.format("Block is not valid: %s", block ));
 				return;
 			}
+			if(!block.isMined()) {
+				logger.info("*********************************************************");
+				logger.info("Block is not mined {}", block);
+				return;
+			}
 		}
 
 		synchronizer.unRegister(blockchainIndex);

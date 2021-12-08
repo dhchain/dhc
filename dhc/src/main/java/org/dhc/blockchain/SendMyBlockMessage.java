@@ -29,6 +29,10 @@ public class SendMyBlockMessage extends Message {
 			return;
 		}
 		
+		if(!block.isMined()) {
+			return;
+		}
+		
 		if(Registry.getInstance().getBannedBlockhashes().contains(block.getBlockHash())) {
 			return;
 		}

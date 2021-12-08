@@ -24,6 +24,9 @@ public class MissingBlockReply extends Message {
 
 	@Override
 	public void process(Peer peer) {
+		if(!block.isMined()) {
+			return;
+		}
 		logger.info("MissingBlockReply.process(peer) originDhcAddress={} block key={} {}", originDhcAddress, key, block);
 		if(Registry.getInstance().getBannedBlockhashes().contains(block.getBlockHash())) {
 			return;

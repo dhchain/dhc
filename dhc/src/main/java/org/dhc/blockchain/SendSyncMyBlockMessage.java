@@ -27,6 +27,10 @@ public class SendSyncMyBlockMessage extends Message {
 		if(!block.isMine()) {
 			return;
 		}
+		
+		if(!block.isMined()) {
+			return;
+		}
 
 		Blockchain blockchain = Blockchain.getInstance();
 		
