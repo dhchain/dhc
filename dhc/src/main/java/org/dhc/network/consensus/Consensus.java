@@ -107,8 +107,6 @@ public class Consensus {
 			//logger.trace("unlock");
 		}
 		
-		logger.info("initiate start consensuseHashes={}", consensuses.getBySecondKey("").keySet());
-		
 		if (blockchainIndex != blockchain.getIndex()) {
 			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
@@ -139,7 +137,6 @@ public class Consensus {
 		}
 		
 		bits = Difficulty.getBits();
-		logger.info("bits={}", Long.toString(bits, 16));
 	}
 	
 	private BucketHash findEarlierBuckethashWithTheSameKey(BucketHash bucketHash) {
@@ -180,9 +177,11 @@ public class Consensus {
 	}
 	
 	private void notifyConsensusReady() {
-		if(readyBucketHashes == null && consensuses.getBySecondKey("").isEmpty() && blockchainIndex == blockchain.getIndex()) {
+		
+		if(!isConsensusReady() && blockchainIndex == blockchain.getIndex()) {
 			return;
 		}
+		
 		lock.lock();
 		try {
 			consensusReadyCondition.signal();
@@ -211,7 +210,7 @@ public class Consensus {
 		initiate();
 
 		long start = System.currentTimeMillis();
-		while (readyBucketHashes == null && consensuses.getBySecondKey("").isEmpty()) {
+		while (!isConsensusReady()) {
 			waitForConsensusReady();
 			if (blockchainIndex != blockchain.getIndex()) {
 				throw new BlockchainIndexStaleException("Blockchain index is stale");
@@ -220,6 +219,21 @@ public class Consensus {
 		logger.trace("To get consensus took {} ms.", System.currentTimeMillis() - start);
 		
 		return complete();
+	}
+	
+	private boolean isConsensusReady() {
+		Set<String> set = consensuses.getBySecondKey("").keySet();
+		if(readyBucketHashes == null && set.isEmpty()) {
+			return false;
+		}
+
+		List<String> lastBlockHashes = blockchain.getLastBlockHashes();
+		
+		lastBlockHashes.retainAll(set);
+		if(lastBlockHashes.isEmpty()) {
+			return false;
+		}
+		return true;
 	}
 	
 	private String getEarliestBlockHash() {
@@ -391,15 +405,13 @@ public class Consensus {
 		BucketHash parentBucketHash = new BucketHash(consensusHash, bucketHash);
 		
 		logger.trace("sendNextProposal parentBucketHash {}", parentBucketHash.toStringFull());
-/*		logger.info("sendNextProposal parentBucketHash={} blockchainIndex={} hashcode={} parentBucketHash.isMined={}", 
-				parentBucketHash.getKeyHash(), blockchainIndex, parentBucketHash.getRealHashCode(), parentBucketHash.isMined());*/
+		
+		long localIndex = blockchainIndex;
 		BucketHash earlierBucketHash = findEarlierBuckethashWithTheSameKey(parentBucketHash);
-/*		if(earlierBucketHash != null) {
-			logger.info("sendNextProposal earlierBucketHash={} blockchainIndex={} hashcode={} earlierBucketHash.isMined={}", 
-					earlierBucketHash.getKeyHash(), blockchainIndex, earlierBucketHash.getRealHashCode(), earlierBucketHash.isMined());
-		} else {
-			logger.info("findEarlierBuckethashWithTheSameKey returned null for parentBucketHash.getRealHashCode()={}", parentBucketHash.getRealHashCode());
-		}*/
+		if(localIndex != blockchainIndex) {
+			return;
+		}
+		
 		if(earlierBucketHash != null && earlierBucketHash.hasBothChildren()) {
 			if(earlierBucketHash.hasChild(consensusHash)) {
 				logger.trace("sendNextProposal replace with earlier {}", earlierBucketHash.toStringFull());
@@ -510,6 +522,10 @@ public class Consensus {
 	
 	@SuppressWarnings("unused")
 	public void processPropose(BucketHash bucketHash, boolean noReply, Peer peer, long index) {
+		if(blockchainIndex > index) {
+			logger.trace("blockchainIndex {} > propose index {}", blockchainIndex, index);
+			return;
+		}
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		long start = System.currentTimeMillis();

@@ -32,6 +32,10 @@ public class BucketHashesMap {
 			writeLock.unlock();
 		}
 	}
+	
+	public void clear(String previousHash) {
+		bucketHashesMap.remove(previousHash);
+	}
 
 	public void put(BucketHash bucketHash) {
 		Lock writeLock = readWriteLock.writeLock();
@@ -154,5 +158,7 @@ public class BucketHashesMap {
 		}
 		
 	}
+
+	
 
 }
