@@ -222,8 +222,13 @@ public class Consensus {
 	}
 	
 	private boolean isConsensusReady() {
+		
+		if(readyBucketHashes != null) {
+			return true;
+		}
+		
 		Set<String> set = consensuses.getBySecondKey("").keySet();
-		if(readyBucketHashes == null && set.isEmpty()) {
+		if(set.isEmpty()) {
 			return false;
 		}
 
@@ -693,6 +698,7 @@ public class Consensus {
 	}
 	
 	private void processReadyBucketHashesCallback(BucketHashes bucketHashes, long index) {
+		logger.trace("processReadyBucketHashesCallback START");
 		if (!bucketHashes.isValid()) {
 			return;
 		}
@@ -704,7 +710,7 @@ public class Consensus {
 			if (!recoverFromConsensusCheck(index, bucketHashes.getPreviousBlockHash())) {
 				return;
 			}
-			logger.trace("************ Constructed readyBucketHashes ******************");
+			logger.info("************ Constructed readyBucketHashes ******************");
 			if (bucketHashes.getNumberOfTransactions() == 0 && transactions != null && !transactions.isEmpty()) {
 
 				Block block = blockchain.getByHash(bucketHashes.getPreviousBlockHash());
@@ -720,15 +726,17 @@ public class Consensus {
 				logger.trace("index {}, lastBucketHash {}", index, lastBucketHash.toStringFull());
 			}
 			readyBucketHashes = bucketHashes;
+			logger.info("before call to notifyConsensusReady()");
 			notifyConsensusReady();
 		} finally {
 			writeLock.unlock();
 			long duration = System.currentTimeMillis() - start;
 			if(duration > Constants.SECOND * 10) {
-				logger.info("took {} ms", duration);
+				logger.trace("took {} ms", duration);
 			}
 			//logger.trace("unlock");
 		}
+		logger.trace("processReadyBucketHashesCallback END");
 	}
 	
 	private boolean recoverFromConsensusCheck(long index, String previousBlockHash) {
