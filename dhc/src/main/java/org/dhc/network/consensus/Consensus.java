@@ -107,6 +107,8 @@ public class Consensus {
 			//logger.trace("unlock");
 		}
 		
+		logger.info("initiate start consensuseHashes={}", consensuses.getBySecondKey("").keySet());
+		
 		if (blockchainIndex != blockchain.getIndex()) {
 			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
@@ -205,6 +207,7 @@ public class Consensus {
 	}
 
 	public Block getMiningBlock() {
+		
 		initiate();
 
 		long start = System.currentTimeMillis();
@@ -221,12 +224,20 @@ public class Consensus {
 	
 	private String getEarliestBlockHash() {
 		List<String> lastBlockHashes = blockchain.getLastBlockHashes();
+		
+		if (blockchainIndex != blockchain.getIndex()) {
+			throw new BlockchainIndexStaleException("Blockchain index is stale");
+		}
+		
 		Set<String> set = consensuses.getBySecondKey("").keySet();
 		for(String blockHash: lastBlockHashes) {
 			if(set.contains(blockHash)) {
 				return blockHash;
 			}
 		}
+		logger.info("lastBlockHashes={}", lastBlockHashes);
+		logger.info("consensusHashes={}", set);
+		logger.info("blockchainIndex={}, blockchain.getIndex()={}", blockchainIndex, blockchain.getIndex());
 		throw new ResetMiningException("Consensus state is stale, last blocks hashes do not contain consensus block hashes");
 	}
 	
