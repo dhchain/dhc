@@ -6,15 +6,16 @@ import org.dhc.network.ChainRest;
 import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.PeerSync;
+import org.dhc.network.consensus.BlockchainIndexStaleException;
 import org.dhc.network.consensus.Consensus;
 import org.dhc.network.consensus.ResetMiningException;
-import org.dhc.util.ThreadExecutor;
 import org.dhc.util.BlockEvent;
 import org.dhc.util.Constants;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
 import org.dhc.util.Listeners;
 import org.dhc.util.SharedLock;
+import org.dhc.util.ThreadExecutor;
 
 public class Miner {
 
@@ -46,6 +47,9 @@ public class Miner {
 							continue;
 						}
 						mine();
+					} catch (BlockchainIndexStaleException e) {
+						logger.trace("\n");
+						logger.trace("{}\n", e.getMessage());
 					} catch (ResetMiningException e) {
 						logger.info("\n");
 						logger.info("{}\n", e.getMessage());

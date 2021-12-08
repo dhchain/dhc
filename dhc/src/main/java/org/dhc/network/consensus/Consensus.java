@@ -108,7 +108,7 @@ public class Consensus {
 		}
 		
 		if (blockchainIndex != blockchain.getIndex()) {
-			throw new ResetMiningException("Blockchain index is stale");
+			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
 		
 		
@@ -211,7 +211,7 @@ public class Consensus {
 		while (readyBucketHashes == null && consensuses.getBySecondKey("").isEmpty()) {
 			waitForConsensusReady();
 			if (blockchainIndex != blockchain.getIndex()) {
-				throw new ResetMiningException("Blockchain index is stale");
+				throw new BlockchainIndexStaleException("Blockchain index is stale");
 			}
 		}
 		logger.trace("To get consensus took {} ms.", System.currentTimeMillis() - start);
@@ -307,7 +307,7 @@ public class Consensus {
 		int numberOfConsensuses = Registry.getInstance().getBucketConsensuses().getNumberOfConsensuses(blockchainIndex - 1);
 		
 		if (blockchainIndex != blockchain.getIndex()) {
-			throw new ResetMiningException("Blockchain index is stale");
+			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
 		
 		logger.info("'{}'-{} Ready to mine # peers {} bucketPeers {} myPeers {} pp {} #c {} ap {} {}\n", block.getBucketKey(), block.getIndex(), Peer.getTotalPeerCount(), 
@@ -320,7 +320,7 @@ public class Consensus {
 
 
 		if (blockchainIndex != blockchain.getIndex()) {
-			throw new ResetMiningException("Blockchain index is stale");
+			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
 		
 		Registry.getInstance().getCompactor().addPrunings();
@@ -331,7 +331,7 @@ public class Consensus {
 		
 		if(blockchainIndex != blockchain.getIndex()) {
 			String str = String.format("Blockchain index is stale blockchainIndex=%s, blockchain.getIndex()=%s", blockchainIndex, blockchain.getIndex());
-			throw new ResetMiningException(str);
+			throw new BlockchainIndexStaleException(str);
 		}
 		
 		block.setBlockHash();
@@ -342,7 +342,7 @@ public class Consensus {
 
 		long index = blockchain.getIndex();
 		if (blockchainIndex != index) {
-			throw new ResetMiningException("Blockchain index is stale");
+			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
 
 		try {

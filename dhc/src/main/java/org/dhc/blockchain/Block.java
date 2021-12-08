@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.dhc.network.ChainSync;
+import org.dhc.network.consensus.BlockchainIndexStaleException;
 import org.dhc.network.consensus.BucketHash;
-import org.dhc.network.consensus.ResetMiningException;
 import org.dhc.persistence.BlockStore;
 import org.dhc.util.Base58;
 import org.dhc.util.CryptoUtil;
@@ -638,7 +638,7 @@ public class Block {
 			if(!isGenesis()) {
 				long index = Blockchain.getInstance().getIndex();
 				if (getIndex() != index + 1) {
-					throw new ResetMiningException("Blockchain index is stale");
+					throw new BlockchainIndexStaleException("Blockchain index is stale");
 				}
 			}
 			nonce++;
