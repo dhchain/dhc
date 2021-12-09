@@ -834,17 +834,20 @@ public class Consensus {
 			}
 			BucketHash myBucketHash = new BucketHash(myKey, transactions, bucketHash.getPreviousBlockHash());
 			Registry.getInstance().getBucketConsensuses().put(myBucketHash, blockchainIndex);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(bucketHash, blockchainIndex);
 			replace(myBucketHash);
 
 			otherKey = myBucketHash.getKey().getOtherBucketKey().getKey();
 			otherBucketHash = new BucketHash(otherKey, transactions, bucketHash.getPreviousBlockHash());
 			Registry.getInstance().getBucketConsensuses().put(otherBucketHash, blockchainIndex);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(otherBucketHash, blockchainIndex);
 			replace(otherBucketHash);
 
 			parent = new BucketHash(myBucketHash, otherBucketHash);
 			parent.setTransactions(transactions);
 
 			Registry.getInstance().getBucketConsensuses().put(parent, blockchainIndex);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(parent, blockchainIndex);
 			
 			replace(parent);
 			

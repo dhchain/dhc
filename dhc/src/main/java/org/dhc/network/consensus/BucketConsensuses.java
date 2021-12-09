@@ -386,12 +386,14 @@ public class BucketConsensuses {
 			BucketHash myBucketHash = new BucketHash(myKey, transactions, bucketHash.getPreviousBlockHash());
 			//logger.trace("put myBucketHash={}", myBucketHash.toStringFull());
 			myBucketHash = put(myBucketHash, blockchainIndex);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(myBucketHash, blockchainIndex);
 			network.sendToKey(myBucketHash.getBinaryStringKey(), new SendBucketHashMessage(myBucketHash, blockchainIndex));
 
 			otherKey = myBucketHash.getKey().getOtherBucketKey().getKey();
 			otherBucketHash = new BucketHash(otherKey, transactions, bucketHash.getPreviousBlockHash());
 			//logger.trace("put otherBucketHash={}", otherBucketHash.toStringFull());
 			otherBucketHash = put(otherBucketHash, blockchainIndex);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(otherBucketHash, blockchainIndex);
 			network.sendToKey(otherBucketHash.getBinaryStringKey(), new SendBucketHashMessage(otherBucketHash, blockchainIndex));
 
 			parent = new BucketHash(myBucketHash, otherBucketHash);
@@ -399,6 +401,7 @@ public class BucketConsensuses {
 
 			//logger.trace("put myBucketHash={}", myBucketHash.toStringFull());
 			parent = put(parent, blockchainIndex);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(parent, blockchainIndex);
 			network.sendToKey(parent.getBinaryStringKey(), new SendBucketHashMessage(parent, blockchainIndex));
 
 			myKey = parent.getBinaryStringKey();

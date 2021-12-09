@@ -107,6 +107,14 @@ public class InitialBucketHashes {
 		foundBucketHash.stopMining();
 	}
 	
+	public void notifyForBucketHashFromRecover(BucketHash bucketHash, long blockchainIndex) { // notify without checking if mined
+		BucketHash foundBucketHash = get(bucketHash, blockchainIndex);
+		if(foundBucketHash == null) {
+			return;
+		}
+		foundBucketHash.stopMining();
+	}
+	
 	private synchronized BucketHash get(BucketHash bucketHash, long blockchainIndex) {
 		Map<String, Map<String, Map<String, BucketHash>>> mapByIndex = bucketHashes.get(blockchainIndex);
 		if(mapByIndex == null) {
@@ -148,5 +156,7 @@ public class InitialBucketHashes {
 	public void clear() {
 		bucketHashes.clear();
 	}
+
+	
 
 }
