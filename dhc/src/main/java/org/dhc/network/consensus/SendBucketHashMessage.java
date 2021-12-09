@@ -31,7 +31,7 @@ public class SendBucketHashMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
-		logger.trace("START");
+		logger.trace("{} START SendBucketHashMessage.process() key={}", index, bucketHash.getBinaryStringKey());
 		if(index < Blockchain.getInstance().getIndex()) {
 			return;
 		}
@@ -44,7 +44,7 @@ public class SendBucketHashMessage extends Message {
 					bucketHash.getKeyHash(), index, bucketHash.getRealHashCode(), bucketHash.isMined());
 			return;
 		}
-		logger.trace("Received SendBucketHashMessage bucketHash {} {}", index, bucketHash.toStringFull());
+		logger.trace("{} Received SendBucketHashMessage bucketHash {} {}", bucketHash.toStringFull());
 		
 		if(bucketHash.hasOnlyOneChild()) {
 			logger.info("bucketHash {}", bucketHash.toStringFull());

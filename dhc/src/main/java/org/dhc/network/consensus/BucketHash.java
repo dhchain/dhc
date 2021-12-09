@@ -234,7 +234,7 @@ public class BucketHash {
 						+ ", right: " 
 						+ (right==null? "null": right.getKeyHash())
 								+ ", # transactions: " + (set == null? "null": set.size())
-								+ ", fee: " + getFee().toNumberOfCoins();
+								+ ", fee: " + getFee().toNumberOfCoins() + ", isMined=" + isMined();
 	}
 	
 	public String getKeyHash() {

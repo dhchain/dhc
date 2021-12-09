@@ -30,7 +30,7 @@ public class ProposeMessage extends Message {
 	
 	@Override
 	public void process(Peer peer) {
-		logger.trace("START");
+		logger.trace("{} START ProposeMessage.process() key={}", index, bucketHash.getBinaryStringKey());
 		if(ChainSync.getInstance().isRunning()) {
 			return;
 		}
@@ -39,6 +39,11 @@ public class ProposeMessage extends Message {
 			logger.info("bucketHash {}", bucketHash.toStringFull());
 			logger.info("", new RuntimeException());
 			return;
+		}
+		if(!bucketHash.isMined()) {
+			logger.info(
+					"Not mined bucketHash.getKeyHash()={} index={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
+					bucketHash.getKeyHash(), index, bucketHash.getRealHashCode(), bucketHash.isMined());
 		}
 		
 		
