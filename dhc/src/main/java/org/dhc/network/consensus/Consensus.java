@@ -767,6 +767,7 @@ public class Consensus {
 	}
 	
 	public void processReadyBucketHash(BucketHash bucketHash, long index) {
+		logger.trace("processReadyBucketHash START bucketHash={} index={}", bucketHash.toStringFull(), index);
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		long start = System.currentTimeMillis();
@@ -790,13 +791,16 @@ public class Consensus {
 			//logger.trace("unlock");
 		}
 		recover(bucketHash, index);
+		logger.trace("processReadyBucketHash END bucketHash={} index={}", bucketHash.toStringFull(), index);
 	}
 	
-	private void recover(BucketHash bucketHash, long blockchainIndex) {
+	private void recover(BucketHash bucketHash, long index) {
+		logger.trace("processReadyBucketHash START bucketHash={} index={}", bucketHash.toStringFull(), index);
 
 		Set<Transaction> transactions = bucketHash.getTransactionsIncludingCoinbase();
 		if(transactions == null) {
-			return;
+			//TODO commented out return to see how it will work. Remove this if statement completely after testing
+			//return;
 		}
 		
 		String key = bucketHash.getBinaryStringKey();
@@ -807,8 +811,8 @@ public class Consensus {
 			if(consensuses.get(bucketHash.getPreviousBlockHash(), checkKey) != null) {
 				String myKey = DhcAddress.getMyDhcAddress().getBinary(power);
 				if(myKey.startsWith(checkKey) && !myKey.equals(checkKey)) {
-					logger.trace("Consensus.recover blockchainIndex: {}, bucketHash: {}", blockchainIndex, bucketHash.toStringFull());
-					Registry.getInstance().getBucketConsensuses().recover(bucketHash, blockchainIndex);
+					logger.trace("Consensus.recover blockchainIndex: {}, bucketHash: {}", index, bucketHash.toStringFull());
+					Registry.getInstance().getBucketConsensuses().recover(bucketHash, index);
 				}
 				return;
 			}
@@ -823,7 +827,7 @@ public class Consensus {
 			return; //bucket for key does not strictly contain bucket for myKey
 		}
 		
-		//logger.trace("Consensus.recover {}", bucketHash.toStringFull());
+		logger.trace("Consensus.recover {}", bucketHash.toStringFull());
 		
 		String otherKey = null;
 		BucketHash otherBucketHash =null;
@@ -833,21 +837,23 @@ public class Consensus {
 				return;
 			}
 			BucketHash myBucketHash = new BucketHash(myKey, transactions, bucketHash.getPreviousBlockHash());
-			Registry.getInstance().getBucketConsensuses().put(myBucketHash, blockchainIndex);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(bucketHash, blockchainIndex);
+			Registry.getInstance().getBucketConsensuses().put(myBucketHash, index);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(bucketHash, index);
 			replace(myBucketHash);
 
 			otherKey = myBucketHash.getKey().getOtherBucketKey().getKey();
 			otherBucketHash = new BucketHash(otherKey, transactions, bucketHash.getPreviousBlockHash());
-			Registry.getInstance().getBucketConsensuses().put(otherBucketHash, blockchainIndex);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(otherBucketHash, blockchainIndex);
+			Registry.getInstance().getBucketConsensuses().put(otherBucketHash, index);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(otherBucketHash, index);
 			replace(otherBucketHash);
+			logger.trace("Calling from recover() processPropose otherBucketHash={} index={}", otherBucketHash.toStringFull(), index);
+			processPropose(otherBucketHash, true, null, index);
 
 			parent = new BucketHash(myBucketHash, otherBucketHash);
 			parent.setTransactions(transactions);
 
-			Registry.getInstance().getBucketConsensuses().put(parent, blockchainIndex);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(parent, blockchainIndex);
+			Registry.getInstance().getBucketConsensuses().put(parent, index);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(parent, index);
 			
 			replace(parent);
 			

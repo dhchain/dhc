@@ -61,6 +61,9 @@ public class BucketKey {
 	}
 	
 	public BucketKey getParentKey() {
+		if("".equals(key)) {
+			return this;
+		}
 		BucketKey parent = new BucketKey();
 		String parentKey = key.substring(0, key.length() - 1);
 		parent.setKey(parentKey);
