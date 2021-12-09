@@ -710,7 +710,7 @@ public class Consensus {
 			if (!recoverFromConsensusCheck(index, bucketHashes.getPreviousBlockHash())) {
 				return;
 			}
-			logger.info("************ Constructed readyBucketHashes ******************");
+			logger.trace("************ Constructed readyBucketHashes ******************");
 			if (bucketHashes.getNumberOfTransactions() == 0 && transactions != null && !transactions.isEmpty()) {
 
 				Block block = blockchain.getByHash(bucketHashes.getPreviousBlockHash());
@@ -726,7 +726,6 @@ public class Consensus {
 				logger.trace("index {}, lastBucketHash {}", index, lastBucketHash.toStringFull());
 			}
 			readyBucketHashes = bucketHashes;
-			logger.info("before call to notifyConsensusReady()");
 			notifyConsensusReady();
 		} finally {
 			writeLock.unlock();
