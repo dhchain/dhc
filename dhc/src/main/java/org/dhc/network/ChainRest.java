@@ -137,6 +137,10 @@ public class ChainRest {
 	
 	private void doBlock(Block block) throws Exception {
 		logger.trace("doBlock() block {}", block);
+		if(!Network.getInstance().isConnected()) {
+			logger.info("Network is not connected");
+			return;
+		}
 		if(block.getPower() <= Network.getInstance().getPower()) {
 			return;
 		}

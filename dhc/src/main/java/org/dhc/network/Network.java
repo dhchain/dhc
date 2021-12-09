@@ -237,4 +237,8 @@ public class Network {
 		return Peer.getThinPeers();
 	}
 
+	public boolean isConnected() {
+		return !getMyBucketPeers().isEmpty();
+	}
+
 }
