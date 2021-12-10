@@ -64,8 +64,8 @@ public class Difficulty {
 		double averageDificulty = getDifficulty(averageBits);
 		double newDifficulty = averageDificulty / time * Constants.MINUTE;
 		long bits = convertDifficultyToBits(newDifficulty);
-		//bits = Math.min(INITIAL_BITS, bits); // for block bits cannot be bigger that INITIAL_BITS, 
-		// which would imply there is a minimum difficulty for blocks. For bucketHashes difficulty is fraction of the containing block
+		bits = Math.min(INITIAL_BITS, bits); // for block bits cannot be bigger that INITIAL_BITS, 
+		// which implies there is a minimum difficulty for blocks. For bucketHashes difficulty is fraction of the containing block
 		return bits;
 	}
 
