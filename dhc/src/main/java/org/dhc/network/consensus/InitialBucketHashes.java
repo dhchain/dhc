@@ -18,6 +18,7 @@ public class InitialBucketHashes {
 	private Map<Long, Map<String, Map<String, Map<String, BucketHash>>>> bucketHashes =  new LinkedHashMap<>();
 	
 	public BucketHash waitForBucketHash(BucketHash bucketHashParameter, long blockchainIndex, long bits) {
+		logger.trace("{} waitForBucketHash START buckethash={} hashcode={}", blockchainIndex, bucketHashParameter.getKeyHash(), bucketHashParameter.getRealHashCode());
 		BucketHash bucketHash = bucketHashParameter;
 		BucketHash result = findExisting(bucketHash, blockchainIndex);
 		if(result != null && result.isMined()) {
@@ -32,9 +33,12 @@ public class InitialBucketHashes {
 			}
 		}
 
-		//logger.info("wait   buckethash={} blockchainIndex={} hashcode={}", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode());
 		long start = System.currentTimeMillis();
+		
+		logger.trace("{} waitForBucketHash before mine buckethash={} hashcode={}", blockchainIndex, bucketHashParameter.getKeyHash(), bucketHashParameter.getRealHashCode());
 		bucketHash.mine(blockchainIndex, bits);
+		logger.trace("{} waitForBucketHash after mine buckethash={} hashcode={}", blockchainIndex, bucketHashParameter.getKeyHash(), bucketHashParameter.getRealHashCode());
+
 		
 		if(!bucketHash.isMined() && blockchainIndex == Blockchain.getInstance().getIndex()) {
 			logger.info("done   buckethash={} blockchainIndex={} hashcode={} isMined={} {}ms", bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), bucketHash.isMined(), System.currentTimeMillis() - start);
