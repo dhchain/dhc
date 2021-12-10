@@ -635,6 +635,10 @@ public class Block {
 
 	public void mine() {
 		do {
+/*			if(nonce % 10000 == 0) {
+				logger.info("nonce={}", nonce);
+			}*/
+			
 			if(!isGenesis()) {
 				long index = Blockchain.getInstance().getIndex();
 				if (getIndex() != index + 1) {

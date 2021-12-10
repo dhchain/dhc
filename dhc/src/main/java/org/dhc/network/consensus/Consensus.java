@@ -12,6 +12,7 @@ import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.BucketHashes;
 import org.dhc.blockchain.MissingBlock;
 import org.dhc.blockchain.MyAddresses;
+import org.dhc.blockchain.SendTransactionMessage;
 import org.dhc.blockchain.Transaction;
 import org.dhc.blockchain.TransactionMemoryPool;
 import org.dhc.network.BucketKey;
@@ -361,9 +362,11 @@ public class Consensus {
 		}
 		
 		Registry.getInstance().getCompactor().addPrunings();
-		//createAndSendTransaction(previousBlock);
 		
 		block.setTimeStamp(System.currentTimeMillis());
+		
+		createAndSendTransaction(previousBlock);
+		
 		waitForMiningLock();
 		
 		if(blockchainIndex != blockchain.getIndex()) {
@@ -904,6 +907,25 @@ public class Consensus {
 	
 	public InitialBucketHashes getInitialBucketHashes() {
 		return initialBucketHashes;
+	}
+
+	private void createAndSendTransaction(Block block) {
+
+		try {
+			Coin balance = blockchain.sumByRecipient(DhcAddress.getMyDhcAddress().toString(), block);
+			if(balance.less(Coin.ONE.add(Coin.SATOSHI))) {
+				return;
+			}
+			Transaction transaction = new Transaction();
+			transaction.create(myAddresses.getRandomAddress(), Coin.ONE, Coin.SATOSHI, null, null, block);
+			if (TransactionMemoryPool.getInstance().add(transaction)) {
+				network.sendToAllMyPeers(new SendTransactionMessage(transaction));
+			}
+		} catch (Exception e) {
+			logger.trace(e.getMessage(), e);
+			//System.exit(0);
+		}
+		
 	}
 	
 }

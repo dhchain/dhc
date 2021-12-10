@@ -7,8 +7,8 @@ import org.dhc.blockchain.Blockchain;
 public class Difficulty {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
-	public static final long INITIAL_BITS = 0x6300ffff;
-	public static final int SIZE = 0x70; //Satoshi has 0x1D
+	public static final long INITIAL_BITS = 0x1f00ffff;
+	public static final int SIZE = 0x30; //Satoshi has 0x1D
 	
 	public static BigInteger getTarget(long bits) {
 		String hex = Long.toString(bits, 16);
@@ -19,8 +19,9 @@ public class Difficulty {
 	}
 	
 	public static void main(String[] args) {
-		long bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(Difficulty.INITIAL_BITS) / Math.pow(2, 30));
+		long bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(Difficulty.INITIAL_BITS) / Math.pow(2, 3));
 		logger.info("bits={}", Long.toString(bits, 16));
+		logger.info("target.length()={}", getTarget(bits).toString(2).length());
 	}
 	
 	public static long convertDifficultyToBits(double difficulty) { 
@@ -43,7 +44,7 @@ public class Difficulty {
 	}
 	
 	public static boolean checkProofOfWork(long bits, String hashStr) {
-		BigInteger hash = new BigInteger(CryptoUtil.getBinaryRepresentation(hashStr));
+		BigInteger hash = new BigInteger(CryptoUtil.getBinaryRepresentation(hashStr), 2);
 		return getTarget(bits).compareTo(hash) >= 0;
 	}
 	
@@ -55,14 +56,17 @@ public class Difficulty {
 	
 	public static long getBits() {
 		Blockchain blockchain = Blockchain.getInstance();
-		if(blockchain.getIndex() == 0) {
+		if(blockchain == null || blockchain.getIndex() == 0) {
 			return INITIAL_BITS;
 		}
 		long time = blockchain.getAverageMiningTime();
 		long averageBits = blockchain.getAverageBits();
 		double averageDificulty = getDifficulty(averageBits);
 		double newDifficulty = averageDificulty / time * Constants.MINUTE;
-		return convertDifficultyToBits(newDifficulty);
+		long bits = convertDifficultyToBits(newDifficulty);
+		//bits = Math.min(INITIAL_BITS, bits); // for block bits cannot be bigger that INITIAL_BITS, 
+		// which would imply there is a minimum difficulty for blocks. For bucketHashes difficulty is fraction of the containing block
+		return bits;
 	}
 
 }

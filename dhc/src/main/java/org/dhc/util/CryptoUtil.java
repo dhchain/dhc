@@ -147,6 +147,15 @@ public class CryptoUtil {
 		return str;
 	}
 	
+	public static void main(String[] args) {
+		int length = getHash("dfgdsgfdfsgsdfgdsfgdfgdfsgdfvbnghjelkgobbklffl;;d;e;d,f,mf").length;
+		logger.info("length={}", length);
+		String str = getHashBase58Encoded("dfgdsgfdfsgsdfgdsfgdfgdfsgdfvbnghjelkgobbklffl;;d;e;d,f,mf");
+		String binary = getBinaryRepresentation(str);
+		logger.info("binary={}", binary);
+		logger.info("binary.length()={}", binary.length());
+	}
+	
 	public static String fromBinaryString(String binary) {
 		byte[] bytes = new byte[binary.length() / 8];
 		for (int i = 0; i < binary.length() / 8; i++) {

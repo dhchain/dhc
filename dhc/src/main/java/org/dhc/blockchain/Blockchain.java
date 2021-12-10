@@ -82,7 +82,7 @@ public class Blockchain {
 		Block block = new Block();
 		block.setIndex(0);
 		block.setMiner(Constants.PUBLIC_KEY);
-		block.setBits(Difficulty.INITIAL_BITS);
+		block.setBits(Difficulty.getBits());
 
 		try {
 			
@@ -92,8 +92,36 @@ public class Blockchain {
 			
 			int i = 0;
 			
-			TransactionOutput output = new TransactionOutput(myAddresses.get(i++), new Coin(Long.MAX_VALUE / 2));
+			TransactionOutput output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
 			output.setOutputId("DNiMXMBFXw4vPSSVYsRmKDgFaSvfyT4RGx6yZWwYdbkx");
+			transaction.getOutputs().add(output);
+			
+			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			output.setOutputId("6PYyPvY9LiM8rWVvjiWpc8onVJiA7J6tvuwFBn2e4daj");
+			transaction.getOutputs().add(output);
+			
+			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			output.setOutputId("CUhgqbPNk72BpVEWzqiYPMdf4dK9PKVnbvSgt3au8V98");
+			transaction.getOutputs().add(output);
+			
+			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			output.setOutputId("Av55WA5ed1fixLjVTc1r1JrRE9VaSwaFLbzUEZBwUcFt");
+			transaction.getOutputs().add(output);
+			
+			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			output.setOutputId("EeE7L3nu2iLbtLEPj3XfUDd6QbTkhLrJvBYb93LNjb25");
+			transaction.getOutputs().add(output);
+			
+			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			output.setOutputId("BAg3xhro4XvaeXpG9BbVNVCf5cafqT3McpsiMR4s7GM5");
+			transaction.getOutputs().add(output);
+			
+			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			output.setOutputId("4Y5CqPJ1dyKLSCEwn63hMJSGi6HVfA3bDomDzmqX4qoy");
+			transaction.getOutputs().add(output);
+			
+			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			output.setOutputId("GgcemwSPjrsTyYwR9F8QjsE3tmuDsegMLmRzT9goLhiX");
 			transaction.getOutputs().add(output);
 			
 			transaction.setValue(transaction.getOutputsValue());
@@ -106,7 +134,7 @@ public class Blockchain {
 				transaction.setTransactionId();
 			    logger.info("transaction signature={}", transaction.getSignature());*/
 			// comment out END
-			transaction.setSignature("iKx1CJMqLzqWaCp1SCFFKKDMTkPArUVtrXwdBYcxbX6NCVJEcqEPPysagv8u2ofpaD8XhVfaLokzTJBAYAnMKiEdr2U3rWa667");
+			transaction.setSignature("381yXYxjxWa8x1m1WC2gUtT2AyHykwVQeoMfuAFKiFUTnvZJZAe2RTheFPXDsBhDHtDBLq1hCcX39CwpL89qkGLMmAPciyzC");
 			transaction.setTransactionId();
 
 			logger.info("transaction signature valid={}", transaction.verifySignature());
@@ -121,21 +149,21 @@ public class Blockchain {
 			block.setBucketHashes(bucketHashes);
 			
 			// comment out START
-				//block.setBlockHash(CryptoUtil.getHashBase58Encoded(""));
-				//block.setTimeStamp(System.currentTimeMillis());
-				//block.mine();
+/*				block.setBlockHash(CryptoUtil.getHashBase58Encoded(""));
+				block.setTimeStamp(System.currentTimeMillis());
+				block.mine();*/
 			// comment out END
 			
-			block.setBlockHash("11237YewcAGzRzVPXRoCpaRqRCeeP6cN4XTTHrBaCkL");
-			block.setTimeStamp(1638712239108L);
-			block.setNonce(262805);
+			block.setBlockHash("11XV1g9ZFzAd6HKds7BCsBzqvV12dxNWFWVmn4tMAHe");
+			block.setTimeStamp(1639169236052L);
+			block.setNonce(88960);
 			
 			// comment out START
-				//logger.info("block signature={}", block.getMinerSignature());
-				//logger.info("block signature valid={}", block.verifySignature());
-				//logger.info("nonce={}, timestamp={}", block.getNonce(), block.getTimeStamp());
+/*				logger.info("block signature={}", block.getMinerSignature());
+				logger.info("block signature valid={}", block.verifySignature());
+				logger.info("nonce={}, timestamp={}", block.getNonce(), block.getTimeStamp());*/
 			// comment out END
-			block.setMinerSignature("381yXYx5nquSWY8sNdDSKGo7Xp3cpCRHrsywFeMqQLyAbSLrdnbpbQK3G4nL1xMQr6jGTvZfHZ4QrD1AkukfVDfyyv5S3uqo");
+			block.setMinerSignature("AN1rKvtPitHqWtbjJv28ofrZA52CLACT62KTMWMaZ2VFuwcURLY6cRcSzbChpkZnYW4aUHgz2npAxJqvJarbTsXV6X7sASkxF");
 			block.setBlockHash();
 			buckethash.setPreviousBlockHash(block.getPreviousHash());
 			
