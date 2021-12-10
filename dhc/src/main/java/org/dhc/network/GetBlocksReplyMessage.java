@@ -18,7 +18,7 @@ public class GetBlocksReplyMessage extends Message {
 	}
 
 	public Block getBlock() {
-		if(!block.isMined()) {
+		if(block == null || !block.isMined()) {
 			return null;
 		}
 		return block;
