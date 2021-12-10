@@ -138,8 +138,8 @@ public class CryptoUtil {
 		return null;
 	}
 	
-	public static String getBinaryRepresentation(String dhcAddress) {
-		byte[] bytes = Base58.decode(dhcAddress);
+	public static String getBinaryRepresentation(String base58Str) {
+		byte[] bytes = Base58.decode(base58Str);
 		String str = "";
 		for(byte b: bytes) {
 			str = str + Integer.toBinaryString((b & 0xFF) + 0x100).substring(1);
