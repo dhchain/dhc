@@ -42,8 +42,8 @@ public class ProposeMessage extends Message {
 		}
 		if(!bucketHash.isMined()) {
 			logger.trace(
-					"Not mined bucketHash.getKeyHash()={} index={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
-					bucketHash.getKeyHash(), index, bucketHash.getRealHashCode(), bucketHash.isMined());
+					"{} {} process() Not mined bucketHash.getKeyHash()={} bucketHash.isMined={}", index, bucketHash.getRealHashCode(),
+					bucketHash.getKeyHash(), bucketHash.isMined());
 			return;
 		}
 		

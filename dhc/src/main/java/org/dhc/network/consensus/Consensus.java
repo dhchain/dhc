@@ -173,7 +173,14 @@ public class Consensus {
 			message.setReply(true);
 			network.sendToAllPeersInBucket(power - 1, message);
 		}
-		network.sendToAllMyPeers(new SendBucketHashMessage(bucketHash, blockchainIndex));
+		
+		if(bucketHash.isMined()) {
+			network.sendToKey(bucketHash.getBinaryStringKey(), new SendBucketHashMessage(bucketHash, blockchainIndex));
+		} else {
+			logger.trace("{} {} recover() Not mined bucketHash.getKeyHash()={} bucketHash.isMined={}", blockchainIndex, bucketHash.getRealHashCode(), 
+					bucketHash.getKeyHash(), bucketHash.isMined());
+		}
+		
 	}
 	
 	private void notifyConsensusReady() {
@@ -185,7 +192,7 @@ public class Consensus {
 		lock.lock();
 		try {
 			consensusReadyCondition.signal();
-			logger.trace("Consensus after consensusReadyCondition.signal.");
+			logger.trace("{} Consensus after consensusReadyCondition.signal.", blockchainIndex);
 		} finally {
 			lock.unlock();
 		}
@@ -422,7 +429,7 @@ public class Consensus {
 				logger.trace("sendNextProposal replace with earlier {}", earlierBucketHash.toStringFull());
 				parentBucketHash = earlierBucketHash;
 				bucketHash = parentBucketHash.getOtherChild(consensusHash);
-				replace(bucketHash);
+				bucketHash = replace(bucketHash);
 			} else {
 				//logger.info("consensusHash {}", consensusHash.toStringFull());
 				//logger.info("earlierBucketHash {}", earlierBucketHash.toStringFull());
@@ -441,7 +448,12 @@ public class Consensus {
 			return;
 		}
 		
-		network.sendToKey(parentBucketHash.getBinaryStringKey(), new SendBucketHashMessage(parentBucketHash, blockchainIndex));
+		if(parentBucketHash.isMined()) {
+			network.sendToKey(parentBucketHash.getBinaryStringKey(), new SendBucketHashMessage(parentBucketHash, blockchainIndex));
+		} else {
+			logger.trace("{} {} recover() Not mined parentBucketHash.getKeyHash()={} parentBucketHash.isMined={}", blockchainIndex, parentBucketHash.getRealHashCode(), 
+					parentBucketHash.getKeyHash(), parentBucketHash.isMined());
+		}
 		
 		int i = bucketHash.getBinaryStringKey().length() - 1;
 		put(parentBucketHash);
@@ -589,7 +601,16 @@ public class Consensus {
 			peer.send(message);
 		}
 		if(index == blockchainIndex && readyBucketHashes != null) {
-			peer.send(new SendBucketHashMessage(readyBucketHashes.getBucketHash(""), blockchainIndex));
+			
+			BucketHash buckethash = readyBucketHashes.getBucketHash("");
+
+			if(buckethash.isMined()) {
+				peer.send(new SendBucketHashMessage(buckethash, blockchainIndex));
+			} else {
+				logger.info("{} {} reply() Not mined buckethash.getKeyHash()={} buckethash.isMined={}", blockchainIndex, buckethash.getRealHashCode(), 
+						buckethash.getKeyHash(), buckethash.isMined());
+			}
+			
 		}
 	}
 	
@@ -605,19 +626,18 @@ public class Consensus {
 		}
 	}
 	
-	private void replace(BucketHash bucketHash) {
-		consensuses.replace(bucketHash);
-		if("".equals(bucketHash.getBinaryStringKey())) {
+	private BucketHash replace(BucketHash bucketHash) {
+		BucketHash result = consensuses.replace(bucketHash);
+		if("".equals(bucketHash.getBinaryStringKey()) || !consensuses.getBySecondKey("").isEmpty()) {
 			notifyConsensusReady();
-			return;
 		}
-		if(!consensuses.getBySecondKey("").isEmpty()) {
-			notifyConsensusReady();
-			return;
-		}
+		return result;
 	}
 
 	private void waitForConsensusReady() {
+		if (blockchainIndex != blockchain.getIndex()) {
+			throw new BlockchainIndexStaleException("Blockchain index is stale");
+		}
 		try {
 			long waitTime = Constants.MINUTE * 5;
 			logger.trace("Consensus before consensusReadyCondition.await.");
@@ -798,9 +818,9 @@ public class Consensus {
 		logger.trace("processReadyBucketHash START bucketHash={} index={}", bucketHash.toStringFull(), index);
 
 		Set<Transaction> transactions = bucketHash.getTransactionsIncludingCoinbase();
-		if(transactions == null) {
-			//TODO commented out return to see how it will work. Remove this if statement completely after testing
-			//return;
+		
+		if(transactions == null && !"".equals(bucketHash.getHash())) {
+			return;
 		}
 		
 		String key = bucketHash.getBinaryStringKey();
@@ -838,14 +858,14 @@ public class Consensus {
 			}
 			BucketHash myBucketHash = new BucketHash(myKey, transactions, bucketHash.getPreviousBlockHash());
 			Registry.getInstance().getBucketConsensuses().put(myBucketHash, index);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(bucketHash, index);
-			replace(myBucketHash);
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(myBucketHash, index);
+			myBucketHash = replace(myBucketHash);
 
 			otherKey = myBucketHash.getKey().getOtherBucketKey().getKey();
 			otherBucketHash = new BucketHash(otherKey, transactions, bucketHash.getPreviousBlockHash());
 			Registry.getInstance().getBucketConsensuses().put(otherBucketHash, index);
 			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(otherBucketHash, index);
-			replace(otherBucketHash);
+			otherBucketHash = replace(otherBucketHash);
 			logger.trace("Calling from recover() processPropose otherBucketHash={} index={}", otherBucketHash.toStringFull(), index);
 			processPropose(otherBucketHash, true, null, index);
 

@@ -138,21 +138,21 @@ public class BucketHashesMap {
 		}
 	}
 	
-	public void replace(BucketHash bucketHash) {
+	public BucketHash replace(BucketHash bucketHash) {
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		try {
 			String key = bucketHash.getBinaryStringKey();
 			if(!key.equals(dhcAddress.getBinary(key.length())) && !key.equals(new BucketKey(dhcAddress.getBinary(key.length())).getOtherBucketKey().getKey())) {
 				logger.info("key {} is wrong for dhcAddress {}", key, dhcAddress.getBinary(key.length()));
-				return;
+				return bucketHash;
 			}
 			BucketHashes hashes = bucketHashesMap.get(bucketHash.getPreviousBlockHash());
 			if (hashes == null) {
 				hashes = new BucketHashes();
 				bucketHashesMap.put(bucketHash.getPreviousBlockHash(), hashes);
 			}
-			hashes.replace(bucketHash);
+			return hashes.replace(bucketHash);
 		} finally {
 			writeLock.unlock();
 		}

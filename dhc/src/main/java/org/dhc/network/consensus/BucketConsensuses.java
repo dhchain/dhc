@@ -235,7 +235,7 @@ public class BucketConsensuses {
 		BucketHashes hashes = new BucketHashes();
 		
 		BucketHash bucketHash = consensus;
-		hashes.replace(bucketHash);
+		bucketHash = hashes.replace(bucketHash);
 		//logger.trace("recovered bucketHash={}", bucketHash.toStringFull());
 		
 		while(hashes.size() <= power) {
@@ -261,7 +261,7 @@ public class BucketConsensuses {
 				return null;
 			}
 			
-			hashes.replace(bucketHash);
+			bucketHash = hashes.replace(bucketHash);
 			
 			if(consensus == null) {
 				logger.info("consensus is null");
@@ -287,10 +287,18 @@ public class BucketConsensuses {
 				return null;
 			}
 
-			Network.getInstance().sendToKey(consensus.getBinaryStringKey(), new SendBucketHashMessage(consensus, blockchainIndex));
+			
+			
+			if(consensus.isMined()) {
+				Network.getInstance().sendToKey(consensus.getBinaryStringKey(), new SendBucketHashMessage(consensus, blockchainIndex));
+			} else {
+				logger.trace("{} {} recoverFromConsensus() Not mined consensus.getKeyHash()={} consensus.isMined={}", blockchainIndex, consensus.getRealHashCode(), 
+						consensus.getKeyHash(), consensus.isMined());
+			}
+			
 		}
 
-		hashes.replace(consensus);
+		consensus = hashes.replace(consensus);
 		
 		int difference = hashes.getPower() == 0? 1: 2;
 		if(hashes.getPower() + difference != hashes.size()) {
@@ -369,7 +377,7 @@ public class BucketConsensuses {
 		logger.trace("Trying to recover bucketHash={}", bucketHash.toStringFull());
 		Network network = Network.getInstance();
 		Set<Transaction> transactions = bucketHash.getTransactionsIncludingCoinbase();
-		if(transactions == null) {
+		if(transactions == null && !"".equals(bucketHash.getHash())) {
 			return;
 		}
 
@@ -387,14 +395,30 @@ public class BucketConsensuses {
 			//logger.trace("put myBucketHash={}", myBucketHash.toStringFull());
 			myBucketHash = put(myBucketHash, blockchainIndex);
 			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(myBucketHash, blockchainIndex);
-			network.sendToKey(myBucketHash.getBinaryStringKey(), new SendBucketHashMessage(myBucketHash, blockchainIndex));
+			
+			if(myBucketHash.isMined()) {
+				network.sendToKey(myBucketHash.getBinaryStringKey(), new SendBucketHashMessage(myBucketHash, blockchainIndex));
+			} else {
+				logger.trace("{} {} recover() Not mined myBucketHash.getKeyHash()={} myBucketHash.isMined={}", blockchainIndex, myBucketHash.getRealHashCode(), 
+						myBucketHash.getKeyHash(), myBucketHash.isMined());
+			}
+			
+			
 
 			otherKey = myBucketHash.getKey().getOtherBucketKey().getKey();
 			otherBucketHash = new BucketHash(otherKey, transactions, bucketHash.getPreviousBlockHash());
 			//logger.trace("put otherBucketHash={}", otherBucketHash.toStringFull());
 			otherBucketHash = put(otherBucketHash, blockchainIndex);
 			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(otherBucketHash, blockchainIndex);
-			network.sendToKey(otherBucketHash.getBinaryStringKey(), new SendBucketHashMessage(otherBucketHash, blockchainIndex));
+			
+			if(otherBucketHash.isMined()) {
+				network.sendToKey(otherBucketHash.getBinaryStringKey(), new SendBucketHashMessage(otherBucketHash, blockchainIndex));
+			} else {
+				logger.trace("{} {} recover() Not mined otherBucketHash.getKeyHash()={}  otherBucketHash.isMined={}", blockchainIndex, otherBucketHash.getRealHashCode(), 
+						otherBucketHash.getKeyHash(), otherBucketHash.isMined());
+			}
+			
+			
 
 			parent = new BucketHash(myBucketHash, otherBucketHash);
 			parent.setTransactions(transactions);
@@ -402,7 +426,15 @@ public class BucketConsensuses {
 			//logger.trace("put myBucketHash={}", myBucketHash.toStringFull());
 			parent = put(parent, blockchainIndex);
 			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(parent, blockchainIndex);
-			network.sendToKey(parent.getBinaryStringKey(), new SendBucketHashMessage(parent, blockchainIndex));
+			
+			if(parent.isMined()) {
+				network.sendToKey(parent.getBinaryStringKey(), new SendBucketHashMessage(parent, blockchainIndex));
+			} else {
+				logger.trace("{} {} recover() Not mined parent.getKeyHash()={} parent.isMined={}", blockchainIndex, parent.getRealHashCode(), 
+						parent.getKeyHash(), parent.isMined());
+			}
+			
+			
 
 			myKey = parent.getBinaryStringKey();
 		}

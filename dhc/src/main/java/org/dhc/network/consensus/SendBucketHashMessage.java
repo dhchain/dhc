@@ -27,6 +27,12 @@ public class SendBucketHashMessage extends Message {
 			logger.info("bucketHash {}", bucketHash.toStringFull());
 			logger.info("", new RuntimeException());
 		}
+		
+		if(!bucketHash.isMined()) {
+			logger.info("{} init() Not mined bucketHash.getKeyHash()={} index={} bucketHash.getRealHashCode()={} bucketHash.isMined={}", index, 
+					bucketHash.getKeyHash(), bucketHash.getRealHashCode(), bucketHash.isMined());
+			logger.info("", new RuntimeException());
+		}
 	}
 
 	@Override
@@ -39,9 +45,8 @@ public class SendBucketHashMessage extends Message {
 			return;
 		}
 		if(!bucketHash.isMined()) {
-			logger.trace(
-					"Not mined bucketHash.getKeyHash()={} index={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
-					bucketHash.getKeyHash(), index, bucketHash.getRealHashCode(), bucketHash.isMined());
+			logger.info("{} process() Not mined bucketHash.getKeyHash()={} index={} bucketHash.getRealHashCode()={} bucketHash.isMined={}", index, 
+					bucketHash.getKeyHash(), bucketHash.getRealHashCode(), bucketHash.isMined());
 			return;
 		}
 		logger.trace("{} Received SendBucketHashMessage bucketHash {} {}", bucketHash.toStringFull());

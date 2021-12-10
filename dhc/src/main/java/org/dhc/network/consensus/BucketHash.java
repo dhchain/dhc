@@ -571,11 +571,13 @@ public class BucketHash {
 	}
 
 	public synchronized void mine(long blockchainIndex, long newBits) {
+		logger.trace("{} {} \t mine START buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
 		long timestamp = this.timestamp;
 		int nonce = this.nonce;
 		String miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
 		bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(newBits) / Math.pow(2, getPower()));
 		if(Difficulty.checkProofOfWork(bits, miningHash)) {
+			logger.trace("{} {} \t mine END   buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
 			return;
 		}
 		do {
@@ -597,6 +599,7 @@ public class BucketHash {
 			this.timestamp = timestamp;
 			this.nonce = nonce;
 		}
+		logger.trace("{} {} \t mine END   buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
 	}
 	
 	public boolean isMined() {

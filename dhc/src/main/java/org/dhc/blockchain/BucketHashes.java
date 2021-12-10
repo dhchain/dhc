@@ -196,10 +196,17 @@ public class BucketHashes {
 		bucketHashes.put(key, bucketHash);
 	}
 
-	public void replace(BucketHash bucketHash) {
+	public BucketHash replace(BucketHash bucketHash) {
+		BucketHash original = bucketHashes.get(bucketHash.getBinaryStringKey());
+		if(original != null && original.isMined() && !bucketHash.isMined()) {
+			logger.trace("Not replacing because original is mined but bucketHash is not");
+			logger.trace("original   = {}", original.toStringFull());
+			logger.trace("bucketHash = {}", bucketHash.toStringFull());
+			return original;
+		}
 		validateChildren(bucketHash);
 		validateParent(bucketHash);
-		BucketHash original = bucketHashes.put(bucketHash.getBinaryStringKey(), bucketHash);
+		bucketHashes.put(bucketHash.getBinaryStringKey(), bucketHash);
 		if(original == null) {
 			logger.trace("BucketHashes.put() {} {}", bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
 		} else {
@@ -207,7 +214,7 @@ public class BucketHashes {
 			logger.trace("BucketHashes.replace() {} {}", original.getPreviousBlockHash(), original.toStringFull());
 			logger.trace("with {} {}", bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
 		}
-
+		return bucketHash;
 	}
 	
 	private void validateParent(BucketHash bucketHash) {
