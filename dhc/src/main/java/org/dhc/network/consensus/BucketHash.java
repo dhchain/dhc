@@ -593,7 +593,7 @@ public class BucketHash {
 				nonce = 0;
 				timestamp++;
 			}
-			miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
+			miningHash = getMiningHash();
 		} while(!Difficulty.checkProofOfWork(bits, miningHash));
 		if(!stop) {
 			this.timestamp = timestamp;
@@ -607,8 +607,12 @@ public class BucketHash {
 		if(bits == 0) {
 			return false;
 		}
-		String miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);
+		String miningHash = getMiningHash();
 		return Difficulty.checkProofOfWork(bits, miningHash);
+	}
+	
+	private String getMiningHash() {
+		return CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce); //getKeyHash() already contains previous block hash
 	}
 
 	public void stopMining() {
