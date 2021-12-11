@@ -93,7 +93,7 @@ public class Consensus {
 	}
 	
 	private void initiate() {
-
+		logger.trace("{} ********************* initiate() START *************************", blockchainIndex);
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		long start = System.currentTimeMillis();
@@ -118,9 +118,13 @@ public class Consensus {
 		String key = dhcAddress.getBinary(power);
 
 		for (Block block : lastBlocks) {
+
 			initiatePerLastBlock(block, key);
+			
 		}
 		readyConsensuses.process(blockchainIndex);
+		logger.trace("{} ********************* initiate() END *************************", blockchainIndex);
+		
 	}
 	
 	private void init() {
@@ -163,6 +167,7 @@ public class Consensus {
 		}
 		
 		if(getConsensusNoWait(bucketHash.getBinaryStringKey(), block.getBlockHash()) != null) {
+			logger.trace("{} key='{}' ********************* initiatePerLastBlock() END ************************* {}", blockchainIndex, key, block.getBlockHash());
 			return;
 		}
 		put(bucketHash);
@@ -181,6 +186,8 @@ public class Consensus {
 			logger.trace("{} {} recover() Not mined bucketHash.getKeyHash()={} bucketHash.isMined={}", blockchainIndex, bucketHash.getRealHashCode(), 
 					bucketHash.getKeyHash(), bucketHash.isMined());
 		}
+		
+		logger.trace("{} key='{}' ********************* initiatePerLastBlock() END ************************* {}", blockchainIndex, key, block.getBlockHash());
 		
 	}
 	
@@ -638,6 +645,7 @@ public class Consensus {
 	}
 
 	private void waitForConsensusReady() {
+		logger.trace("{} ********************* waitForConsensusReady() START *************************", blockchainIndex);
 		if (blockchainIndex != blockchain.getIndex()) {
 			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}

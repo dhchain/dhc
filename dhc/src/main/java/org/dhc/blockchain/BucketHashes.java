@@ -354,7 +354,16 @@ public class BucketHashes {
 					logger.trace("Added transactions to parent {}", parent.toStringFull());
 				}
 			}
-			Network.getInstance().sendToKey(parent.getBinaryStringKey(), new SendBucketHashMessage(parent, blockchainIndex));
+
+			if(parent.isMined()) {
+				Network.getInstance().sendToKey(parent.getBinaryStringKey(), new SendBucketHashMessage(parent, blockchainIndex));
+			} else {
+				logger.trace("{} {} recover() Not mined parent.getKeyHash()={} parent.isMined={}", blockchainIndex, parent.getRealHashCode(), 
+						parent.getKeyHash(), parent.isMined());
+			}
+			
+			
+			
 			if("".equals(parent.getBinaryStringKey())) {
 				break;
 			}
