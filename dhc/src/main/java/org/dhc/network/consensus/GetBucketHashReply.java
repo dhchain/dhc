@@ -26,7 +26,7 @@ public class GetBucketHashReply extends Message {
 		}
 		ThreadExecutor.getInstance().execute(new DhcRunnable("GetBucketHashReply") {
 			public void doRun() {
-				Registry.getInstance().getBucketConsensuses().put(bucketHash, blockchainIndex);
+				Registry.getInstance().getBucketConsensuses().put(bucketHash, blockchainIndex, false);
 			}
 		});
 		

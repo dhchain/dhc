@@ -94,7 +94,7 @@ public class BucketConsensuses {
 	}
 	
 
-	public synchronized BucketHash put(BucketHash bucketHash, long blockchainIndex) {
+	public synchronized BucketHash put(BucketHash bucketHash, long blockchainIndex, boolean notifyForce) {
 		
 		if(bucketHashes.size() > 10) {
 			bucketHashes.remove(bucketHashes.keySet().iterator().next());
@@ -138,8 +138,12 @@ public class BucketConsensuses {
 		
 		logger.trace("BucketConsensuses.put {} {} bucketHash {}", blockchainIndex, bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
 		mapByKey.put(bucketHash.getHash(), bucketHash);
-
-		Consensus.getInstance().getInitialBucketHashes().notifyForBucketHash(bucketHash, blockchainIndex);
+		
+		if(notifyForce) {
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(bucketHash, blockchainIndex);
+		} else {
+			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHash(bucketHash, blockchainIndex);
+		}
 		return bucketHash;
 	}
 	
@@ -269,9 +273,9 @@ public class BucketConsensuses {
 			}
 			
 			if(consensus.isHashForTransactionsValid()) {
-				put(consensus, blockchainIndex);
+				put(consensus, blockchainIndex, false);
 			} else if(consensus.getPower() < power && consensus.getLeft() != null && consensus.getRight() != null) {
-				put(consensus, blockchainIndex);
+				put(consensus, blockchainIndex, false);
 			}
 			
 			BucketHash originalConsensus = consensus;
@@ -393,8 +397,7 @@ public class BucketConsensuses {
 		while(!key.equals(myKey)) {
 			BucketHash myBucketHash = new BucketHash(myKey, transactions, bucketHash.getPreviousBlockHash());
 			//logger.trace("put myBucketHash={}", myBucketHash.toStringFull());
-			myBucketHash = put(myBucketHash, blockchainIndex);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(myBucketHash, blockchainIndex);
+			myBucketHash = put(myBucketHash, blockchainIndex, true);
 			
 			if(myBucketHash.isMined()) {
 				network.sendToKey(myBucketHash.getBinaryStringKey(), new SendBucketHashMessage(myBucketHash, blockchainIndex));
@@ -408,8 +411,7 @@ public class BucketConsensuses {
 			otherKey = myBucketHash.getKey().getOtherBucketKey().getKey();
 			otherBucketHash = new BucketHash(otherKey, transactions, bucketHash.getPreviousBlockHash());
 			//logger.trace("put otherBucketHash={}", otherBucketHash.toStringFull());
-			otherBucketHash = put(otherBucketHash, blockchainIndex);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(otherBucketHash, blockchainIndex);
+			otherBucketHash = put(otherBucketHash, blockchainIndex, true);
 			
 			if(otherBucketHash.isMined()) {
 				network.sendToKey(otherBucketHash.getBinaryStringKey(), new SendBucketHashMessage(otherBucketHash, blockchainIndex));
@@ -424,8 +426,7 @@ public class BucketConsensuses {
 			parent.setTransactions(transactions);
 
 			//logger.trace("put myBucketHash={}", myBucketHash.toStringFull());
-			parent = put(parent, blockchainIndex);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(parent, blockchainIndex);
+			parent = put(parent, blockchainIndex, true);
 			
 			if(parent.isMined()) {
 				network.sendToKey(parent.getBinaryStringKey(), new SendBucketHashMessage(parent, blockchainIndex));

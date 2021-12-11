@@ -198,7 +198,7 @@ public class BucketHashes {
 
 	public BucketHash replace(BucketHash bucketHash) {
 		BucketHash original = bucketHashes.get(bucketHash.getBinaryStringKey());
-		if(original != null && original.isMined() && !bucketHash.isMined()) {
+		if(original != null && original.isMined() && !bucketHash.isMined() && bucketHash.getHash().equals(original.getHash())) {
 			logger.trace("Not replacing because original is mined but bucketHash is not");
 			logger.trace("original   = {}", original.toStringFull());
 			logger.trace("bucketHash = {}", bucketHash.toStringFull());
@@ -208,11 +208,11 @@ public class BucketHashes {
 		validateParent(bucketHash);
 		bucketHashes.put(bucketHash.getBinaryStringKey(), bucketHash);
 		if(original == null) {
-			logger.trace("BucketHashes.put() {} {}", bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
+			logger.trace("BucketHashes.put() {}", bucketHash.toStringFull());
 		} else {
 			
-			logger.trace("BucketHashes.replace() {} {}", original.getPreviousBlockHash(), original.toStringFull());
-			logger.trace("with {} {}", bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
+			logger.trace("BucketHashes.replace() {}", original.toStringFull());
+			logger.trace("with                   {}", bucketHash.toStringFull());
 		}
 		return bucketHash;
 	}
@@ -238,6 +238,10 @@ public class BucketHashes {
 		if(left != null && right != null) {
 			BucketHash test = new BucketHash(left, right);
 			if(!test.getHash().equals(bucketHash.getHash())) {
+				logger.info("left {}", left.toStringFull());
+				logger.info("right {}", right.toStringFull());
+				logger.info("test {}", test.toStringFull());
+				logger.info("bucketHash {}", bucketHash.toStringFull());
 				throw new RuntimeException("Wrong children for bucketHash " + bucketHash.toStringFull()); 
 			}
 		}

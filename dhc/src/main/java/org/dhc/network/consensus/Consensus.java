@@ -868,14 +868,12 @@ public class Consensus {
 				return;
 			}
 			BucketHash myBucketHash = new BucketHash(myKey, transactions, bucketHash.getPreviousBlockHash());
-			Registry.getInstance().getBucketConsensuses().put(myBucketHash, index);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(myBucketHash, index);
+			Registry.getInstance().getBucketConsensuses().put(myBucketHash, index, true);
 			myBucketHash = replace(myBucketHash);
 
 			otherKey = myBucketHash.getKey().getOtherBucketKey().getKey();
 			otherBucketHash = new BucketHash(otherKey, transactions, bucketHash.getPreviousBlockHash());
-			Registry.getInstance().getBucketConsensuses().put(otherBucketHash, index);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(otherBucketHash, index);
+			Registry.getInstance().getBucketConsensuses().put(otherBucketHash, index, true);
 			otherBucketHash = replace(otherBucketHash);
 			logger.trace("Calling from recover() processPropose otherBucketHash={} index={}", otherBucketHash.toStringFull(), index);
 			processPropose(otherBucketHash, true, null, index);
@@ -883,8 +881,7 @@ public class Consensus {
 			parent = new BucketHash(myBucketHash, otherBucketHash);
 			parent.setTransactions(transactions);
 
-			Registry.getInstance().getBucketConsensuses().put(parent, index);
-			Consensus.getInstance().getInitialBucketHashes().notifyForBucketHashFromRecover(parent, index);
+			Registry.getInstance().getBucketConsensuses().put(parent, index, true);
 			
 			replace(parent);
 			
