@@ -179,10 +179,13 @@ public class BucketHashes {
 		if(original != null && !original.getHash().equals(hash)) {
 			logger.info("Attempt to replace hash '{}' with '{}' for key '{}'", bucketHashes.get(key).getHash(), hash, key);
 			logger.info("original hash: {}", original.toStringFull());
+			logger.info("bucketHash   : {}", bucketHash.toStringFull());
 			logger.info("", new RuntimeException());
 			return;
 		}
-		validateChildren(bucketHash);
+		if(!areChildrenValid(bucketHash)) {
+			return;
+		}
 		if(original == null) {
 			logger.trace("BucketHashes.put() {} {}", bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
 		}
@@ -204,7 +207,9 @@ public class BucketHashes {
 			logger.trace("bucketHash = {}", bucketHash.toStringFull());
 			return original;
 		}
-		validateChildren(bucketHash);
+		if(!areChildrenValid(bucketHash)) {
+			return original;
+		}
 		validateParent(bucketHash);
 		bucketHashes.put(bucketHash.getBinaryStringKey(), bucketHash);
 		if(original == null) {
@@ -232,7 +237,7 @@ public class BucketHashes {
 		}
 	}
 
-	private void validateChildren(BucketHash bucketHash) {
+	private boolean areChildrenValid(BucketHash bucketHash) {
 		BucketHash left = getBucketHash(bucketHash.getKey().getLeftKey().getKey());
 		BucketHash right = getBucketHash(bucketHash.getKey().getRightKey().getKey());
 		if(left != null && right != null) {
@@ -241,10 +246,11 @@ public class BucketHashes {
 				logger.info("left {}", left.toStringFull());
 				logger.info("right {}", right.toStringFull());
 				logger.info("test {}", test.toStringFull());
-				logger.info("bucketHash {}", bucketHash.toStringFull());
-				throw new RuntimeException("Wrong children for bucketHash " + bucketHash.toStringFull()); 
+				logger.info("Wrong children for bucketHash {}", bucketHash.toStringFull());
+				return false;
 			}
 		}
+		return true;
 	}
 
 	public BucketHash getBucketHash(String key) {
