@@ -50,7 +50,9 @@ public class ProposeMessage extends Message {
 		
 		
 		//should not hold lock on consensus in receiver thread, it will slow it down and potentially cause a deadlock with other threads
-		ThreadExecutor.getInstance().execute(new DhcRunnable("processPropose") {
+		String str = String.format("ProposeMessage@%s %s-%s '%s'='%s' %s", hashCode(), index, bucketHash.getPreviousBlockHash().substring(0, 7), 
+				bucketHash.getBinaryStringKey(), bucketHash.getHash().substring(0, Math.min(7, bucketHash.getHash().length())), reply);
+		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
 			public void doRun() {
 				Consensus.getInstance().processPropose(bucketHash, !reply, peer, index);
 			}

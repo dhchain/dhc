@@ -67,7 +67,7 @@ public class SendBucketHashMessage extends Message {
 		}
 
 		//should not hold lock on consensus in receiver thread, it will slow it down and potentially cause a deadlock with other threads
-		String str = String.format("SendBucketHashMessage %s-%s '{}'='{}'", index, bucketHash.getPreviousBlockHash().substring(0, 7), 
+		String str = String.format("SendBucketHashMessage@%s %s-%s '%s'='%s'", hashCode(), index, bucketHash.getPreviousBlockHash().substring(0, 7), 
 				bucketHash.getBinaryStringKey(), bucketHash.getHash().substring(0, Math.min(7, bucketHash.getHash().length())));
 		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
 			public void doRun() {
