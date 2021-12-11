@@ -1,5 +1,6 @@
 package org.dhc.network.consensus;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +60,7 @@ public class Consensus {
 	private ReadyBucketHashes readyConsensuses = new ReadyBucketHashes();
 	private MyAddresses myAddresses = new MyAddresses();
 	private long bits;
+	private Set<BucketHash> nextProposals = new HashSet<>();
 	
 	public static Consensus getInstance() {
 		return instance;
@@ -75,6 +77,7 @@ public class Consensus {
 	
 
 	private void clear() {
+		nextProposals.clear();
 		initialBucketHashes.clear();
 		readyBucketHashes = null;
 		if(blockchainIndex + 1 == blockchain.getIndex()) {
@@ -355,12 +358,15 @@ public class Consensus {
 			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
 		
+		logger.trace("{} ********************* Ready to mine *************************", blockchainIndex);
 		logger.info("'{}'-{} Ready to mine # peers {} bucketPeers {} myPeers {} pp {} #c {} ap {} {}\n", block.getBucketKey(), block.getIndex(), Peer.getTotalPeerCount(), 
 				network.getAllPeers().size(), network.getMyBucketPeers().size(), network.getPossiblePower(), numberOfConsensuses, blockchain.getAveragePower(), block);
 		Listeners.getInstance().sendEvent(new BlockEvent(block, "Ready to mine"));
 		
 		for(BucketHash b: consensuses.getBySecondKey("").values()) {
-			logger.info("consensus isMined={}", b.isMined());
+			if(!b.isMined()) {
+				logger.info("consensus isMined={}", b.isMined());
+			}
 		}
 		
 
@@ -422,6 +428,11 @@ public class Consensus {
 			logger.info("bucketHash={}", bucketHash.toStringFull());
 			return;
 		}
+		
+		if(nextProposals.contains(bucketHash)) {
+			return;
+		}
+		nextProposals.add(bucketHash);
 
 		String consensusKey = dhcAddress.getBinary(bucketHash.getBinaryStringKey().length());
 		
@@ -661,6 +672,7 @@ public class Consensus {
 			lock.lock();
 			try {
 				waitExpired = !consensusReadyCondition.await(waitTime, TimeUnit.MILLISECONDS);
+				logger.trace("{} ********************* waitForConsensusReady() END *************************", blockchainIndex);
 				logger.trace("Consensus after consensusReadyCondition.await.");
 			} finally {
 				lock.unlock();
@@ -690,6 +702,7 @@ public class Consensus {
 			logger.error(e.getMessage(), e);
 		}
 	}
+
 
 	public void processReadyBucketHashes(BucketHash consensus, long index) {
 		if(consensus == null) {
