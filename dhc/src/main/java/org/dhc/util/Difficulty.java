@@ -19,7 +19,7 @@ public class Difficulty {
 	}
 	
 	public static void main(String[] args) {
-		long bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(0x1e137853) / Math.pow(2, 15));
+		long bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(0x1e137853) / Math.pow(2, 2));
 		logger.info("bits={}", Long.toString(bits, 16));
 		logger.info("target.length()={}", getTarget(bits).toString(2).length());
 	}

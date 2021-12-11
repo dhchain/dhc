@@ -47,7 +47,7 @@ public class InitialBucketHashes {
 		}
 
 		result = findExisting(bucketHash, blockchainIndex);
-		if(result != null && bucketHash.isMined()) {
+		if(result != null && bucketHash.isMined() && bucketHash.getHash().equals(result.getHash())) {
 			result.setTimestamp(bucketHash.getTimestamp());
 			result.setNonce(bucketHash.getNonce());
 			//logger.info("waitForBucketHash   result={} blockchainIndex={} hashcode={} bucketHash.isMined()={}", result.getKeyHash(), blockchainIndex, result.getRealHashCode(), bucketHash.isMined());
@@ -55,6 +55,12 @@ public class InitialBucketHashes {
 		return result;
 	}
 	
+	/**
+	 * Searches BucketHashes in memory by index, previous block hash, bucket key. Returns first found or null if none found
+	 * @param bucketHash
+	 * @param blockchainIndex
+	 * @return BucketHash
+	 */
 	private BucketHash findExisting(BucketHash bucketHash, long blockchainIndex) {
 		boolean hasNullTransactions = bucketHash.hasNullTransactions();
 		BucketHash result = null;
@@ -87,14 +93,7 @@ public class InitialBucketHashes {
 	}
 	
 	public synchronized void notifyForBucketHash(BucketHash bucketHash, long blockchainIndex) {
-		BucketHash foundBucketHash = get(bucketHash, blockchainIndex);
-		if(foundBucketHash == null) {
-			return;
-		}
-
-		if(foundBucketHash.isMined()) {
-			return;
-		}
+		
 		if(!bucketHash.isMined()) {
 			logger.trace(
 					"notify skip bucketHash.getKeyHash()={} blockchainIndex={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
@@ -102,20 +101,47 @@ public class InitialBucketHashes {
 			logger.trace("", new RuntimeException());
 			return;
 		}
-		foundBucketHash.setTimestamp(bucketHash.getTimestamp());
-		foundBucketHash.setNonce(bucketHash.getNonce());
-		foundBucketHash.stopMining();
-	}
-	
-	public void notifyForBucketHashFromRecover(BucketHash bucketHash, long blockchainIndex) { // notify without checking if mined
-		BucketHash foundBucketHash = get(bucketHash, blockchainIndex);
-		if(foundBucketHash == null) {
+		
+		Map<String, BucketHash> map = getByKey(bucketHash, blockchainIndex);
+		if(map == null) {
 			return;
 		}
-		foundBucketHash.stopMining();
+		
+		for(BucketHash foundBucketHash: map.values()) {
+			if(foundBucketHash.isMined()) {
+				continue;
+			}
+			
+			if(foundBucketHash.getHash().equals(bucketHash.getHash())) {
+				foundBucketHash.setTimestamp(bucketHash.getTimestamp());
+				foundBucketHash.setNonce(bucketHash.getNonce());
+			}
+			
+			foundBucketHash.stopMining();
+		}
+
+	}
+	
+	public synchronized void notifyForBucketHashFromRecover(BucketHash bucketHash, long blockchainIndex) { // notify without checking if mined
+		Map<String, BucketHash> map = getByKey(bucketHash, blockchainIndex);
+		if(map == null) {
+			return;
+		}
+		for(BucketHash foundBucketHash: map.values()) {
+			foundBucketHash.stopMining();
+		}
 	}
 	
 	private synchronized BucketHash get(BucketHash bucketHash, long blockchainIndex) {
+		Map<String, BucketHash> mapByKey = getByKey(bucketHash, blockchainIndex);
+		if(mapByKey == null) {
+			return null;
+		}
+		BucketHash result = mapByKey.get(bucketHash.getHash());
+		return result;
+	}
+	
+	private synchronized Map<String, BucketHash> getByKey(BucketHash bucketHash, long blockchainIndex) {
 		Map<String, Map<String, Map<String, BucketHash>>> mapByIndex = bucketHashes.get(blockchainIndex);
 		if(mapByIndex == null) {
 			return null;
@@ -128,8 +154,7 @@ public class InitialBucketHashes {
 		if(mapByKey == null) {
 			return null;
 		}
-		BucketHash result = mapByKey.get(bucketHash.getHash());
-		return result;
+		return mapByKey;
 	}
 	
 	private synchronized void put(BucketHash bucketHash, long blockchainIndex) {
