@@ -45,7 +45,7 @@ public class SendBucketHashMessage extends Message {
 			return;
 		}
 		if(!bucketHash.isMined()) {
-			logger.info("{} process() Not mined bucketHash.getKeyHash()={} index={} bucketHash.getRealHashCode()={} bucketHash.isMined={}", index, 
+			logger.info("{} process() Not mined bucketHash.getKeyHash()={} bucketHash.getRealHashCode()={} bucketHash.isMined={}", index, 
 					bucketHash.getKeyHash(), bucketHash.getRealHashCode(), bucketHash.isMined());
 			return;
 		}
@@ -56,6 +56,21 @@ public class SendBucketHashMessage extends Message {
 			logger.info("", new RuntimeException());
 		}
 		
+
+
+		//should not hold lock on consensus in receiver thread, it will slow it down and potentially cause a deadlock with other threads
+		String str = String.format("SendBucketHashMessage@%s %s-%s '%s'='%s'", hashCode(), index, bucketHash.getPreviousBlockHash().substring(0, 7), 
+				bucketHash.getBinaryStringKey(), bucketHash.getHash().substring(0, Math.min(7, bucketHash.getHash().length())));
+		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
+			public void doRun() {
+				processReadyBucketHashes(peer);
+			}
+		});
+		
+	}
+	
+	private void processReadyBucketHashes(Peer peer) {
+		
 		if(bucketHash != Registry.getInstance().getBucketConsensuses().put(bucketHash, index, false)) {
 			return;
 		}
@@ -65,19 +80,7 @@ public class SendBucketHashMessage extends Message {
 		if(blockToMine != null && index < blockToMine.getIndex()) {
 			return;
 		}
-
-		//should not hold lock on consensus in receiver thread, it will slow it down and potentially cause a deadlock with other threads
-		String str = String.format("SendBucketHashMessage@%s %s-%s '%s'='%s'", hashCode(), index, bucketHash.getPreviousBlockHash().substring(0, 7), 
-				bucketHash.getBinaryStringKey(), bucketHash.getHash().substring(0, Math.min(7, bucketHash.getHash().length())));
-		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
-			public void doRun() {
-				processReadyBucketHashes();
-			}
-		});
 		
-	}
-	
-	private void processReadyBucketHashes() {
 		BucketHash bucketHash = this.bucketHash.clone();
 		Consensus.getInstance().processReadyBucketHash(bucketHash, index);
 		if(!"".equals(bucketHash.getBinaryStringKey())) {

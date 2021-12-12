@@ -474,12 +474,13 @@ public class Consensus {
 			return;
 		}
 		
-		if(parentBucketHash.isMined()) {
-			network.sendToKey(parentBucketHash.getBinaryStringKey(), new SendBucketHashMessage(parentBucketHash, blockchainIndex));
-		} else {
-			logger.trace("{} {} recover() Not mined parentBucketHash.getKeyHash()={} parentBucketHash.isMined={}", blockchainIndex, parentBucketHash.getRealHashCode(), 
+		if(!parentBucketHash.isMined()) {
+			logger.trace("{} {} sendNextProposal() Not mined parentBucketHash.getKeyHash()={} parentBucketHash.isMined={}", blockchainIndex, parentBucketHash.getRealHashCode(), 
 					parentBucketHash.getKeyHash(), parentBucketHash.isMined());
+			return;
 		}
+		
+		network.sendToKey(parentBucketHash.getBinaryStringKey(), new SendBucketHashMessage(parentBucketHash, blockchainIndex));
 		
 		int i = bucketHash.getBinaryStringKey().length() - 1;
 		put(parentBucketHash);
@@ -705,9 +706,13 @@ public class Consensus {
 
 
 	public void processReadyBucketHashes(BucketHash consensus, long index) {
+		
 		if(consensus == null) {
 			return;
 		}
+		
+		logger.trace("{} processReadyBucketHashes START consensus={}", index, consensus.toStringFull());
+		
 		if(index > blockchainIndex) {
 			readyConsensuses.add(consensus, index);
 			return;
@@ -747,7 +752,7 @@ public class Consensus {
 	}
 	
 	private void processReadyBucketHashesCallback(BucketHashes bucketHashes, long index) {
-		logger.trace("processReadyBucketHashesCallback START");
+		logger.trace("{} processReadyBucketHashesCallback START", index);
 		if (!bucketHashes.isValid()) {
 			return;
 		}
@@ -760,7 +765,8 @@ public class Consensus {
 				return;
 			}
 			logger.trace("************ Constructed readyBucketHashes ******************");
-			if (bucketHashes.getNumberOfTransactions() == 0 && transactions != null && !transactions.isEmpty()) {
+
+/*			if (bucketHashes.getNumberOfTransactions() == 0 && transactions != null && !transactions.isEmpty()) {
 
 				Block block = blockchain.getByHash(bucketHashes.getPreviousBlockHash());
 				Set<Transaction> myBranchTransactions = block.filterBranchTransactions(transactions);
@@ -773,7 +779,8 @@ public class Consensus {
 				logger.trace("lastBucketHash.getFee()={}", lastBucketHash.getFee());
 				logger.trace("Transaction.collectFees(lastBucketHash.getTransactions()) = {}", Transaction.collectFees(lastBucketHash.getTransactionsIncludingCoinbase()));
 				logger.trace("index {}, lastBucketHash {}", index, lastBucketHash.toStringFull());
-			}
+			}*/
+			
 			readyBucketHashes = bucketHashes;
 			notifyConsensusReady();
 		} finally {
@@ -901,6 +908,9 @@ public class Consensus {
 
 			Registry.getInstance().getBucketConsensuses().put(parent, index, true);
 			
+			if(bucketHash.equals(parent)) {
+				parent = bucketHash; //bucketHash is already mined so use it
+			}
 			replace(parent);
 			
 			parent.isValid();

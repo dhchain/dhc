@@ -2,9 +2,11 @@ package org.dhc.network.consensus;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.dhc.blockchain.Blockchain;
 import org.dhc.util.DhcLogger;
@@ -92,7 +94,7 @@ public class InitialBucketHashes {
 		return result;
 	}
 	
-	public synchronized void notifyForBucketHash(BucketHash bucketHash, long blockchainIndex) {
+	public void notifyForBucketHash(BucketHash bucketHash, long blockchainIndex) {
 		
 		if(!bucketHash.isMined()) {
 			logger.trace(
@@ -102,12 +104,16 @@ public class InitialBucketHashes {
 			return;
 		}
 		
-		Map<String, BucketHash> map = getByKey(bucketHash, blockchainIndex);
-		if(map == null) {
-			return;
+		Set<BucketHash> hashes = new HashSet<>();
+		synchronized(this) {
+			Map<String, BucketHash> map = getByKey(bucketHash, blockchainIndex);
+			if(map == null) {
+				return;
+			}
+			hashes.addAll(map.values());
 		}
 		
-		for(BucketHash foundBucketHash: map.values()) {
+		for(BucketHash foundBucketHash: hashes) {
 			if(foundBucketHash.isMined()) {
 				continue;
 			}
@@ -118,6 +124,7 @@ public class InitialBucketHashes {
 			}
 			
 			foundBucketHash.stopMining();
+			
 		}
 
 	}
@@ -178,7 +185,7 @@ public class InitialBucketHashes {
 	}
 
 	
-	public void clear() {
+	public synchronized void clear() {
 		bucketHashes.clear();
 	}
 

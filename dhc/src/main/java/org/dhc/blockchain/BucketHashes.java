@@ -173,6 +173,12 @@ public class BucketHashes {
 	}
 
 	public void put(BucketHash bucketHash) {
+		
+		if("".equals(bucketHash.getBinaryStringKey()) && !bucketHash.isMined()) {
+			logger.info("put() Not mined bucketHash   : {}", bucketHash.toStringFull());
+			logger.info("", new RuntimeException());
+		}
+		
 		String key = bucketHash.getBinaryStringKey();
 		String hash = bucketHash.getHash();
 		BucketHash original = bucketHashes.get(key);
@@ -200,6 +206,12 @@ public class BucketHashes {
 	}
 
 	public BucketHash replace(BucketHash bucketHash) {
+		
+		if("".equals(bucketHash.getBinaryStringKey()) && !bucketHash.isMined()) {
+			logger.info("replace() Not mined bucketHash   : {}", bucketHash.toStringFull());
+			logger.info("", new RuntimeException());
+		}
+		
 		BucketHash original = bucketHashes.get(bucketHash.getBinaryStringKey());
 		if(original != null && original.isMined() && !bucketHash.isMined() && bucketHash.getHash().equals(original.getHash())) {
 			logger.trace("Not replacing because original is mined but bucketHash is not");
@@ -334,7 +346,8 @@ public class BucketHashes {
 		newBucketHashes.put(hash.getBinaryStringKey(), hash);
 		bucketHashes = newBucketHashes;
 	}
-
+	
+	// TODO review and remove. This method used to be called from processReadyBucketHashesCallback but produces non mined bucket hashes
 	public void addMyTransactions(Set<Transaction> transactions, long blockchainIndex) {
 		BucketHash last = getLastBucketHash().clone();
 		last.setTransactions(transactions);
