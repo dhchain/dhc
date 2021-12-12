@@ -49,7 +49,7 @@ public class SendBucketHashMessage extends Message {
 					bucketHash.getKeyHash(), bucketHash.getRealHashCode(), bucketHash.isMined());
 			return;
 		}
-		logger.trace("{} Received SendBucketHashMessage bucketHash {} {}", bucketHash.toStringFull());
+		logger.trace("{} Received SendBucketHashMessage bucketHash {}", index, bucketHash.toStringFull());
 		
 		if(bucketHash.hasOnlyOneChild()) {
 			logger.info("bucketHash {}", bucketHash.toStringFull());
