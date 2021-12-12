@@ -39,7 +39,7 @@ public class InitialBucketHashes {
 		bucketHash.mine(blockchainIndex, bits);
 
 		if(!bucketHash.isMined() && blockchainIndex == Blockchain.getInstance().getIndex()) {
-			logger.trace("{} waitForBucketHash () done   buckethash={} hashcode={} isMined={} {}ms", blockchainIndex, bucketHash.getKeyHash(), bucketHash.getRealHashCode(), bucketHash.isMined(), System.currentTimeMillis() - start);
+			logger.trace("{} {} {} waitForBucketHash () done   buckethash={} {}ms", blockchainIndex, bucketHash.isMined(), bucketHash.getRealHashCode(), bucketHash.getKeyHash(), System.currentTimeMillis() - start);
 		}
 		
 		if(bucketHash.isMined()) {
@@ -54,7 +54,7 @@ public class InitialBucketHashes {
 		}
 		
 		if(result != null && !result.isMined()) {
-			logger.info("{} waitForBucketHash() result={} hashcode={} isMined={}", blockchainIndex, result.getKeyHash(), result.getRealHashCode(), result.isMined());
+			logger.info("{} {} {} waitForBucketHash() result={}", blockchainIndex, result.isMined(), result.getRealHashCode(), result.getKeyHash());
 			logger.info("", new RuntimeException());
 		}
 		
@@ -92,8 +92,8 @@ public class InitialBucketHashes {
 			return null;
 		}
 
-		logger.trace("Found {} existing buckethashes", existingBucketHashes.size());
-		logger.trace("Will use existing buckethash {} {}", blockchainIndex, result.toStringFull());
+		logger.trace("{} Found {} existing buckethashes", blockchainIndex, existingBucketHashes.size());
+		logger.trace("{} {} Will use existing buckethash {}", blockchainIndex, result.isMined(), result.toStringFull());
 
 		return result;
 	}

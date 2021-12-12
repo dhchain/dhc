@@ -30,11 +30,11 @@ public class ProposeMessage extends Message {
 	
 	@Override
 	public void process(Peer peer) {
-		logger.trace("{} START ProposeMessage.process() key={}", index, bucketHash.getBinaryStringKey());
+		logger.trace("{} {} START ProposeMessage.process() key={}", index, bucketHash.isMined(), bucketHash.getBinaryStringKey());
 		if(ChainSync.getInstance().isRunning()) {
 			return;
 		}
-		logger.trace("{} Propose received {}", index, bucketHash.toStringFull());
+		logger.trace("{} {} Propose received {}", index, bucketHash.isMined(), bucketHash.toStringFull());
 		if(bucketHash.hasOnlyOneChild()) {
 			logger.info("bucketHash {}", bucketHash.toStringFull());
 			logger.info("", new RuntimeException());
@@ -42,15 +42,15 @@ public class ProposeMessage extends Message {
 		}
 		if(!bucketHash.isMined()) {
 			logger.trace(
-					"{} {} process() Not mined bucketHash.getKeyHash()={} bucketHash.isMined={}", index, bucketHash.getRealHashCode(),
-					bucketHash.getKeyHash(), bucketHash.isMined());
+					"{} {} {} process() Not mined bucketHash.getKeyHash()={}", index, bucketHash.isMined(), bucketHash.getRealHashCode(),
+					bucketHash.getKeyHash());
 			return;
 		}
 		
 		
 		
 		//should not hold lock on consensus in receiver thread, it will slow it down and potentially cause a deadlock with other threads
-		String str = String.format("ProposeMessage@%s %s-%s '%s'='%s' %s", hashCode(), index, bucketHash.getPreviousBlockHash().substring(0, 7), 
+		String str = String.format("ProposeMessage@%s %s-%s '%s'='%s' reply=%s", hashCode(), index, bucketHash.getPreviousBlockHash().substring(0, 7), 
 				bucketHash.getBinaryStringKey(), bucketHash.getHash().substring(0, Math.min(7, bucketHash.getHash().length())), reply);
 		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
 			public void doRun() {

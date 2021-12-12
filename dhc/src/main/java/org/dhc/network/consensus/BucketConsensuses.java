@@ -51,7 +51,7 @@ public class BucketConsensuses {
 		}
 		BucketHash result = mapByKey.get(bucketHash.getHash());
 		if(result != null) {
-			logger.trace("BucketConsensuses.get {} {} return buckethash {}", blockchainIndex, bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
+			logger.trace("{} {} BucketConsensuses.get return buckethash {}", blockchainIndex, bucketHash.isMined(), bucketHash.toStringFull());
 		}
 		return result;
 	}
@@ -136,7 +136,7 @@ public class BucketConsensuses {
 			mapByPreviousBlockHash.put(bucketHash.getBinaryStringKey(), mapByKey);
 		}
 		
-		logger.trace("BucketConsensuses.put {} {} bucketHash {}", blockchainIndex, bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
+		logger.trace("{} {} BucketConsensuses.put bucketHash {}", blockchainIndex, bucketHash.isMined(), bucketHash.toStringFull());
 		mapByKey.put(bucketHash.getHash(), bucketHash);
 		
 		if(notifyForce) {

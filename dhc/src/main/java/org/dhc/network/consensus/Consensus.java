@@ -234,7 +234,7 @@ public class Consensus {
 				throw new BlockchainIndexStaleException("Blockchain index is stale");
 			}
 		}
-		logger.trace("To get consensus took {} ms.", System.currentTimeMillis() - start);
+		logger.trace("{} To get consensus took {} ms.", blockchainIndex, System.currentTimeMillis() - start);
 		
 		return complete();
 	}
@@ -442,7 +442,7 @@ public class Consensus {
 		}
 		BucketHash parentBucketHash = new BucketHash(consensusHash, bucketHash);
 		
-		logger.trace("sendNextProposal parentBucketHash {}", parentBucketHash.toStringFull());
+		logger.trace("{} {} sendNextProposal parentBucketHash {}", blockchainIndex, parentBucketHash.isMined(), parentBucketHash.toStringFull());
 		
 		long localIndex = blockchainIndex;
 		BucketHash earlierBucketHash = findEarlierBuckethashWithTheSameKey(parentBucketHash);
@@ -452,7 +452,7 @@ public class Consensus {
 		
 		if(earlierBucketHash != null && earlierBucketHash.hasBothChildren()) {
 			if(earlierBucketHash.hasChild(consensusHash)) {
-				logger.trace("sendNextProposal replace with earlier {}", earlierBucketHash.toStringFull());
+				logger.trace("{} {} sendNextProposal replace with earlier {}", blockchainIndex, earlierBucketHash.isMined(), earlierBucketHash.toStringFull());
 				parentBucketHash = earlierBucketHash;
 				bucketHash = parentBucketHash.getOtherChild(consensusHash);
 				bucketHash = replace(bucketHash);
@@ -475,8 +475,8 @@ public class Consensus {
 		}
 		
 		if(!parentBucketHash.isMined()) {
-			logger.trace("{} {} sendNextProposal() Not mined parentBucketHash.getKeyHash()={} parentBucketHash.isMined={}", blockchainIndex, parentBucketHash.getRealHashCode(), 
-					parentBucketHash.getKeyHash(), parentBucketHash.isMined());
+			logger.trace("{} {} {} sendNextProposal() Not mined parentBucketHash.getKeyHash()={}", blockchainIndex, parentBucketHash.isMined(), parentBucketHash.getRealHashCode(), 
+					parentBucketHash.getKeyHash());
 			return;
 		}
 		
@@ -599,7 +599,7 @@ public class Consensus {
 				return;
 			}
 
-			logger.trace("Proposal {} '{}'={}, previous blockHash {}, #tx {}", index, key, bucketHash, blockHash, bucketHash.getNumberOfTransactions());
+			logger.trace("{} {} Proposal bucketHash {}", index, bucketHash.isMined(), bucketHash.toStringFull());
 			if (!saveProposal(bucketHash)) {
 				return;
 			}
@@ -674,7 +674,7 @@ public class Consensus {
 			try {
 				waitExpired = !consensusReadyCondition.await(waitTime, TimeUnit.MILLISECONDS);
 				logger.trace("{} ********************* waitForConsensusReady() END *************************", blockchainIndex);
-				logger.trace("Consensus after consensusReadyCondition.await.");
+				logger.trace("{} Consensus after consensusReadyCondition.await.", blockchainIndex);
 			} finally {
 				lock.unlock();
 			}
@@ -711,7 +711,7 @@ public class Consensus {
 			return;
 		}
 		
-		logger.trace("{} processReadyBucketHashes START consensus={}", index, consensus.toStringFull());
+		logger.trace("{} {} processReadyBucketHashes START consensus={}", index, consensus.isMined(), consensus.toStringFull());
 		
 		if(index > blockchainIndex) {
 			readyConsensuses.add(consensus, index);
@@ -823,7 +823,7 @@ public class Consensus {
 	}
 	
 	public void processReadyBucketHash(BucketHash bucketHash, long index) {
-		logger.trace("processReadyBucketHash START bucketHash={} index={}", bucketHash.toStringFull(), index);
+		logger.trace("{} {} processReadyBucketHash START bucketHash={}", index, bucketHash.isMined(), bucketHash.toStringFull());
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		long start = System.currentTimeMillis();
@@ -847,11 +847,11 @@ public class Consensus {
 			//logger.trace("unlock");
 		}
 		recover(bucketHash, index);
-		logger.trace("processReadyBucketHash END bucketHash={} index={}", bucketHash.toStringFull(), index);
+		logger.trace("{} {} processReadyBucketHash END bucketHash={}", index, bucketHash.isMined(), bucketHash.toStringFull());
 	}
 	
 	private void recover(BucketHash bucketHash, long index) {
-		logger.trace("processReadyBucketHash START bucketHash={} index={}", bucketHash.toStringFull(), index);
+		logger.trace("{} {} recover START bucketHash={}", index, bucketHash.isMined(), bucketHash.toStringFull());
 
 		Set<Transaction> transactions = bucketHash.getTransactionsIncludingCoinbase();
 		
@@ -883,7 +883,7 @@ public class Consensus {
 			return; //bucket for key does not strictly contain bucket for myKey
 		}
 		
-		logger.trace("Consensus.recover {}", bucketHash.toStringFull());
+		logger.trace("{} {} Consensus.recover {}", index, bucketHash.isMined(), bucketHash.toStringFull());
 		
 		String otherKey = null;
 		BucketHash otherBucketHash =null;
@@ -900,7 +900,7 @@ public class Consensus {
 			otherBucketHash = new BucketHash(otherKey, transactions, bucketHash.getPreviousBlockHash());
 			Registry.getInstance().getBucketConsensuses().put(otherBucketHash, index, true);
 			otherBucketHash = replace(otherBucketHash);
-			logger.trace("Calling from recover() processPropose otherBucketHash={} index={}", otherBucketHash.toStringFull(), index);
+			logger.trace("{} {} Calling from recover() processPropose otherBucketHash={}", index, otherBucketHash.isMined(), otherBucketHash.toStringFull());
 			processPropose(otherBucketHash, true, null, index);
 
 			parent = new BucketHash(myBucketHash, otherBucketHash);

@@ -37,7 +37,7 @@ public class SendBucketHashMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
-		logger.trace("{} START SendBucketHashMessage.process() key={}", index, bucketHash.getBinaryStringKey());
+		logger.trace("{} {} START SendBucketHashMessage.process() key={}", index, bucketHash.isMined(), bucketHash.getBinaryStringKey());
 		if(index < Blockchain.getInstance().getIndex()) {
 			return;
 		}
@@ -45,11 +45,11 @@ public class SendBucketHashMessage extends Message {
 			return;
 		}
 		if(!bucketHash.isMined()) {
-			logger.info("{} process() Not mined bucketHash.getKeyHash()={} bucketHash.getRealHashCode()={} bucketHash.isMined={}", index, 
-					bucketHash.getKeyHash(), bucketHash.getRealHashCode(), bucketHash.isMined());
+			logger.info("{} {} process() Not mined bucketHash.getKeyHash()={} bucketHash.getRealHashCode()={}", index, bucketHash.isMined(), 
+					bucketHash.getKeyHash(), bucketHash.getRealHashCode());
 			return;
 		}
-		logger.trace("{} Received SendBucketHashMessage bucketHash {}", index, bucketHash.toStringFull());
+		logger.trace("{} {} Received SendBucketHashMessage bucketHash {}", index, bucketHash.isMined(), bucketHash.toStringFull());
 		
 		if(bucketHash.hasOnlyOneChild()) {
 			logger.info("bucketHash {}", bucketHash.toStringFull());
@@ -87,8 +87,8 @@ public class SendBucketHashMessage extends Message {
 			return;
 		}
 		//Can not hold receiver pool threads because processReadyBucketHashes will do send and expect reply back which would need to use these threads
-		String str = String.format("Ready BHashes %s-%s %s", index, bucketHash, hashCode());
-		logger.trace("SendBucketHashMessage {}", str);
+		
+		logger.trace("{} {} SendBucketHashMessage@{}.processReadyBucketHashes buckethash {}", index, bucketHash.isMined(), hashCode(), bucketHash.toStringFull());
 		Consensus.getInstance().processReadyBucketHashes(bucketHash, index);
 	}
 	

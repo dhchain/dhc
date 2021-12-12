@@ -599,7 +599,7 @@ public class BucketHash {
 			this.timestamp = timestamp;
 			this.nonce = nonce;
 		}
-		logger.trace("{} {} \t mine END   buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
+		logger.trace("{} {} {} \t mine END   buckethash={}", blockchainIndex, isMined(), getRealHashCode(), getKeyHash());
 	}
 	
 	public boolean isMined() {

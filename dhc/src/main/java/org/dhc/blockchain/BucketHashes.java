@@ -193,7 +193,7 @@ public class BucketHashes {
 			return;
 		}
 		if(original == null) {
-			logger.trace("BucketHashes.put() {} {}", bucketHash.getPreviousBlockHash(), bucketHash.toStringFull());
+			logger.trace("{} BucketHashes.put() {}", bucketHash.isMined(), bucketHash.toStringFull());
 		}
 		bucketHashes.put(key, bucketHash);
 
@@ -215,8 +215,8 @@ public class BucketHashes {
 		BucketHash original = bucketHashes.get(bucketHash.getBinaryStringKey());
 		if(original != null && original.isMined() && !bucketHash.isMined() && bucketHash.getHash().equals(original.getHash())) {
 			logger.trace("Not replacing because original is mined but bucketHash is not");
-			logger.trace("original   = {}", original.toStringFull());
-			logger.trace("bucketHash = {}", bucketHash.toStringFull());
+			logger.trace("{} original   = {}", original.isMined(), original.toStringFull());
+			logger.trace("{} bucketHash = {}", bucketHash.isMined(), bucketHash.toStringFull());
 			return original;
 		}
 		if(!areChildrenValid(bucketHash)) {
@@ -225,11 +225,11 @@ public class BucketHashes {
 		validateParent(bucketHash);
 		bucketHashes.put(bucketHash.getBinaryStringKey(), bucketHash);
 		if(original == null) {
-			logger.trace("BucketHashes.put() {}", bucketHash.toStringFull());
+			logger.trace("{} BucketHashes.put() {}", bucketHash.isMined(), bucketHash.toStringFull());
 		} else {
 			
-			logger.trace("BucketHashes.replace() {}", original.toStringFull());
-			logger.trace("with                   {}", bucketHash.toStringFull());
+			logger.trace("{} BucketHashes.replace() {}", original.isMined(), original.toStringFull());
+			logger.trace("{} with                   {}", bucketHash.isMined(), bucketHash.toStringFull());
 		}
 		return bucketHash;
 	}
