@@ -101,10 +101,9 @@ public class InitialBucketHashes {
 	public void notifyForBucketHash(BucketHash bucketHash, long blockchainIndex) {
 		
 		if(!bucketHash.isMined()) {
-			logger.trace(
-					"notify skip bucketHash.getKeyHash()={} blockchainIndex={} bucketHash.getRealHashCode()={} bucketHash.isMined={}",
+			String str = String.format("notify skip bucketHash.getKeyHash()=%s blockchainIndex=%s bucketHash.getRealHashCode()=%s bucketHash.isMined=%s",
 					bucketHash.getKeyHash(), blockchainIndex, bucketHash.getRealHashCode(), bucketHash.isMined());
-			logger.trace("", new RuntimeException());
+			logger.trace(str, new RuntimeException());
 			return;
 		}
 		

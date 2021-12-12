@@ -208,8 +208,8 @@ public class BucketHashes {
 	public BucketHash replace(BucketHash bucketHash) {
 		
 		if("".equals(bucketHash.getBinaryStringKey()) && !bucketHash.isMined()) {
-			logger.info("replace() Not mined bucketHash   : {}", bucketHash.toStringFull());
-			logger.info("", new RuntimeException());
+			String str = String.format("{} replace() Not mined bucketHash {}", bucketHash.isMined(), bucketHash.toStringFull());
+			logger.info(str, new RuntimeException());
 		}
 		
 		BucketHash original = bucketHashes.get(bucketHash.getBinaryStringKey());
