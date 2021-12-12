@@ -62,12 +62,22 @@ public class MissingBlock {
 		if(blockchain.contains(blockHash) || index < lastIndex) {
 			return;
 		}
+
+		Block block = ChainRest.getInstance().getBlock(key, blockHash);
+		
+		//Check again because getting block might take a couple of seconds and the block might be already added
+		lastIndex = Math.max(Blockchain.getInstance().getIndex(), ChainSync.getInstance().getLastBlockchainIndex());
+		if(blockchain.contains(blockHash) || index < lastIndex) {
+			return;
+		}
 		
 		logger.info("MissingBlock.process() trying to get block from my peers for index={}, key={}, hash={}", index, key, blockHash);
-		Block block = ChainRest.getInstance().getBlock(key, blockHash);
 		if(block != null && block.isMine()) {
 			logger.info("MissingBlock.process() got block from my peers {}", block);
 			if(blockchain.add(block)) {
+				return;
+			}
+			if(blockchain.contains(blockHash)) {//check if block was already added
 				return;
 			}
 			logger.info("MissingBlock.process() could not add block {}", block);

@@ -466,7 +466,10 @@ public class Consensus {
 					replaceChildren(parentBucketHash);
 				}
 			}
+		} else {
+			logger.trace("earlierBucketHash is null or does not have both children so cannot use it");
 		}
+
 		
 		String nextConsensusKey = parentBucketHash.getBinaryStringKey();
 
@@ -477,6 +480,7 @@ public class Consensus {
 		if(!parentBucketHash.isMined()) {
 			logger.trace("{} {} {} sendNextProposal() Not mined parentBucketHash.getKeyHash()={}", blockchainIndex, parentBucketHash.isMined(), parentBucketHash.getRealHashCode(), 
 					parentBucketHash.getKeyHash());
+			logger.trace("{} return from sendNextProposal() because can not process with non mined hash", blockchainIndex);
 			return;
 		}
 		
