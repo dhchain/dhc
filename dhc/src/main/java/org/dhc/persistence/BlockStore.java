@@ -129,6 +129,14 @@ public class BlockStore {
 		if (!block.hasOutputsForAllInputs()) {
 			return false;
 		}
+		
+		String previousHash = block.getPreviousHash();
+		
+		long nextBits = getNextBits(previousHash);
+		if(!block.isGenesis() &&  (block.getBits() != nextBits)) {
+			logger.info("previous block next bits != bits of this block {}", block);
+			return false;
+		}
 
 		new DBExecutor() {
 			public void doWork() throws Exception {
@@ -840,6 +848,28 @@ public class BlockStore {
 			logger.error(e.getMessage(), e);
 		}
 		
+		return result[0];
+	}
+	
+	public long getNextBits(String blockhash) {
+		long[] result = new long[1];
+		result[0] = 0;
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select nextBits from block where blockHash = ?";
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, blockhash);
+					rs = ps.executeQuery();
+					if (rs.next()) {
+						result[0] = rs.getLong("nextBits");
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+
 		return result[0];
 	}
 

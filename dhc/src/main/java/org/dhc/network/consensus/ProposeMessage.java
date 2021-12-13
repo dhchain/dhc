@@ -47,6 +47,14 @@ public class ProposeMessage extends Message {
 			return;
 		}
 		
+		if(!bucketHash.areBitsValid()) {
+			logger.info(
+					"{} {} {} ProposeMessage.process() bits not valid bucketHash.getKeyHash()={}", index, bucketHash.isMined(), bucketHash.getRealHashCode(),
+					bucketHash.getKeyHash());
+			//return;
+		}
+		
+		
 		
 		
 		//should not hold lock on consensus in receiver thread, it will slow it down and potentially cause a deadlock with other threads

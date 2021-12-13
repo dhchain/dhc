@@ -334,7 +334,7 @@ public class Consensus {
 		block.removeCoinbase();
 		block.addTransaction(coinbase);
 		block.setCoinbaseTransactionId(coinbase.getTransactionId());
-		long bits = Blockchain.getInstance().getByHash(block.getPreviousHash()).getNextBits();
+		long bits = previousBlock.getNextBits();
 		block.setBits(bits);
 
 		if(!block.getBucketHashes().isFeeValid()) {

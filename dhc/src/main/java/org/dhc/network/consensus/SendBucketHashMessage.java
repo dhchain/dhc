@@ -33,6 +33,12 @@ public class SendBucketHashMessage extends Message {
 					bucketHash.getKeyHash(), bucketHash.getRealHashCode(), bucketHash.isMined());
 			logger.info("", new RuntimeException());
 		}
+		
+		if(!bucketHash.areBitsValid()) {
+			logger.info(
+					"{} {} {} SendBucketHashMessage.init() bits not valid bucketHash.getKeyHash()={}", index, bucketHash.isMined(), bucketHash.getRealHashCode(),
+					bucketHash.getKeyHash());
+		}
 	}
 
 	@Override
@@ -49,6 +55,14 @@ public class SendBucketHashMessage extends Message {
 					bucketHash.getKeyHash(), bucketHash.getRealHashCode());
 			return;
 		}
+		
+		if(!bucketHash.areBitsValid()) {
+			logger.info(
+					"{} {} {} SendBucketHashMessage.process() bits not valid bucketHash.getKeyHash()={}", index, bucketHash.isMined(), bucketHash.getRealHashCode(),
+					bucketHash.getKeyHash());
+			//return;
+		}
+		
 		logger.trace("{} {} Received SendBucketHashMessage bucketHash {}", index, bucketHash.isMined(), bucketHash.toStringFull());
 		
 		if(bucketHash.hasOnlyOneChild()) {

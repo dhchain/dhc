@@ -570,13 +570,12 @@ public class BucketHash {
 		return bits;
 	}
 
-	public synchronized void mine(long blockchainIndex) {
+	public synchronized void mine(long blockchainIndex, long blockBits) {
 		logger.trace("{} {} \t mine START buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
 		long timestamp = this.timestamp;
 		int nonce = this.nonce;
 		String miningHash = getMiningHash();
-		long newBits = Blockchain.getInstance().getByHash(getPreviousBlockHash()).getNextBits();
-		bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(newBits) / Math.pow(2, getPower()));
+		bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(blockBits) / Math.pow(2, getPower()));
 		if(Difficulty.checkProofOfWork(bits, miningHash)) {
 			logger.trace("{} {} \t mine END   buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
 			return;
@@ -608,8 +607,21 @@ public class BucketHash {
 		if(bits == 0) {
 			return false;
 		}
+
 		String miningHash = getMiningHash();
 		return Difficulty.checkProofOfWork(bits, miningHash);
+	}
+	
+	public boolean areBitsValid() {
+		long blockBits = Blockchain.getInstance().getNextBits(previousBlockHash);
+		if (blockBits != 0) {
+			long testBits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(blockBits) / Math.pow(2, getPower()));
+			if (bits != testBits) {
+				logger.info("Buckethash is not mined bits={}, testBits={} bucketHash={}", bits, testBits, getKeyHash());
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private String getMiningHash() {
