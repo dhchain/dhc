@@ -873,4 +873,26 @@ public class BlockStore {
 		return result[0];
 	}
 
+	public long getBits(String blockhash) {
+		long[] result = new long[1];
+		result[0] = 0;
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select bits from block where blockHash = ?";
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, blockhash);
+					rs = ps.executeQuery();
+					if (rs.next()) {
+						result[0] = rs.getLong("bits");
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		return result[0];
+	}
+
 }

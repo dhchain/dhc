@@ -26,6 +26,7 @@ import org.dhc.util.Coin;
 import org.dhc.util.Constants;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Difficulty;
 import org.dhc.util.Listeners;
 import org.dhc.util.Registry;
 import org.dhc.util.SharedLock;
@@ -580,7 +581,10 @@ public class Consensus {
 		try {
 			String blockHash = bucketHash.getPreviousBlockHash();
 			String key = bucketHash.getBinaryStringKey();
-			new MissingBlock(blockHash, index);
+			
+			long bits = bucketHash.getBits();
+			bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(bits) * Math.pow(2, bucketHash.getPower()));
+			new MissingBlock(blockHash, index, bits);
 			if (blockchainIndex + 1 == index && key.equals(new BucketKey(dhcAddress.getBinary(key.length())).getOtherBucketKey().getKey())) {
 				if (nextConsensuses.get(blockHash, key) == null) {
 					nextConsensuses.put(bucketHash);

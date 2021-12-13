@@ -65,7 +65,7 @@ public class SendBlockMessage extends Message {
 		
 		RecoveringBlocks.getInstance().run(block);
 
-		new MissingBlock(block.getBlockHash(), block.getIndex());
+		new MissingBlock(block.getBlockHash(), block.getIndex(), block.getBits());
 
 	}
 	

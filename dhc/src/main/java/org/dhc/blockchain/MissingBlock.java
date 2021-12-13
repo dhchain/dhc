@@ -21,8 +21,10 @@ public class MissingBlock {
 	private String blockHash;
 	private String key;
 	private long index;
+	private long bits;
 	
-	public MissingBlock(String blockHash, long index) {
+	public MissingBlock(String blockHash, long index, long bits) {
+		
 		if(Registry.getInstance().getBannedBlockhashes().contains(blockHash)) {
 			return;
 		}
@@ -32,6 +34,7 @@ public class MissingBlock {
 			}
 			blocks.add(blockHash);
 		}
+		this.bits = bits;
 		this.blockHash = blockHash;
 		this.key = DhcAddress.getMyDhcAddress().getBinary(Blockchain.getInstance().getPower());
 		this.index = index;
@@ -85,7 +88,9 @@ public class MissingBlock {
 		
 		logger.info("*************************************************************************");
 		logger.info("MissingBlock.process() index={}, key={}, hash={}", index, key, blockHash);
-		new MissingBlockMessage(blockHash, key, index, DhcAddress.getMyDhcAddress()).send();
+		MissingBlockMessage message = new MissingBlockMessage(blockHash, key, index, DhcAddress.getMyDhcAddress(), bits);
+		message.mine();
+		message.send();
 	}
 
 }

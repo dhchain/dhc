@@ -1,13 +1,17 @@
 package org.dhc.blockchain;
 
+import java.math.BigInteger;
+
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
 import org.dhc.util.Constants;
+import org.dhc.util.CryptoUtil;
 import org.dhc.util.Message;
 import org.dhc.util.ThreadExecutor;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
+import org.dhc.util.Difficulty;
 
 public class MissingBlockMessage extends Message {
 	
@@ -17,12 +21,16 @@ public class MissingBlockMessage extends Message {
 	private String key;
 	private long index;
 	private DhcAddress originDhcAddress;
+	private long bits;
+	private long timestamp = System.currentTimeMillis();
+	private int nonce;
 	
-	public MissingBlockMessage(String blockHash, String key, long index, DhcAddress originDhcAddress) {
+	public MissingBlockMessage(String blockHash, String key, long index, DhcAddress originDhcAddress, long bits) {
 		this.blockHash = blockHash;
 		this.key = key;
 		this.index = index;
 		this.originDhcAddress = originDhcAddress;
+		this.bits = bits;
 	}
 
 	@Override
@@ -34,8 +42,20 @@ public class MissingBlockMessage extends Message {
 		if(MissingBlocks.getInstance().getFoundBlocks(blockHash, key) != null) {
 			return;
 		}
+		
+		if(!isMined() || bits > Difficulty.INITIAL_BITS) {
+			return;
+		}
 
 		Blockchain blockchain = Blockchain.getInstance();
+		
+		long testBits = blockchain.getBits(blockHash);
+		if((testBits != 0) && (testBits != bits)) {
+			return;
+		}
+		
+		
+		
 		Block block = blockchain.getByHash(blockHash);
 		if(block != null) {
 			if(key.startsWith(block.getBucketKey())) {
@@ -76,6 +96,9 @@ public class MissingBlockMessage extends Message {
 		if(MissingBlocks.getInstance().getFoundBlocks(blockHash, key) != null) {
 			return;
 		}
+		
+
+		
 		Blockchain blockchain = Blockchain.getInstance();
 		Block block = blockchain.getByHash(blockHash);
 		if(block == null) {
@@ -105,6 +128,27 @@ public class MissingBlockMessage extends Message {
 	
 	public String toString() {
 		return String.format("MissingBlockMessage %s-%s-%s", index, key, blockHash);
+	}
+
+	public void mine() {
+		BigInteger target = Difficulty.getTarget(bits);
+		String miningHash;
+		String prehash = blockHash + key + index + originDhcAddress;
+		do {
+			nonce++;
+			if(nonce == Integer.MAX_VALUE) {
+				nonce = 0;
+				timestamp++;
+			}
+			
+			miningHash = CryptoUtil.getHashBase58Encoded(prehash + timestamp + nonce);
+		} while(!Difficulty.checkProofOfWork(miningHash, target));
+	}
+	
+	private boolean isMined() {
+		String prehash = blockHash + key + index + originDhcAddress;
+		String miningHash = CryptoUtil.getHashBase58Encoded(prehash + timestamp + nonce);
+		return Difficulty.checkProofOfWork(bits, miningHash);
 	}
 
 }

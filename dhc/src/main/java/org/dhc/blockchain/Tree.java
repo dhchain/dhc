@@ -601,4 +601,20 @@ public class Tree {
 		}
 	}
 
+	public long getBits(String blockhash) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return BlockStore.getInstance().getBits(blockhash);
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
 }
