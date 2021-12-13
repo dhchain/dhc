@@ -1,5 +1,6 @@
 package org.dhc.blockchain;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -636,11 +637,9 @@ public class Block {
 	}
 
 	public void mine() {
+		BigInteger target = Difficulty.getTarget(bits);
+		String localBlockHash;
 		do {
-/*			if(nonce % 10000 == 0) {
-				logger.info("nonce={}", nonce);
-			}*/
-			
 			if(!isGenesis()) {
 				long index = Blockchain.getInstance().getIndex();
 				if (getIndex() != index + 1) {
@@ -653,15 +652,17 @@ public class Block {
 				timeStamp++;
 			}
 			sign();
-			setBlockHash(calculateHash());
-		} while(!isMined());
-		
+			
+			localBlockHash = calculateHash();
+		} while(!Difficulty.checkProofOfWork(localBlockHash, target));
+		setBlockHash(localBlockHash);
 	}
 	
 	public boolean isMined() {
 		if(getBits() == 0 || getBlockHash() == null) {
 			return false;
 		}
+		
 		return Difficulty.checkProofOfWork(getBits(), getBlockHash());
 	}
 

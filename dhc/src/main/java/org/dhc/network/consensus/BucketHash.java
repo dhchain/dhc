@@ -1,6 +1,7 @@
 package org.dhc.network.consensus;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -576,7 +577,8 @@ public class BucketHash {
 		int nonce = this.nonce;
 		String miningHash = getMiningHash();
 		bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(blockBits) / Math.pow(2, getPower()));
-		if(Difficulty.checkProofOfWork(bits, miningHash)) {
+		BigInteger target = Difficulty.getTarget(bits);
+		if(Difficulty.checkProofOfWork(miningHash, target)) {
 			logger.trace("{} {} \t mine END   buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
 			return;
 		}
@@ -594,7 +596,7 @@ public class BucketHash {
 				timestamp++;
 			}
 			miningHash = CryptoUtil.getHashBase58Encoded(getKeyHash() + timestamp + nonce);//uses local timestamp and nonce, cannot replace here with getMiningHash()
-		} while(!Difficulty.checkProofOfWork(bits, miningHash));
+		} while(!Difficulty.checkProofOfWork(miningHash, target));
 		if(!stop) {
 			this.timestamp = timestamp;
 			this.nonce = nonce;

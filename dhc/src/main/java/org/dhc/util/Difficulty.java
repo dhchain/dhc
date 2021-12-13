@@ -48,6 +48,11 @@ public class Difficulty {
 		return getTarget(bits).compareTo(hash) >= 0;
 	}
 	
+	public static boolean checkProofOfWork(String hashStr, BigInteger target) {
+		BigInteger hash = new BigInteger(CryptoUtil.getBinaryRepresentation(hashStr), 2);
+		return target.compareTo(hash) >= 0;
+	}
+	
 	public static double getDifficulty(long bits) {
 		int exponent_diff  = (int)(8 * (SIZE - ((bits >> 24) & 0xFF)));
 		double significand = bits & 0xFFFFFF; 
