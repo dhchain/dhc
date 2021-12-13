@@ -95,10 +95,18 @@ public class BlockStore {
 	}
 	
 	private void updateNextBits(Block block) throws Exception {
-		if(block.getNextBits() != 0) {
+		long blockNextBits = block.getNextBits();
+		long calculatedNextBits;
+		if(blockNextBits != 0) {
+			calculatedNextBits = Difficulty.getBits(block);
+			if(blockNextBits != calculatedNextBits) {
+				logger.info("blockNextBits={} != calculatedNextBits={}", blockNextBits, calculatedNextBits);
+				throw new RuntimeException("nextbits are not correct");
+			}
 			return;
 		}
-		block.setNextBits(Difficulty.getBits(block));
+		calculatedNextBits = Difficulty.getBits(block);
+		block.setNextBits(calculatedNextBits);
 		new DBExecutor() {
 			public void doWork() throws Exception {
 				String sql = "update block set nextBits = ? where blockhash = ?";
