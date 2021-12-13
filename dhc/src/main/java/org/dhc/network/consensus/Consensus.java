@@ -583,8 +583,11 @@ public class Consensus {
 			String key = bucketHash.getBinaryStringKey();
 			
 			long bits = bucketHash.getBits();
-			bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(bits) * Math.pow(2, bucketHash.getPower()));
-			new MissingBlock(blockHash, index, bits);
+			if(bits != 0 && bits <= Difficulty.INITIAL_BITS) {
+				bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(bits) * Math.pow(2, bucketHash.getPower()));
+				new MissingBlock(blockHash, index, bits);
+			}
+			
 			if (blockchainIndex + 1 == index && key.equals(new BucketKey(dhcAddress.getBinary(key.length())).getOtherBucketKey().getKey())) {
 				if (nextConsensuses.get(blockHash, key) == null) {
 					nextConsensuses.put(bucketHash);
