@@ -35,6 +35,7 @@ public class Block {
 	private long timeStamp;
 	private int nonce;
 	private long bits;
+	private long nextBits;
 	
 	public void prune() {
 		bucketHashes = null;
@@ -65,6 +66,7 @@ public class Block {
 		clone.timeStamp = timeStamp;
 		clone.nonce = nonce;
 		clone.bits = bits;
+		clone.nextBits = nextBits;
 		return clone;
 	}
 
@@ -135,7 +137,7 @@ public class Block {
 					+ " hash=" + blockHash + " previous="
 					+ previousHash + " miner=" + getDhcAddress() + " " + hashes
 					+ ", fee=" + (hashes == null ? "": hashes.getFirstBucketHash().getFee().toNumberOfCoins())
-					+ ", nonce=" + nonce + ", bits=" + Long.toString(getBits(), 16) + ", isMined=" + isMined();
+					+ ", nonce=" + nonce + ", bits=" + Long.toString(getBits(), 16) + ", nextBits=" + Long.toString(getNextBits(), 16) + ", isMined=" + isMined();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return e.getMessage();
@@ -661,6 +663,14 @@ public class Block {
 			return false;
 		}
 		return Difficulty.checkProofOfWork(getBits(), getBlockHash());
+	}
+
+	public long getNextBits() {
+		return nextBits;
+	}
+
+	public void setNextBits(long nextBits) {
+		this.nextBits = nextBits;
 	}
 	
 

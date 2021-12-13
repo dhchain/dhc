@@ -73,6 +73,8 @@ public class BlockStore {
 			return false;
 		}
 		
+		updateNextBits(block);
+		
 		BucketHashStore.getInstance().saveBucketHashes(block.getBlockHash(), block.getBucketHashes());
 		TransactionStore.getInstance().saveTransactions(block.getAllTransactions());
 		
@@ -92,6 +94,25 @@ public class BlockStore {
 		return true;
 	}
 	
+	private void updateNextBits(Block block) throws Exception {
+		if(block.getNextBits() != 0) {
+			return;
+		}
+		block.setNextBits(Difficulty.getBits());
+		new DBExecutor() {
+			public void doWork() throws Exception {
+				String sql = "update block set nextBits = ? where blockhash = ?";
+				ps = conn.prepareStatement(sql);
+				int i = 1;
+				ps.setLong(i++, block.getNextBits());
+				ps.setString(i++, block.getBlockHash());
+				long start = System.currentTimeMillis();
+				ps.executeUpdate();
+				logger.trace("Query updateNextBits took {} ms. '{}' ", System.currentTimeMillis() - start, sql);
+			}
+		}.execute();
+	}
+
 	private boolean doSaveBlock(Block block) throws Exception {
 		if (getByBlockhash(block.getBlockHash()) != null) {
 			return false;
@@ -111,8 +132,8 @@ public class BlockStore {
 
 		new DBExecutor() {
 			public void doWork() throws Exception {
-				String sql = "insert into block (block_id, blockHash, miner, index, previousHash, receivedTime, power, coinbaseTransactionId, minerSignature, consensus, timeStamp, nonce, bits) "
-						+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				String sql = "insert into block (block_id, blockHash, miner, index, previousHash, receivedTime, power, coinbaseTransactionId, minerSignature, consensus, timeStamp, nonce, bits, nextBits) "
+						+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 				ps = conn.prepareStatement(sql);
 				int i = 1;
@@ -145,6 +166,7 @@ public class BlockStore {
 				ps.setLong(i++, block.getTimeStamp());
 				ps.setInt(i++, block.getNonce());
 				ps.setLong(i++, block.getBits());
+				ps.setLong(i++, block.getNextBits());
 				long start = System.currentTimeMillis();
 				ps.executeUpdate();
 				logger.trace("Query doSaveBlock took {} ms. '{}' ", System.currentTimeMillis() - start, sql);
@@ -251,6 +273,7 @@ public class BlockStore {
 		block.setTimeStamp(rs.getLong("timeStamp"));
 		block.setNonce(rs.getInt("nonce"));
 		block.setBits(rs.getLong("bits"));
+		block.setNextBits(rs.getLong("nextBits"));
 		return block;
 	}
 
@@ -317,7 +340,7 @@ public class BlockStore {
 					s.execute("create table block ( block_id bigint NOT NULL CONSTRAINT block_PK PRIMARY KEY, blockHash varchar(64) NOT NULL, "
 							+ "miner varchar(256), index bigint NOT NULL, previousHash varchar(64), receivedTime bigint, "
 							+ "power int NOT NULL, coinbaseTransactionId varchar(64), minerSignature varchar(256), "
-							+ "consensus varchar(64) NOT NULL, timeStamp bigint, nonce int, bits bigint)");
+							+ "consensus varchar(64) NOT NULL, timeStamp bigint, nonce int, bits bigint, nextBits bigint DEFAULT " + Difficulty.INITIAL_BITS + ")");
 
 					s.execute("ALTER TABLE block ADD CONSTRAINT block_blockHash UNIQUE (blockhash)");
 					s.execute("CREATE INDEX block_index ON block(index)");
@@ -328,10 +351,11 @@ public class BlockStore {
 				}
 				rs.close();
 
-				addNewColumn(dbmd, tableName, "coinbaseTransactionId", "ALTER TABLE BLOCK ADD coinbaseTransactionId VARCHAR(64)");
+				addNewColumn(dbmd, tableName, "coinbaseTransactionId", "ALTER TABLE " + tableName + " ADD coinbaseTransactionId VARCHAR(64)");
 				
-				addNewColumn(dbmd, tableName, "timeStamp", "ALTER TABLE BLOCK ADD timeStamp bigint");
-				addIndex(dbmd, tableName, "block_timeStamp", "CREATE INDEX block_timeStamp ON "+ tableName + "(timeStamp)");
+				addNewColumn(dbmd, tableName, "timeStamp", "ALTER TABLE " + tableName + " ADD timeStamp bigint");
+				addIndex(dbmd, tableName, "block_timeStamp", "CREATE INDEX block_timeStamp ON " + tableName + "(timeStamp)");
+				addNewColumn(dbmd, tableName, "nextBits", "ALTER TABLE " + tableName + " ADD nextBits bigint DEFAULT " + Difficulty.INITIAL_BITS);
 				
 			}
 		}.execute();

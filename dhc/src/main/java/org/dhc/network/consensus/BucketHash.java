@@ -570,11 +570,12 @@ public class BucketHash {
 		return bits;
 	}
 
-	public synchronized void mine(long blockchainIndex, long newBits) {
+	public synchronized void mine(long blockchainIndex) {
 		logger.trace("{} {} \t mine START buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
 		long timestamp = this.timestamp;
 		int nonce = this.nonce;
-		String miningHash = getMiningHash();;
+		String miningHash = getMiningHash();
+		long newBits = Blockchain.getInstance().getByHash(getPreviousBlockHash()).getNextBits();
 		bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(newBits) / Math.pow(2, getPower()));
 		if(Difficulty.checkProofOfWork(bits, miningHash)) {
 			logger.trace("{} {} \t mine END   buckethash={} isMined={}", blockchainIndex, getRealHashCode(), getKeyHash(), isMined());
