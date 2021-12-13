@@ -12,6 +12,7 @@ import org.dhc.util.ThreadExecutor;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
+import org.dhc.util.Difficulty;
 
 public class MissingBlock {
 
@@ -34,9 +35,10 @@ public class MissingBlock {
 			}
 			blocks.add(blockHash);
 		}
-		this.bits = bits;
-		this.blockHash = blockHash;
 		this.key = DhcAddress.getMyDhcAddress().getBinary(Blockchain.getInstance().getPower());
+		this.bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(bits) / Math.pow(2, key.length()));
+		this.blockHash = blockHash;
+		
 		this.index = index;
 		long lastIndex = Math.max(Blockchain.getInstance().getIndex(), ChainSync.getInstance().getLastBlockchainIndex());
 		if(index < lastIndex) {

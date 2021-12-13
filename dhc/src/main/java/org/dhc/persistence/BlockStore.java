@@ -134,7 +134,8 @@ public class BlockStore {
 		
 		long nextBits = getNextBits(previousHash);
 		if(!block.isGenesis() &&  (block.getBits() != nextBits)) {
-			logger.info("previous block next bits != bits of this block {}", block);
+			logger.info("previous block next bits {} != {} bits of this block {}", nextBits, block.getBits(), block);
+			
 			return false;
 		}
 
