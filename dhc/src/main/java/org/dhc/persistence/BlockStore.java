@@ -816,7 +816,7 @@ public class BlockStore {
 			
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select * from block where index >= ? and index <= ? order by index desc";
+					String sql = "select blockhash, timeStamp, previousHash from block where index >= ? and index <= ? order by index desc";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setLong(i++, firstIndex);
@@ -847,7 +847,7 @@ public class BlockStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select * from block where index >= ? and index <= ? order by index desc";
+					String sql = "select blockhash, bits, previousHash from block where index >= ? and index <= ? order by index desc";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setLong(i++, firstIndex);
