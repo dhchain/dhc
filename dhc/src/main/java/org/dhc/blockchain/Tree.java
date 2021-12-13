@@ -553,12 +553,12 @@ public class Tree {
 		}
 	}
 
-	public long getAverageMiningTime() {
+	public long getAverageMiningTime(Block block) {
 		Lock readLock = readWriteLock.readLock();
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			return BlockStore.getInstance().getAverageMiningTime();
+			return BlockStore.getInstance().getAverageMiningTime(block);
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;
@@ -569,12 +569,12 @@ public class Tree {
 		}
 	}
 	
-	public long getAverageBits() {
+	public long getAverageBits(Block block) {
 		Lock readLock = readWriteLock.readLock();
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			return BlockStore.getInstance().getAverageBits();
+			return BlockStore.getInstance().getAverageBits(block);
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;

@@ -98,7 +98,7 @@ public class BlockStore {
 		if(block.getNextBits() != 0) {
 			return;
 		}
-		block.setNextBits(Difficulty.getBits());
+		block.setNextBits(Difficulty.getBits(block));
 		new DBExecutor() {
 			public void doWork() throws Exception {
 				String sql = "update block set nextBits = ? where blockhash = ?";
@@ -800,51 +800,64 @@ public class BlockStore {
 		return result[0];
 	}
 
-	public long getAverageMiningTime() {
-		long lastIndex = getLastIndex();
+	public long getAverageMiningTime(Block block) {
+		long lastIndex = block.getIndex();
 		long firstIndex = Math.max(0, lastIndex - 100);
-		List<Long> timestamps = new ArrayList<Long>();
+		long[] timestamp = new long[1];
 		try {
+			
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select min(timeStamp) timeStamp from block where index in (?, ?) group by index";
+					String sql = "select * from block where index >= ? and index <= ? order by index desc";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
-					ps.setLong(i++, lastIndex);
 					ps.setLong(i++, firstIndex);
+					ps.setLong(i++, lastIndex);
 					rs = ps.executeQuery();
+					String branchHash = block.getBlockHash();
 					while (rs.next()) {
-						timestamps.add(rs.getLong("timeStamp"));
+						String hash = rs.getString("blockhash");
+						if (branchHash.equals(hash)) {
+							timestamp[0] = rs.getLong("timeStamp");
+							branchHash = rs.getString("previousHash");
+						}
 					}
 				}
 			}.execute();
+
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 		
-		return Math.abs(timestamps.get(0) - timestamps.get(1)) / (lastIndex - firstIndex);
+		return (block.getTimeStamp() - timestamp[0]) / (lastIndex - firstIndex);
 	}
 	
-	public long getAverageBits() {
-		long lastIndex = getLastIndex();
+	public long getAverageBits(Block block) {
+		long lastIndex = block.getIndex();
 		long firstIndex = Math.max(0, lastIndex - 100);
 		long[] result = new long[1];
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select min(bits) bits from block where index <= ? and index >= ? group by index";
+					String sql = "select * from block where index >= ? and index <= ? order by index desc";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
-					ps.setLong(i++, lastIndex);
 					ps.setLong(i++, firstIndex);
+					ps.setLong(i++, lastIndex);
 					rs = ps.executeQuery();
+					String branchHash = block.getBlockHash();
 					double sum = 0;
 					while (rs.next()) {
-						sum = sum + Difficulty.getDifficulty(rs.getLong("bits"));
+						String hash = rs.getString("blockhash");
+						if (branchHash.equals(hash)) {
+							sum = sum + Difficulty.getDifficulty(rs.getLong("bits"));
+							branchHash = rs.getString("previousHash");
+						}
 					}
 					result[0] = Difficulty.convertDifficultyToBits(sum / (lastIndex - firstIndex));
 				}
 			}.execute();
+
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

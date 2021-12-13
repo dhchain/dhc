@@ -82,7 +82,7 @@ public class Blockchain {
 		Block block = new Block();
 		block.setIndex(0);
 		block.setMiner(Constants.PUBLIC_KEY);
-		block.setBits(Difficulty.getBits());
+		block.setBits(Difficulty.getBits(block));
 
 		try {
 			
@@ -143,6 +143,9 @@ public class Blockchain {
 			buckethash.setBinaryStringKey("");
 			buckethash.addTransaction(transaction);
 			buckethash.recalculateHashFromTransactions();
+			buckethash.setNonce(10110);
+			buckethash.setTimestamp(1639412369073L);
+			buckethash.setBits(Difficulty.INITIAL_BITS);
 
 			BucketHashes bucketHashes = new BucketHashes();
 			bucketHashes.put(buckethash);
@@ -814,12 +817,12 @@ public class Blockchain {
 		}
 	}
 
-	public long getAverageMiningTime() {
+	public long getAverageMiningTime(Block block) {
 		Lock readLock = readWriteLock.readLock();
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			return tree.getAverageMiningTime();
+			return tree.getAverageMiningTime(block);
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;
@@ -830,12 +833,12 @@ public class Blockchain {
 		}
 	}
 	
-	public long getAverageBits() {
+	public long getAverageBits(Block block) {
 		Lock readLock = readWriteLock.readLock();
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			return tree.getAverageBits();
+			return tree.getAverageBits(block);
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;

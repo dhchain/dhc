@@ -650,5 +650,9 @@ public class BucketHash {
 		this.nonce = nonce;
 	}
 
+	public void setBits(long bits) {
+		this.bits = bits;
+	}
+
 
 }
