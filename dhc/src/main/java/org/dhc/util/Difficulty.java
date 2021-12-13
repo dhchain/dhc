@@ -55,6 +55,9 @@ public class Difficulty {
 	}
 	
 	public static double getDifficulty(long bits) {
+		if(bits == 0) {
+			bits = INITIAL_BITS;
+		}
 		int exponent_diff  = (int)(8 * (SIZE - ((bits >> 24) & 0xFF)));
 		double significand = bits & 0xFFFFFF; 
 		return Math.scalb(0x00FFFF / significand, exponent_diff);
