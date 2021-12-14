@@ -586,10 +586,13 @@ public class BucketHash {
 			if(stop) {
 				break;
 			}
-			long index = Blockchain.getInstance().getIndex();
-			if(blockchainIndex < index) {
-				break;
+			if(blockchainIndex != 0) {
+				long index = Blockchain.getInstance().getIndex();
+				if(blockchainIndex < index) {
+					break;
+				}
 			}
+			
 			nonce++;
 			if(nonce == Integer.MAX_VALUE) {
 				nonce = 0;

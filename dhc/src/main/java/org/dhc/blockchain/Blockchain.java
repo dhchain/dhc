@@ -92,36 +92,8 @@ public class Blockchain {
 			
 			int i = 0;
 			
-			TransactionOutput output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
+			TransactionOutput output = new TransactionOutput(myAddresses.get(i++), new Coin(Long.MAX_VALUE));
 			output.setOutputId("DNiMXMBFXw4vPSSVYsRmKDgFaSvfyT4RGx6yZWwYdbkx");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("6PYyPvY9LiM8rWVvjiWpc8onVJiA7J6tvuwFBn2e4daj");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("CUhgqbPNk72BpVEWzqiYPMdf4dK9PKVnbvSgt3au8V98");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("Av55WA5ed1fixLjVTc1r1JrRE9VaSwaFLbzUEZBwUcFt");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("EeE7L3nu2iLbtLEPj3XfUDd6QbTkhLrJvBYb93LNjb25");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("BAg3xhro4XvaeXpG9BbVNVCf5cafqT3McpsiMR4s7GM5");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("4Y5CqPJ1dyKLSCEwn63hMJSGi6HVfA3bDomDzmqX4qoy");
-			transaction.getOutputs().add(output);
-			
-			output = new TransactionOutput(myAddresses.get(i++), Coin.ONE.multiply(1000000));
-			output.setOutputId("GgcemwSPjrsTyYwR9F8QjsE3tmuDsegMLmRzT9goLhiX");
 			transaction.getOutputs().add(output);
 			
 			transaction.setValue(transaction.getOutputsValue());
@@ -134,7 +106,7 @@ public class Blockchain {
 				transaction.setTransactionId();
 			    logger.info("transaction signature={}", transaction.getSignature());*/
 			// comment out END
-			transaction.setSignature("381yXYxjxWa8x1m1WC2gUtT2AyHykwVQeoMfuAFKiFUTnvZJZAe2RTheFPXDsBhDHtDBLq1hCcX39CwpL89qkGLMmAPciyzC");
+			transaction.setSignature("AN1rKoRqz88686BLMJk3Qc3N3MkB9LT9gS4ZZVVr6SC2csF1oms3f1GdETMgnXsmPFzbVRxSA7FnyhchoUivpWe6zgfXnue96");
 			transaction.setTransactionId();
 
 			logger.info("transaction signature valid={}", transaction.verifySignature());
@@ -143,9 +115,11 @@ public class Blockchain {
 			buckethash.setBinaryStringKey("");
 			buckethash.addTransaction(transaction);
 			buckethash.recalculateHashFromTransactions();
-			buckethash.setNonce(10110);
-			buckethash.setTimestamp(1639412369073L);
+			buckethash.setNonce(263982);
+			buckethash.setTimestamp(1639450588766L);
 			buckethash.setBits(Difficulty.INITIAL_BITS);
+/*			buckethash.mine(0, Difficulty.INITIAL_BITS);
+			logger.info("buckethash.getNonce()={}, buckethash.getTimestamp()={}", buckethash.getNonce(), buckethash.getTimestamp());*/
 
 			BucketHashes bucketHashes = new BucketHashes();
 			bucketHashes.put(buckethash);
@@ -157,16 +131,16 @@ public class Blockchain {
 				block.mine();*/
 			// comment out END
 			
-			block.setBlockHash("11XV1g9ZFzAd6HKds7BCsBzqvV12dxNWFWVmn4tMAHe");
-			block.setTimeStamp(1639169236052L);
-			block.setNonce(88960);
+			block.setBlockHash("11RLNshrqDRuKWGs6gU7pG7BTxRcZce3McDnEW1gsqG");
+			block.setTimeStamp(1639450594080L);
+			block.setNonce(15574);
 			
 			// comment out START
 /*				logger.info("block signature={}", block.getMinerSignature());
 				logger.info("block signature valid={}", block.verifySignature());
 				logger.info("nonce={}, timestamp={}", block.getNonce(), block.getTimeStamp());*/
 			// comment out END
-			block.setMinerSignature("AN1rKvtPitHqWtbjJv28ofrZA52CLACT62KTMWMaZ2VFuwcURLY6cRcSzbChpkZnYW4aUHgz2npAxJqvJarbTsXV6X7sASkxF");
+			block.setMinerSignature("iKx1CJN1oQsDuhJpw9ufuJ173js2o6xW1ZvKPNQB2hgMJ4rbQwmES9u8zyZfigYJQSjh8kCRPybTof82P4svQ6LYuQWw6gUBmu");
 			block.setBlockHash();
 			buckethash.setPreviousBlockHash(block.getPreviousHash());
 			

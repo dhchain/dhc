@@ -7,7 +7,7 @@ public class Constants {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	private static final Configurator configurator = Configurator.getInstance();
-	public static final int k = 3;
+	public static final int k = 8;
 	public static final int maxNumberOfPeersToSend = configurator.getIntProperty("org.dhc.util.Constants.maxNumberOfPeersToSend", 5);
 	public static final int MAX_CONN = configurator.getIntProperty("org.dhc.util.Constants.max.number.of.connections", 500);
 	public static final long SECOND = 1000;
