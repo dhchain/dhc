@@ -422,6 +422,8 @@ public class Consensus {
 	
 	private void sendNextProposal(BucketHash bucketHash) {
 		
+		logger.trace("{} sendNextProposal() START bucketHash={}", blockchainIndex, bucketHash.getKeyHash());
+		
 		if("".equals(bucketHash.getBinaryStringKey())) {
 			logger.info("************************************************");
 			logger.info("bucketHash={}", bucketHash.toStringFull());
@@ -473,6 +475,7 @@ public class Consensus {
 		String nextConsensusKey = parentBucketHash.getBinaryStringKey();
 
 		if(consensuses.get(bucketHash.getPreviousBlockHash(), nextConsensusKey) != null) {
+			logger.trace("Returning because consensuses.get({}, {}) != null", bucketHash.getPreviousBlockHash(), nextConsensusKey);
 			return;
 		}
 		
@@ -496,21 +499,27 @@ public class Consensus {
 		i--;
 		if(i < 0 && !consensuses.getBySecondKey("").isEmpty()) {
 			notifyConsensusReady();
+			logger.trace("{} return from sendNextProposal()", blockchainIndex);
 			return;
 		}
 		String nextBucketKey = network.getBucketKey(i);
 		if(nextBucketKey == null) {//this can happen if the number of buckets changed and there is no bucket with index i
+			logger.trace("{} return from sendNextProposal() because nextBucketKey == null", blockchainIndex);
 			return;
 		}
 		BucketHash bHash = consensuses.get(bucketHash.getPreviousBlockHash(), nextBucketKey);
 		if(bHash == null) {
+			logger.trace("{} return from sendNextProposal() because bHash == null", blockchainIndex);
 			return;
 		}
 		String nextBucketHash = bHash.getHash();
 		if(nextBucketHash == null) {
+			logger.trace("{} return from sendNextProposal() because bHash == nextBucketHash", blockchainIndex);
 			return;
 		}
 		sendNextProposal(bHash);
+		
+		logger.trace("{} sendNextProposal() END bucketHash={}", blockchainIndex, bucketHash.getKeyHash());
 	}
 
 	private void replaceChildren(BucketHash bucketHash) {
