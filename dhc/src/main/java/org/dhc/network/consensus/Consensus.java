@@ -382,7 +382,7 @@ public class Consensus {
 		
 		block.setTimeStamp(System.currentTimeMillis());
 		
-		createAndSendTransaction(previousBlock);
+		//createAndSendTransaction(previousBlock);
 		
 		waitForMiningLock();
 		
@@ -960,6 +960,7 @@ public class Consensus {
 		return initialBucketHashes;
 	}
 
+	@SuppressWarnings("unused")
 	private void createAndSendTransaction(Block block) {
 
 		try {
