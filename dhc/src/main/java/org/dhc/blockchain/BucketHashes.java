@@ -175,8 +175,8 @@ public class BucketHashes {
 	public void put(BucketHash bucketHash) {
 		
 		if("".equals(bucketHash.getBinaryStringKey()) && !bucketHash.isMined()) {
-			logger.info("put() Not mined bucketHash   : {}", bucketHash.toStringFull());
-			logger.info("", new RuntimeException());
+			logger.trace("put() Not mined bucketHash   : {}", bucketHash.toStringFull());
+			logger.trace("", new RuntimeException());
 		}
 		
 		String key = bucketHash.getBinaryStringKey();
