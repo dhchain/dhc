@@ -56,8 +56,8 @@ public class InitialBucketHashes {
 		}
 		
 		if(result != null && !result.isMined() && "".equals(result.getBinaryStringKey())) {
-			logger.info("{} {} {} waitForBucketHash() result={}", blockchainIndex, result.isMined(), result.getRealHashCode(), result.getKeyHash());
-			logger.info("", new RuntimeException());
+			logger.trace("{} {} {} waitForBucketHash() result={}", blockchainIndex, result.isMined(), result.getRealHashCode(), result.getKeyHash());
+			logger.trace("", new RuntimeException());
 		}
 		
 		return result;

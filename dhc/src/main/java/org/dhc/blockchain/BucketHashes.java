@@ -209,7 +209,7 @@ public class BucketHashes {
 		
 		if("".equals(bucketHash.getBinaryStringKey()) && !bucketHash.isMined()) {
 			String str = String.format("%s replace() Not mined bucketHash %s", bucketHash.isMined(), bucketHash.toStringFull());
-			logger.info(str, new RuntimeException());
+			logger.trace(str, new RuntimeException());
 		}
 		
 		BucketHash original = bucketHashes.get(bucketHash.getBinaryStringKey());
