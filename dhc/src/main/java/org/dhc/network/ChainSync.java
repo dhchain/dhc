@@ -118,9 +118,13 @@ public class ChainSync {
 
 		try {
 			int count = 0;
-			while(!myPeers.isEmpty() || Blockchain.getInstance().getQueueSize() > 0) {
+			while(!myPeers.isEmpty() || blockchain.getQueueSize() > 0) {
 				
+				long index = blockchain.getIndex();
 				wait(Constants.SECOND * 1);
+				if(blockchain.getIndex() > index) {
+					continue;
+				}
 				removedClosed(myPeers);
 				if(!myPeers.isEmpty()) {
 					logger.info("myPeers {}: ", myPeers.size());
@@ -128,8 +132,8 @@ public class ChainSync {
 						logger.info("\t peer {}", peer);
 					}
 				}
-				if(Blockchain.getInstance().getQueueSize() > 0) {
-					logger.info("Blockchain.getInstance().getQueueSize() {}", Blockchain.getInstance().getQueueSize());
+				if(blockchain.getQueueSize() > 0) {
+					logger.info("blockchain.getQueueSize() {}", blockchain.getQueueSize());
 				}
 				if(lastBlockchainIndex <= blockchain.getIndex()) {
 					break;
@@ -138,7 +142,7 @@ public class ChainSync {
 					break;
 				}
 			}
-			logger.trace("ChainSynchronizer was notified by {} peer(s) networkPower={}, blockchainPower={}:", list.size(), Network.getInstance().getPower(), Blockchain.getInstance().getPower());
+			logger.trace("ChainSynchronizer was notified by {} peer(s) networkPower={}, blockchainPower={}:", list.size(), Network.getInstance().getPower(), blockchain.getPower());
 			for (Peer peer : list) {
 				logger.trace("\t{} {}", peer.getTAddress().getBinary(), peer);
 			}
