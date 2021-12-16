@@ -75,7 +75,7 @@ public class Buckets {
 			
 			Collections.sort(peers, new TimeAddedPeerComparator());
 
-			if (peers.size() >= Constants.k / 2) {//reverting to k instead of k/2
+			if (peers.size() >= Constants.k) {//reverting to k instead of k/2
 				Bucket bucket = new Bucket(this);
 				bucket.getPeers().addAll(peers);
 				buckets.add(bucket);
