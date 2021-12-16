@@ -74,7 +74,7 @@ public class Buckets {
 			
 			Collections.sort(peers, new TimeAddedPeerComparator());
 
-			if (peers.size() >= Constants.k / 2) {// at least my bucket has half of Constants.k peers, before was at least my bucket has Constants.k peers
+			if (peers.size() >= Constants.k) {//reverting to k instead of k/2
 				Bucket bucket = new Bucket(this);
 				bucket.getPeers().addAll(peers);
 				buckets.add(bucket);
