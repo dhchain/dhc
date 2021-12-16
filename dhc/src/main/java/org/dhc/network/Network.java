@@ -5,10 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dhc.util.Constants;
-import org.dhc.util.Message;
-import org.dhc.util.Registry;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Message;
+import org.dhc.util.Registry;
+import org.dhc.util.TAddress;
 
 public class Network {
 	
@@ -121,7 +122,7 @@ public class Network {
 	public List<Peer> getPeersWithKey(String key) {
 		List<Peer> result = new ArrayList<Peer>();
 		for(Peer p: new ArrayList<Peer>(Peer.getPeers())) {
-			if(p.getDhcAddress() != null && p.getDhcAddress().isMyKey(key)) {
+			if(p.getTAddress() != null && p.getTAddress().isMyKey(key)) {
 				result.add(p);
 			}
 		}
@@ -138,7 +139,7 @@ public class Network {
 	public List<Peer> getPeersForKey(String key) {
 		List<Peer> result = new ArrayList<Peer>();
 		for(Peer p: getAllPeers()) {
-			if(p.getDhcAddress().isMyKey(key)) {
+			if(p.getTAddress().isMyKey(key)) {
 				result.add(p);
 			}
 		}
@@ -180,6 +181,13 @@ public class Network {
 			return "";
 		}
 		return buckets.getBucketKey(dhcAddress);
+	}
+	
+	public String getBucketKey(TAddress tAddress) {
+		if(buckets == null || buckets.isEmpty()) {
+			return "";
+		}
+		return buckets.getBucketKey(tAddress);
 	}
 
 	public String getBucketKey(int index) {

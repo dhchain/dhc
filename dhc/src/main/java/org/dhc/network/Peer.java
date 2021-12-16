@@ -23,14 +23,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.dhc.util.Callback;
 import org.dhc.util.Constants;
 import org.dhc.util.CryptoUtil;
+import org.dhc.util.DhcLogger;
+import org.dhc.util.DhcRunnable;
 import org.dhc.util.ExpiringMap;
 import org.dhc.util.GsonUtil;
 import org.dhc.util.Message;
+import org.dhc.util.TAddress;
 import org.dhc.util.ThreadExecutor;
-import org.dhc.util.DhcAddress;
-import org.dhc.util.DhcLogger;
-import org.dhc.util.DhcRunnable;
-import org.dhc.util.Wallet;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -41,7 +40,7 @@ public class Peer {
 	private static final GsonUtil gsonUtil = GsonUtil.getInstance();
 	private static final Map<InetSocketAddress, Peer> peers = new ConcurrentHashMap<InetSocketAddress, Peer>();
 
-	private DhcAddress dhcAddress;// it is set in process(Message message), don't set it here.
+	private TAddress tAddress;// it is set in process(Message message), don't set it here.
 	private String networkIdentifier;// process(Message message), don't set it here.
 	private int power;// process(Message message), don't set it here.
 	private Boolean inUse;
@@ -110,7 +109,7 @@ public class Peer {
 		if(isClosed() || !Peer.getPeers().contains(this)) {
 			return;
 		}
-		if(getDhcAddress() == null) {
+		if(getTAddress() == null) {
 			return;
 		}
 		Network network = Network.getInstance();
@@ -148,18 +147,6 @@ public class Peer {
 		} finally {
 			writeLock.unlock();
 		}
-	}
-
-	public DhcAddress getDhcAddress() {
-		return dhcAddress;
-	}
-
-	private void setDhcAddress(DhcAddress dhcAddress) {
-		if(this.dhcAddress != null && !this.dhcAddress.equals(dhcAddress)) {
-			logger.error("dhcAddress={}, this.dhcAddress={}", dhcAddress, this.dhcAddress);
-			throw new RuntimeException("Trying to change already set dhc address");
-		}
-		this.dhcAddress = dhcAddress;
 	}
 
 	public String getNetworkIdentifier() {
@@ -249,7 +236,7 @@ public class Peer {
 			setPower(message.getPower());
 			setInUse(message.isInUse());
 			setPossiblePower(message.getPossiblePower());
-			setDhcAddress(message.getDhcAddress());
+			setTAddress(message.getDhcAddress());
 			message.process(this);
 			putResponse(message);
 			callback(message);
@@ -383,7 +370,7 @@ public class Peer {
 	
 	public void send(Message message) {
 		message.setNetworkIdentifier(Message.NETWORK_IDENTIFIER);
-		message.setDhcAddress(Wallet.getInstance().getDhcAddress());
+		message.setTAddress(TAddress.getMyTAddress());
 		SenderPool.getInstance().send(this, message);
 	}
 
@@ -435,7 +422,7 @@ public class Peer {
 	}
 	
 	public String toString() {
-		return socket + " \t\t\t\t\t\t" + networkIdentifier + " \t" + dhcAddress + " \tclosed=" + isClosed() + " \tinUse=" + getInUse() + 
+		return socket + " \t\t\t\t\t\t" + networkIdentifier + " \t" + tAddress + " \tclosed=" + isClosed() + " \tinUse=" + getInUse() + 
 				" \t\tlastSeen=" + new Date(getLastSeen()) + " \ttimeAdded=" + new Date(getTimeAdded()) + " \t" + getType() + " \t";
 	}
 	
@@ -482,13 +469,13 @@ public class Peer {
 		return result;
 	}
 
-	public static List<Peer> getClosestKPeers(DhcAddress dhcAddress) {
+	public static List<Peer> getClosestKPeers(TAddress tAddress) {
 		List<Peer> peers = getAllToPeers();
 		//logger.trace("Will sort {} peers: {}", peers.size(), peers);
 		Collections.sort(peers, new Comparator<Peer>() {
 			@Override
 			public int compare(Peer p1, Peer p2) {
-				return dhcAddress.compareDistance(p1.getDhcAddress(), p2.getDhcAddress());
+				return tAddress.compareDistance(p1.getTAddress(), p2.getTAddress());
 			}
 		});
 		return peers.subList(0, Math.min(Constants.k,peers.size()));
@@ -497,7 +484,7 @@ public class Peer {
 	public static List<Peer> getAllToPeers() {
 		List<Peer> result = new ArrayList<Peer>();
 		for(Peer peer: new ArrayList<>(peers.values())) {
-			if(PeerType.TO.equals(peer.getType()) && peer.getDhcAddress() != null) {
+			if(PeerType.TO.equals(peer.getType()) && peer.getTAddress() != null) {
 				result.add(peer);
 			}
 		}
@@ -537,7 +524,7 @@ public class Peer {
 	}
 	
 	public String getKey() {
-		return getDhcAddress().getBinary(getPower());
+		return getTAddress().getBinary(getPower());
 	}
 
 	/**
@@ -556,6 +543,14 @@ public class Peer {
 	
 	public Socket getSocket() {
 		return socket;
+	}
+
+	public TAddress getTAddress() {
+		return tAddress;
+	}
+
+	public void setTAddress(TAddress tAddress) {
+		this.tAddress = tAddress;
 	}
 
 }

@@ -17,11 +17,11 @@ import org.dhc.persistence.BlockStore;
 import org.dhc.persistence.BucketHashStore;
 import org.dhc.util.BoundedMap;
 import org.dhc.util.Constants;
-import org.dhc.util.GsonUtil;
-import org.dhc.util.ThreadExecutor;
-import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
+import org.dhc.util.GsonUtil;
+import org.dhc.util.TAddress;
+import org.dhc.util.ThreadExecutor;
 
 import com.google.gson.Gson;
 
@@ -95,7 +95,7 @@ public class ChainRest {
 				} finally {
 					setRunning(false);
 					logger.info("END ChainRestorer. Took {} ms. Number of attempts {}", System.currentTimeMillis() - start, attemptNumber);
-					Bootstrap.getInstance().navigate(network.getAllPeers(), DhcAddress.getMyDhcAddress());
+					Bootstrap.getInstance().navigate(network.getAllPeers(), TAddress.getMyTAddress());
 				}
 			}
 		});

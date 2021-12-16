@@ -4,21 +4,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dhc.util.Message;
-import org.dhc.util.ThreadExecutor;
-import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
+import org.dhc.util.Message;
+import org.dhc.util.TAddress;
+import org.dhc.util.ThreadExecutor;
 
 public class NavigateReplyMessage extends Message {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
 
 	private List<Peer> peers;
-	private DhcAddress hash;
+	private TAddress hash;
 	private int index;
 
-	public NavigateReplyMessage(List<Peer> peers, DhcAddress hash, int index) {
+	public NavigateReplyMessage(List<Peer> peers, TAddress hash, int index) {
 		this.peers = peers;
 		this.hash = hash;
 		this.index = index;

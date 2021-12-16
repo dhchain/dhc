@@ -2,14 +2,6 @@ package org.dhc.blockchain;
 
 import java.math.BigInteger;
 import java.util.AbstractMap.SimpleEntry;
-
-import org.dhc.network.Network;
-import org.dhc.network.consensus.BucketHash;
-import org.dhc.network.consensus.SendBucketHashMessage;
-import org.dhc.util.Coin;
-import org.dhc.util.DhcAddress;
-import org.dhc.util.DhcLogger;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -18,6 +10,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.dhc.network.Network;
+import org.dhc.network.consensus.BucketHash;
+import org.dhc.network.consensus.SendBucketHashMessage;
+import org.dhc.util.Coin;
+import org.dhc.util.DhcLogger;
+import org.dhc.util.TAddress;
 
 public class BucketHashes {
 	
@@ -319,8 +318,8 @@ public class BucketHashes {
 		return getLastBucketHash().isMyHash();
 	}
 
-	public boolean isHis(DhcAddress dhcAddress) {
-		return getLastBucketHash().isHis(dhcAddress);
+	public boolean isHis(TAddress tAddress) {
+		return getLastBucketHash().isHis(tAddress);
 	}
 
 	public void trim(int power) {

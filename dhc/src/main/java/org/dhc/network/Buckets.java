@@ -8,12 +8,13 @@ import java.util.concurrent.locks.Lock;
 
 import org.dhc.blockchain.Blockchain;
 import org.dhc.util.Constants;
-import org.dhc.util.ExpiringMap;
-import org.dhc.util.SharedLock;
-import org.dhc.util.ThreadExecutor;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
+import org.dhc.util.ExpiringMap;
+import org.dhc.util.SharedLock;
+import org.dhc.util.TAddress;
+import org.dhc.util.ThreadExecutor;
 
 public class Buckets {
 
@@ -42,7 +43,7 @@ public class Buckets {
 		try {
 			
 			allPeersCount = Peer.getTotalPeerCount();
-			DhcAddress dhcAddress = DhcAddress.getMyDhcAddress();
+			TAddress tAddress = TAddress.getMyTAddress();
 
 			buckets.clear();
 
@@ -74,7 +75,7 @@ public class Buckets {
 			
 			Collections.sort(peers, new TimeAddedPeerComparator());
 
-			if (peers.size() >= Constants.k) {//reverting to k instead of k/2
+			if (peers.size() >= Constants.k / 2) {//reverting to k instead of k/2
 				Bucket bucket = new Bucket(this);
 				bucket.getPeers().addAll(peers);
 				buckets.add(bucket);
@@ -86,7 +87,7 @@ public class Buckets {
 			if(possiblePower > getPower() || possiblePower < Blockchain.getInstance().getLastAveragePower()) {
 				ThreadExecutor.getInstance().execute(new DhcRunnable("navigate") {
 					public void doRun() {
-						Bootstrap.getInstance().navigate(getAllPeers(), dhcAddress);
+						Bootstrap.getInstance().navigate(getAllPeers(), tAddress);
 					}
 				});
 				
@@ -206,17 +207,17 @@ public class Buckets {
 			peers.removeAll(network.getAllPeers());
 			
 			for (Peer peer : peers) {
-				if(peer.getDhcAddress() == null) {
+				if(peer.getTAddress() == null) {
 					continue;
 				}
-				logger.info("\t{} {}", peer.getDhcAddress().getBinary(), peer);
+				logger.info("\t{} {}", peer.getTAddress().getBinary(), peer);
 			}
 			logger.info("\n");
 			
 			for (Bucket bucket : buckets) {
 				logger.info("bucket index={} key={}", bucket.getIndex(), bucket.getBucketKey());
 				for (Peer peer : bucket.getPeers()) {
-					logger.info("\t{} {}", peer.getDhcAddress().getBinary(), peer);
+					logger.info("\t{} {}", peer.getTAddress().getBinary(), peer);
 				}
 			}
 			logger.info("\n");
@@ -242,7 +243,7 @@ public class Buckets {
 			String key = bucketKey.getKey();
 			List<Peer> list = new ArrayList<>();
 			for (Peer peer : Peer.getPeers()) {
-				if (peer.getDhcAddress() != null && peer.getDhcAddress().getBinary().startsWith(key)) {
+				if (peer.getTAddress() != null && peer.getTAddress().getBinary().startsWith(key)) {
 					list.add(peer);
 				}
 			}
@@ -267,7 +268,7 @@ public class Buckets {
 			String key = bucketKey.getOtherBucketKey().getKey();
 			List<Peer> list = new ArrayList<>();
 			for (Peer peer : Peer.getPeers()) {
-				if (peer.getDhcAddress() != null && peer.getDhcAddress().getBinary().startsWith(key)) {
+				if (peer.getTAddress() != null && peer.getTAddress().getBinary().startsWith(key)) {
 					list.add(peer);
 				}
 			}
@@ -360,6 +361,28 @@ public class Buckets {
 			//logger.trace("unlock");
 		}
 	}
+	
+	private Bucket find(TAddress tAddress) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			TAddress myTAddress = TAddress.getMyTAddress();
+			int index = myTAddress.getBucketIndex(tAddress, getPower());
+			if (index < 0) {
+				logger.error("index={} dhcAddress={} peer.getDhcAddress({} power={}", index, myTAddress, tAddress, getPower());
+			}
+			Bucket bucket = buckets.get(index);
+			return bucket;
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
 
 	public int indexOf(Bucket bucket) {
 		Lock readLock = readWriteLock.readLock();
@@ -401,6 +424,17 @@ public class Buckets {
 		readLock.lock();
 		try {
 			return find(dhcAddress).getBucketKey();
+		} finally {
+			readLock.unlock();
+			//logger.trace("unlock");
+		}
+	}
+	
+	public String getBucketKey(TAddress tAddress) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		try {
+			return find(tAddress).getBucketKey();
 		} finally {
 			readLock.unlock();
 			//logger.trace("unlock");

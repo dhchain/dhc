@@ -16,6 +16,7 @@ import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.Difficulty;
+import org.dhc.util.TAddress;
 
 public class BucketHash {
 	
@@ -348,8 +349,8 @@ public class BucketHash {
 		return DhcAddress.getMyDhcAddress().isMyKey(getBinaryStringKey());
 	}
 
-	public boolean isHis(DhcAddress dhcAddress) {
-		return dhcAddress.isMyKey(getBinaryStringKey());
+	public boolean isHis(TAddress tAddress) {
+		return tAddress.isMyKey(getBinaryStringKey());
 	}
 	
 	public boolean isHashForTransactionsValid() {

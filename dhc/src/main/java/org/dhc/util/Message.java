@@ -10,7 +10,7 @@ public abstract class Message {
 
 	private long timestamp = System.currentTimeMillis();
 	private String networkIdentifier;
-	private DhcAddress dhcAddress;
+	private TAddress tAddress;
 	private String correlationId = CryptoUtil.getRandomString(16);
 	private byte[] networkType = Constants.NETWORK_TYPE;
 	private String callbackId;
@@ -33,8 +33,8 @@ public abstract class Message {
 		return networkIdentifier;
 	}
 
-	public DhcAddress getDhcAddress() {
-		return dhcAddress;
+	public TAddress getDhcAddress() {
+		return tAddress;
 	}
 
 	public String getCorrelationId() {
@@ -107,8 +107,8 @@ public abstract class Message {
 		this.networkIdentifier = networkIdentifier;
 	}
 
-	public void setDhcAddress(DhcAddress dhcAddress) {
-		this.dhcAddress = dhcAddress;
+	public void setTAddress(TAddress tAddress) {
+		this.tAddress = tAddress;
 	}
 
 	public void failedToSend(@SuppressWarnings("unused") Peer peer, @SuppressWarnings("unused") Exception e) {

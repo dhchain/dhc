@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.TAddress;
 
 public class Bucket {
 
@@ -60,8 +61,8 @@ public class Bucket {
 			return;
 		}
 		for(Peer peer: allPeers) {
-			DhcAddress dhcAddress = peer.getDhcAddress();
-			if(dhcAddress != null && dhcAddress.getBinary().startsWith(myKey) && !peers.contains(peer)) {
+			TAddress tAddress = peer.getTAddress();
+			if(tAddress != null && tAddress.getBinary().startsWith(myKey) && !peers.contains(peer)) {
 				peers.add(peer);
 			}
 		}

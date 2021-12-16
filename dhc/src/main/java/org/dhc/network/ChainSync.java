@@ -11,9 +11,9 @@ import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.SyncMessage;
 import org.dhc.blockchain.Trimmer;
 import org.dhc.util.Constants;
-import org.dhc.util.ThreadExecutor;
-import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.TAddress;
+import org.dhc.util.ThreadExecutor;
 
 public class ChainSync {
 
@@ -54,7 +54,7 @@ public class ChainSync {
 			}
 			
 			start();
-			Bootstrap.getInstance().navigate(network.getAllPeers(), DhcAddress.getMyDhcAddress());
+			Bootstrap.getInstance().navigate(network.getAllPeers(), TAddress.getMyTAddress());
 			logger.info("END ChainSynchronizer.sync() power={} # myPeers {} lastBlockchainIndex {} pendingBlocks {}", network.getPower(), myPeers.size(), lastBlockchainIndex, Blockchain.getInstance().getNumberOfPendingBlocks());
 			
 			logger.info("Pending nodes queue size: {}", Blockchain.getInstance().getQueueSize());
@@ -140,7 +140,7 @@ public class ChainSync {
 			}
 			logger.trace("ChainSynchronizer was notified by {} peer(s) networkPower={}, blockchainPower={}:", list.size(), Network.getInstance().getPower(), Blockchain.getInstance().getPower());
 			for (Peer peer : list) {
-				logger.trace("\t{} {}", peer.getDhcAddress().getBinary(), peer);
+				logger.trace("\t{} {}", peer.getTAddress().getBinary(), peer);
 			}
 		} catch (InterruptedException e) {
 			

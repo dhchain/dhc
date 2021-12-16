@@ -58,6 +58,10 @@ public class DhcAddress {
 		DhcAddress other = (DhcAddress) obj;
 		return address.equals(other.address);
 	}
+	
+	public boolean startsWith(TAddress tAddress) {
+		return address.startsWith(tAddress.getAddress());
+	}
 
 	public BigInteger toBigInteger() {
 		byte[] bytes = Base58.decode(address);
@@ -97,6 +101,14 @@ public class DhcAddress {
 	
 	public boolean isDhcAddressValid() {
 		return CryptoUtil.isDhcAddressValid(address);
+	}
+	
+	public TAddress getTAddress() {
+		int LENGTH = 4;
+		byte[] bytes = Base58.decode(address);
+		byte[] subArray = new byte[LENGTH];
+		System.arraycopy(bytes, 0, subArray, 0, LENGTH);
+		return new TAddress(Base58.encode(subArray));
 	}
 
 }

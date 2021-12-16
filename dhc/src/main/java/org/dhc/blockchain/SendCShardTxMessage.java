@@ -107,7 +107,7 @@ public class SendCShardTxMessage extends Message {
 	@Override
 	public void failedToSend(Peer peer, Exception e) {
 		logger.trace("Failed to send SendCShardTxMessage {}", transaction);
-		logger.trace("Failed to send to bucket {} to peer {}", Network.getInstance().getBucketKey(peer.getDhcAddress()), peer);
+		logger.trace("Failed to send to bucket {} to peer {}", Network.getInstance().getBucketKey(peer.getTAddress()), peer);
 		new SendCShardTxMessage(transaction).send();
 	}
 	

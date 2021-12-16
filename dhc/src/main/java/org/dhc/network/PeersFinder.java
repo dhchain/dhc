@@ -7,8 +7,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.dhc.util.Constants;
-import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.TAddress;
 
 public class PeersFinder {
 	
@@ -34,10 +34,10 @@ public class PeersFinder {
 		}
 	}
 	
-	private void findPeers(List<Peer> peers, DhcAddress dhcAddress) {
+	private void findPeers(List<Peer> peers, TAddress tAddress) {
 		this.peers.clear();
 		this.peers.addAll(peers);
-		FindNodeRequestMessage message = new FindNodeRequestMessage(dhcAddress);
+		FindNodeRequestMessage message = new FindNodeRequestMessage(tAddress);
 		for(Peer peer: peers) {
 			peer.send(message);
 		}
@@ -66,7 +66,7 @@ public class PeersFinder {
 		}
 
 		try {
-			findPeers(Peer.getPeers(), DhcAddress.getMyDhcAddress());
+			findPeers(Peer.getPeers(), TAddress.getMyTAddress());
 		} finally {
 			writeLock.unlock();
 		}

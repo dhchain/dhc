@@ -18,6 +18,7 @@ import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.Difficulty;
+import org.dhc.util.TAddress;
 import org.dhc.util.Wallet;
 
 public class Block {
@@ -306,15 +307,15 @@ public class Block {
 		return bucketHashes.isMine();
 	}
 
-	public boolean isHis(DhcAddress dhcAddress) {
-		return bucketHashes.isHis(dhcAddress);
+	public boolean isHis(TAddress tAddress) {
+		return bucketHashes.isHis(tAddress);
 	}
 	
 	public boolean isMineBucketKeyTransaction(Transaction transaction) {
-		if(!isHis(transaction.getReceiver())) {
+		if(!isHis(transaction.getReceiver().getTAddress())) {
 			return false;
 		}
-		if(!isHis(transaction.getSenderDhcAddress())) {
+		if(!isHis(transaction.getSenderDhcAddress().getTAddress())) {
 			return false;
 		}
 		return true;

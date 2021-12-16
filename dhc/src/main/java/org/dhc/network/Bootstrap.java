@@ -15,8 +15,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
-import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.TAddress;
 
 public class Bootstrap {
 	
@@ -101,14 +101,14 @@ public class Bootstrap {
 		logger.info("number of bootstrap peers {}", set.size());
 	}
 	
-	private void navigate(Peer bootPeer, DhcAddress dhcAddress) {
+	private void navigate(Peer bootPeer, TAddress tAddress) {
 		if(bootPeer.isClosed()) {
 			return;
 		}
-		bootPeer.send(new NavigateMessage(dhcAddress, 0));
+		bootPeer.send(new NavigateMessage(tAddress, 0));
 	}
 	
-	public void navigate(List<Peer> list, DhcAddress dhcAddress) {
+	public void navigate(List<Peer> list, TAddress tAddress) {
 		//logger.trace("Navigate for number of peers {}", list.size());
 		List<Callable<Boolean>> calls = new ArrayList<>();
 		for (Peer peer : list) {
@@ -116,7 +116,7 @@ public class Bootstrap {
 
 				@Override
 				public Boolean call() throws Exception {
-					navigate(peer, dhcAddress);
+					navigate(peer, tAddress);
 					return null;
 				}
 			});
@@ -129,7 +129,7 @@ public class Bootstrap {
 		if(set.isEmpty()) {
 			return;
 		}
-		DhcAddress dhcAddress = DhcAddress.getMyDhcAddress();
+		TAddress tAddress = TAddress.getMyTAddress();
 		logger.info("Connecting to number of peers {}", set.size());
 		List<Callable<Boolean>> calls = new ArrayList<>();
 		for (Peer peer : set) {
@@ -138,7 +138,7 @@ public class Bootstrap {
 				@Override
 				public Boolean call() throws Exception {
 					if(connect(peer)) {
-						navigate(peer, dhcAddress);
+						navigate(peer, tAddress);
 					}
 					return null;
 				}

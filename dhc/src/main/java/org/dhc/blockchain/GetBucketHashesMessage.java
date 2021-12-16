@@ -18,7 +18,7 @@ public class GetBucketHashesMessage extends Message {
 		if(block == null) {
 			return;
 		}
-		if(block != null && !block.isHis(peer.getDhcAddress())) {
+		if(block != null && !block.isHis(peer.getTAddress())) {
 			return;
 		}
 		GetBucketHashesReplyMessage message = new GetBucketHashesReplyMessage(blockHash, block.getBucketHashes());

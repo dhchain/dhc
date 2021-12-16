@@ -20,7 +20,7 @@ public class ThinPeerNotifier {
 	private void doNotifyTransaction(Transaction transaction) {
 		List<Peer> thinPeers = Network.getInstance().getThinPeers();
 		for(Peer peer: thinPeers) {
-			if(transaction.getSenderDhcAddress().equals(peer.getDhcAddress()) || transaction.getReceiver().equals(peer.getDhcAddress())) {
+			if(transaction.getSenderDhcAddress().startsWith(peer.getTAddress()) || transaction.getReceiver().startsWith(peer.getTAddress())) {
 				peer.send(new NotifyTransactionMessage(transaction));
 			}
 		}
