@@ -60,7 +60,13 @@ public class DhcAddress {
 	}
 	
 	public boolean startsWith(TAddress tAddress) {
-		return address.startsWith(tAddress.getAddress());
+		if(tAddress == null) {
+			return false;
+		}
+		return address.
+				startsWith(
+						tAddress.
+						getAddress());
 	}
 
 	public BigInteger toBigInteger() {

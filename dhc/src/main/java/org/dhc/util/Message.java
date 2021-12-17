@@ -7,6 +7,7 @@ public abstract class Message {
 	
 	private static final ExpiringMap<String, String> sentMessages =  new ExpiringMap<String, String>(Constants.MINUTE * 5);
 	public static final String NETWORK_IDENTIFIER = CryptoUtil.getRandomString(32);
+	private static final DhcLogger logger = DhcLogger.getLogger();
 
 	private long timestamp = System.currentTimeMillis();
 	private String networkIdentifier;
@@ -74,24 +75,34 @@ public abstract class Message {
 	}
 	
 	public boolean alreadySent(String key) {
-		ExpiringMap<String, String> sentMessages = getSentMessages();
-		synchronized(sentMessages) {
-			if(sentMessages.containsKey(key)) {
-				return true;
+		try {
+			ExpiringMap<String, String> sentMessages = getSentMessages();
+			synchronized(sentMessages) {
+				if(sentMessages.containsKey(key)) {
+					return true;
+				}
+				sentMessages.put(key, key);
+				return false;
 			}
-			sentMessages.put(key, key);
-			return false;
+		} catch (Exception e) {
+			logger.info(e.getMessage(), e);
+			return true; // to stop re-sending until scheduledExecutor queue size reduced
 		}
 	}
 	
 	public boolean alreadySent(String key, long timeout) {
-		ExpiringMap<String, String> sentMessages = getSentMessages();
-		synchronized(sentMessages) {
-			if(sentMessages.containsKey(key)) {
-				return true;
+		try {
+			ExpiringMap<String, String> sentMessages = getSentMessages();
+			synchronized (sentMessages) {
+				if (sentMessages.containsKey(key)) {
+					return true;
+				}
+				sentMessages.put(key, key, timeout);
+				return false;
 			}
-			sentMessages.put(key, key, timeout);
-			return false;
+		} catch (Exception e) {
+			logger.info(e.getMessage(), e);
+			return true; // to stop re-sending until scheduledExecutor queue size reduced
 		}
 	}
 
