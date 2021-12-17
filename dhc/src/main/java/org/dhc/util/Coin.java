@@ -10,21 +10,16 @@ public class Coin {
 	public static Coin SATOSHI = new Coin(1);
 	
 	private long value;
-	
-	public Coin() {
-
-	}
 
 	public Coin(long value) {
+		if(value < 0) {
+			throw new RuntimeException("Coin amount cannot be less than zero");
+		}
 		this.value = value;
 	}
 
 	public long getValue() {
 		return value;
-	}
-
-	public void setValue(long value) {
-		this.value = value;
 	}
 	
 	public Coin multiply(double amount) {
@@ -58,8 +53,16 @@ public class Coin {
 		return value < coin.getValue();
 	}
 	
+	public boolean lessOrEqual(Coin coin) {
+		return value <= coin.getValue();
+	}
+	
 	public boolean greaterOrEqual(Coin coin) {
 		return value >= coin.getValue();
+	}
+	
+	public boolean greater(Coin coin) {
+		return value > coin.getValue();
 	}
 	
 	public String toNumberOfCoins() {

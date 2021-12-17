@@ -63,8 +63,12 @@ public class SendTransactionAction extends AbstractAction implements Caller {
 			return false;
 		}
 		try {
-			Double.parseDouble(amount);
-			Long.parseLong(fee);
+			if(Double.parseDouble(amount) <= 0) {
+				return false;
+			}
+			if(Long.parseLong(fee) < 0) {
+				return false;
+			}
 			if(expiringData != null) {
 				Long.parseLong(expire);
 			}

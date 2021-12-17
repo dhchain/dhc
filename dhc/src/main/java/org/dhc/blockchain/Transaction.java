@@ -746,6 +746,12 @@ public class Transaction {
 	}
 
 	public void create(DhcAddress to, Coin value,  Coin fee, TransactionData expiringData, Keywords keywords, Block block) {
+		if(fee.less(Coin.ZERO)) {
+			throw new CreateTransactionException("fee has to be positive");
+		}
+		if(value.lessOrEqual(Coin.ZERO)) {
+			throw new CreateTransactionException("amount has to be positive");
+		}
 		Wallet wallet = Wallet.getInstance();
 		setSender(wallet.getPublicKey());
 		receiver = to;
@@ -802,6 +808,17 @@ public class Transaction {
 	}
 	
 	public void createSplitOutputsTransaction(DhcAddress to, Coin fee, Block block, Coin... value) {
+		
+		if(fee.less(Coin.ZERO)) {
+			throw new CreateTransactionException("fee has to be positive");
+		}
+		
+		for(Coin coin: value) {
+			if(coin.lessOrEqual(Coin.ZERO)) {
+				throw new CreateTransactionException("amount has to be positive");
+			}
+		}
+		
 		Wallet wallet = Wallet.getInstance();
 		setSender(wallet.getPublicKey());
 		receiver = to;

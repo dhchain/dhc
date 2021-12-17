@@ -68,6 +68,10 @@ public class JoinAction extends AbstractAction implements Caller {
 		Coin amount;
 		try {
 			amount = Coin.ONE.multiply(Double.parseDouble(StringUtil.trim(amountField.getText())));
+			if(amount.lessOrEqual(Coin.ZERO)) {
+				log("Amount cannot be negative");
+				return;
+			}
 		} catch (Exception e) {
 			log("Please enter valid amount");
 			return;
