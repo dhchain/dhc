@@ -19,7 +19,7 @@ import org.dhc.util.ThreadExecutor;
 public class Buckets {
 
 	private static final DhcLogger logger = DhcLogger.getLogger();
-	private static final ExpiringMap<String, String> expiringMap =  new ExpiringMap<>(Constants.MINUTE * 5);
+	private static final ExpiringMap<String, String> expiringMap =  new ExpiringMap<>(Constants.MINUTE);
 
 	private List<Bucket> buckets = new CopyOnWriteArrayList<Bucket>();
 	private final SharedLock readWriteLock = SharedLock.getInstance();
@@ -91,7 +91,7 @@ public class Buckets {
 					}
 				});
 				
-				expiringMap.clear();
+				//expiringMap.clear();
 			}
 			
 			possiblePower = getPower();
