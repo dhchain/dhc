@@ -6,9 +6,9 @@
         <appname>Distributed Hash Chain</appname>
         <appversion>1.0</appversion>
         <authors>
-            <author name="Distributed Hashchain" email="admin@dhashchain.org"/>
+            <author name="Distributed Hashchain" email="admin@dhcne.org"/>
         </authors>
-        <url>https://dhashchain.org/</url>
+        <url>https://github.com/dhchain/dhc</url>
     </info>
  
     <guiprefs width="640" height="480" resizable="yes"/>
@@ -39,6 +39,9 @@
             <description>DHC Application Runnables</description>
             <file src="../../target/dhc.jar" targetdir="$INSTALL_PATH"/>
             <file src="dhc.bat" targetdir="$INSTALL_PATH"/>
+            <file src="dhcgui.bat" targetdir="$INSTALL_PATH"/>
+            <file src="dhcgui.bat" targetdir="$INSTALL_PATH"/>
+            <file src="../../media/dhcLogo.png" targetdir="$INSTALL_PATH"/>
             <fileset dir="../../target/lib" includes="*.jar" targetdir="$INSTALL_PATH/lib" />
             <file src="../../config/dhc.properties" targetdir="$INSTALL_PATH/config"/>
             <file src="../../config/peers.config" targetdir="$INSTALL_PATH/config"/>

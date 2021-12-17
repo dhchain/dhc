@@ -47,10 +47,6 @@ public class Main {
 	@Option(name="-pw", aliases="--password", usage="Optional password to avoid entering manually, not recommended to be used for security reason", metaVar="<password>")
 	private String password;
 	
-	@Option(name="-pr", aliases="--proofFile", usage="Relative or absolute proof file path, for example \"config/proof\", can be shared among instances", 
-			required=true, metaVar="<proof file path>")
-	private String proofFilePath;
-	
 	@Option(name="-k", aliases="--key", usage="Path to key file, containing encrypted private key", required=true, metaVar="<key file path>")
 	private String key;
 	

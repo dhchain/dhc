@@ -1,4 +1,4 @@
-Copyright © 2020 DHC admin@dhashchain.org
+Copyright © 2021 DHC admin@dhcne.org
 All rights reserved. No warranty, explicit or implicit, provided.
 Permission granted to use DHC client/blockchain free of charge. 
 Any part of the software cannot be copied or modified to run or be used on any new or existing blockchain, distributed ledger, consensus system.
