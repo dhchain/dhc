@@ -4,6 +4,7 @@ public enum TransactionType {
 	
 	STANDARD,
     COINBASE,
-    PRUNING;
+    PRUNING, 
+    GENESIS;
 
 }

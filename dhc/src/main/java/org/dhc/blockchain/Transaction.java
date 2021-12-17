@@ -455,11 +455,19 @@ public class Transaction {
 			}
 		}
 		
-		if(!isCoinbase() && !getInputsValue().subtract(getOutputsValue()).equals(fee)) {
-			logger.debug("Not valid transaction {}", this);
+		if(!isCoinbase() && !isGenesis()) {
+			if(!getInputsValue().equals(getOutputsValue().add(fee))) {
+				logger.info("Not valid transaction {}", this);
+				return false;
+			}
 		}
 		
+		
 		if(!isPruningTransactionValid()) {
+			return false;
+		}
+		
+		if(isGenesis() && getBlockIndex() != 0) {
 			return false;
 		}
 
@@ -873,6 +881,10 @@ public class Transaction {
 
 	public boolean isCoinbase() {
 		return TransactionType.COINBASE.equals(type);
+	}
+	
+	public boolean isGenesis() {
+		return TransactionType.GENESIS.equals(type);
 	}
 
 	public static Coin collectFees(Set<Transaction> transactions) {

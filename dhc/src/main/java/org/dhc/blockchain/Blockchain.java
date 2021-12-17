@@ -89,6 +89,7 @@ public class Blockchain {
 			MyAddresses myAddresses = new MyAddresses();
 
 			Transaction transaction = new Transaction();
+			transaction.setType(TransactionType.GENESIS);
 			
 			int i = 0;
 			
