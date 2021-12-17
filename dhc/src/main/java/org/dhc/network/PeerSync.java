@@ -62,6 +62,7 @@ public class PeerSync {
 			running = true;
 		}
 		logger.info("PeerSynchronizer START");
+		long start = System.currentTimeMillis();
 		try {
 			Network network = Network.getInstance();
 			Bootstrap.getInstance().bootstrap();
@@ -79,7 +80,7 @@ public class PeerSync {
 		} finally {
 			synchronized (this) {
 				running = false;
-				logger.info("PeerSynchronizer END");
+				logger.info("PeerSynchronizer END took {}ms", System.currentTimeMillis() - start);
 				notifyAll();
 			}
 		}

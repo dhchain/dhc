@@ -85,6 +85,11 @@ public class ExpiringMap<K, V> implements Map<K, V> {
 	}
 
 	public synchronized void clear() {
+		for(ScheduledFuture<?> scheduledFuture: futures.values()) {
+			if(scheduledFuture != null) {
+				scheduledFuture.cancel(true);
+			}
+		}
 		futures.clear();
 		map.clear();
 	}
