@@ -101,11 +101,6 @@ public class Blockchain {
 			transaction.setBlockHash(block.getBlockHash(), block.getIndex());
 			transaction.setSender(block.getMiner());
 			transaction.setReceiver(transaction.getSenderDhcAddress());
-			// comment out START
-/*				transaction.signTransaction(Wallet.getInstance().getPrivateKey());
-				transaction.setTransactionId();
-			    logger.info("transaction signature={}", transaction.getSignature());*/
-			// comment out END
 			transaction.setSignature("AN1rKoRqz88686BLMJk3Qc3N3MkB9LT9gS4ZZVVr6SC2csF1oms3f1GdETMgnXsmPFzbVRxSA7FnyhchoUivpWe6zgfXnue96");
 			transaction.setTransactionId();
 
@@ -118,28 +113,15 @@ public class Blockchain {
 			buckethash.setNonce(263982);
 			buckethash.setTimestamp(1639450588766L);
 			buckethash.setBits(Difficulty.INITIAL_BITS);
-/*			buckethash.mine(0, Difficulty.INITIAL_BITS);
-			logger.info("buckethash.getNonce()={}, buckethash.getTimestamp()={}", buckethash.getNonce(), buckethash.getTimestamp());*/
 
 			BucketHashes bucketHashes = new BucketHashes();
 			bucketHashes.put(buckethash);
 			block.setBucketHashes(bucketHashes);
 			
-			// comment out START
-/*				block.setBlockHash(CryptoUtil.getHashBase58Encoded(""));
-				block.setTimeStamp(System.currentTimeMillis());
-				block.mine();*/
-			// comment out END
-			
 			block.setBlockHash("11RLNshrqDRuKWGs6gU7pG7BTxRcZce3McDnEW1gsqG");
 			block.setTimeStamp(1639450594080L);
 			block.setNonce(15574);
-			
-			// comment out START
-/*				logger.info("block signature={}", block.getMinerSignature());
-				logger.info("block signature valid={}", block.verifySignature());
-				logger.info("nonce={}, timestamp={}", block.getNonce(), block.getTimeStamp());*/
-			// comment out END
+
 			block.setMinerSignature("iKx1CJN1oQsDuhJpw9ufuJ173js2o6xW1ZvKPNQB2hgMJ4rbQwmES9u8zyZfigYJQSjh8kCRPybTof82P4svQ6LYuQWw6gUBmu");
 			block.setBlockHash();
 			buckethash.setPreviousBlockHash(block.getPreviousHash());
@@ -151,12 +133,8 @@ public class Blockchain {
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
-		
-		
-		
+
 		logger.info("Blockchain initialized");
-		
-		
 	}
 	
 	private void addChildren(Node parent) {
