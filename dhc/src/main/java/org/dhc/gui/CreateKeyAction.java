@@ -36,17 +36,15 @@ public class CreateKeyAction extends AbstractAction implements Caller {
 		try {
 			PasswordHelper passwordHelper = new PasswordHelper(main.getKey());
 			passwordHelper.generateKey(passphrase);
-			
-			main.getFrame().getContentPane().removeAll();
+
 			JPanel form = new JPanel(new BorderLayout());
 			label = new JLabel("New key generated, starting network");
 			label.setAlignmentX(JLabel.LEFT_ALIGNMENT);
 			label.setBorder(new EmptyBorder(5,5,5,5));
 			form.add(label);
-			main.getFrame().getContentPane().add(form, BorderLayout.NORTH);
-			main.getFrame().revalidate();
-			main.getFrame().getContentPane().repaint();
-			main.start(this);
+			main.setForm(form);
+			
+			main.start();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

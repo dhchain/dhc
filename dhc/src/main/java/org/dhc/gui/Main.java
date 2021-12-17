@@ -21,7 +21,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.dhc.blockchain.Block;
@@ -35,10 +37,8 @@ import org.dhc.util.Coin;
 import org.dhc.util.Constants;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
-import org.dhc.util.DhcRunnable;
 import org.dhc.util.Listeners;
 import org.dhc.util.Registry;
-import org.dhc.util.ThreadExecutor;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -253,15 +253,15 @@ public class Main {
 		return confirmPasswordField;
 	}
 	
-	public void start(Caller caller) {
-		ThreadExecutor.getInstance().execute(new DhcRunnable("START") {
-			public void doRun() {
-				doStart(caller);
+	public void start() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				doStart();
 			}
 		});
 	}
 	
-	private void doStart(Caller caller) {
+	private void doStart() {
 		Constants.DATABASE = dataDir;
 		
 		Blockchain blockchain = Blockchain.getInstance();
@@ -294,7 +294,19 @@ public class Main {
 		network.printBuckets();
 		ChainRest.getInstance().execute();
 		logger.info("Main.start() completed");
-		caller.log("Started Distributed Hash Chain");
+		showMenu();
+	}
+	
+	private void showMenu() {
+		
+		new MenuCreator(this).addMenu();
+		JPanel form = new JPanel(new BorderLayout());
+		JLabel label = new JLabel("Started Distributed Hash Chain");
+		label.setAlignmentX(JLabel.LEFT_ALIGNMENT);
+		label.setBorder(new EmptyBorder(5, 5, 5, 5));
+		form.add(label);
+		setForm(form);
+
 	}
 
 	public JPanel getForm() {

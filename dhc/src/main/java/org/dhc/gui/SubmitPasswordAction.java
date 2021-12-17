@@ -13,7 +13,7 @@ import org.dhc.PasswordHelper;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.StringUtil;
 
-public class SubmitPasswordAction extends AbstractAction implements Caller {
+public class SubmitPasswordAction extends AbstractAction {
 	
 	private static final long serialVersionUID = -5348678702516608164L;
 	private static final DhcLogger logger = DhcLogger.getLogger();
@@ -32,7 +32,8 @@ public class SubmitPasswordAction extends AbstractAction implements Caller {
 		try {
 			PasswordHelper passwordHelper = new PasswordHelper(main.getKey());
 			if(!passwordHelper.verifyPassphrase(passphrase)) {
-				log("Passphrase entered was not correct. Try again.");
+				String message = "Passphrase entered was not correct. Try again.";
+				JOptionPane.showMessageDialog(main.getFrame(), message);
 				return;
 			}
 			
@@ -42,22 +43,12 @@ public class SubmitPasswordAction extends AbstractAction implements Caller {
 			label.setBorder(new EmptyBorder(5,5,5,5));
 			form.add(label);
 			main.setForm(form);
-			log("Passphrase accepted, starting DHC");
 			logger.info("SubmitPasswordAction.actionPerformed() before main.start()");
-			main.start(this);
+			main.start();
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-	}
-	
-	public void log(String message) {
-		if(label != null) {
-			label.setText(message);
-			new MenuCreator(main).addMenu();
-			return;
-		}
-		JOptionPane.showMessageDialog(main.getFrame(), message);
 	}
 
 }

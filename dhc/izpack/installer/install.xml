@@ -40,6 +40,8 @@
             <file src="../../target/dhc.jar" targetdir="$INSTALL_PATH"/>
             <file src="dhc.bat" targetdir="$INSTALL_PATH"/>
             <file src="dhcgui.bat" targetdir="$INSTALL_PATH"/>
+            <file src="dhc.sh" targetdir="$INSTALL_PATH"/>
+            <file src="dhcgui.sh" targetdir="$INSTALL_PATH"/>
             <file src="../../media/dhcLogo.png" targetdir="$INSTALL_PATH"/>
             <fileset dir="../../target/lib" includes="*.jar" targetdir="$INSTALL_PATH/lib" />
             <file src="../../config/dhc.properties" targetdir="$INSTALL_PATH/config"/>
