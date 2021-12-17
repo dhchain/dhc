@@ -3,9 +3,12 @@ package org.dhc;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.dhc.util.Constants;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.ExpiringMap;
 import org.dhc.util.TAddress;
+import org.dhc.util.ThreadExecutor;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -52,4 +55,12 @@ public class TAddressTest extends TestCase {
 		logger.info("tAddress.getBinary()  ={}", tAddress.getBinary());
 		assertTrue(dhcAddress.getBinary().startsWith(tAddress.getBinary()));
 	}
+	
+	public void testExpiringMap() {
+		final ExpiringMap<String, String> expiringMap =  new ExpiringMap<>(Constants.MINUTE);
+		expiringMap.put("test", "test1");
+		expiringMap.put("test", "test2");
+		ThreadExecutor.sleep(Constants.MINUTE * 2);
+	}
+	
 }

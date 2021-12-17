@@ -105,7 +105,7 @@ public class Bootstrap {
 		if(bootPeer.isClosed()) {
 			return;
 		}
-		bootPeer.send(new NavigateMessage(tAddress, 0));
+		new NavigateMessage(tAddress, 0).send(bootPeer);
 	}
 	
 	public void navigate(List<Peer> list, TAddress tAddress) {

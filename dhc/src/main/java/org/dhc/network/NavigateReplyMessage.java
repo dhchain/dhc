@@ -59,12 +59,12 @@ public class NavigateReplyMessage extends Message {
 			Peer foundPeer = Peer.getInstance(p.getInetSocketAddress());
 			foundPeer.setType(PeerType.TO);
 			if(bootstrap.connect(foundPeer)) {
-				foundPeer.send(new NavigateMessage(hash, index));
+				new NavigateMessage(hash, index).send(foundPeer);
 				count++;
 			}
 		}
 		if(count > 0) {
-			peer.send(new NavigateMessage(hash, index + 1));
+			new NavigateMessage(hash, index + 1).send(peer);
 		}
 	}
 
