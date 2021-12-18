@@ -63,10 +63,10 @@ public class DhcAddress {
 		if(tAddress == null) {
 			return false;
 		}
-		return address.
+		return getBinary().
 				startsWith(
 						tAddress.
-						getAddress());
+							getBinary());
 	}
 
 	public BigInteger toBigInteger() {
