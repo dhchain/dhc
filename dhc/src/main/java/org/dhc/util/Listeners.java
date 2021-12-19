@@ -49,7 +49,7 @@ public class Listeners {
 
 	public void removeEventListener(Class<? extends Event> eventClass, EventListener listener) {
 		Set<EventListener> set = listeners.get(eventClass);
-		if(set == null) {
+		if(set == null || listener == null) {
 			return;
 		}
 		set.remove(listener);

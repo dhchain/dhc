@@ -34,13 +34,13 @@ public class JoinInfoEventListener implements EventListener {
 			logger.info("correlation ids are not equal");
 			return;
 		}
+		Listeners.getInstance().removeEventListener(JoinInfoEvent.class, this);
 		JoinInfo joinInfo = joinInfoEvent.getJoinInfo();
 		if(!joinInfo.isValid()) {
 			logger.info("joinInfo.isValid() returned false");
 			return;
 		}
 		split(joinInfoEvent);
-		Listeners.getInstance().removeEventListener(JoinInfoEvent.class, this);
 	}
 	
 	private void split(JoinInfoEvent joinInfoEvent) {

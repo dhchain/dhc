@@ -22,6 +22,7 @@ public class JoinInfo {
 	
 	public boolean isValid() {
 		if(items.isEmpty() && !to.equals(new DhcAddress("42pKbvTuPq8XYNQpxZmHe5NVMEiUnv43FTHG"))) {
+			logger.info("items are empty and to is not a genesis address");
 			return false;
 		}
 		return true;
@@ -87,7 +88,7 @@ public class JoinInfo {
 	
 	@Override
 	public String toString() {
-		String str = String.format("JoinInfo from=%s amount=%s items=%s", getFrom(), getAmount(), items);
+		String str = String.format("JoinInfo from=%s to=%s amount=%s items=%s", getFrom(), getTo(), getAmount(), items);
 		return str;
 	}
 

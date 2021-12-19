@@ -6,12 +6,15 @@ import org.dhc.network.Network;
 import org.dhc.network.Peer;
 import org.dhc.util.Coin;
 import org.dhc.util.DhcAddress;
+import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
 import org.dhc.util.Listeners;
 import org.dhc.util.Message;
 import org.dhc.util.ThreadExecutor;
 
 public class GetJoinInfoThinRequest extends Message {
+	
+	private static final DhcLogger logger = DhcLogger.getLogger();
 
 	private DhcAddress myDhcAddress;
 	private DhcAddress address;
@@ -26,6 +29,7 @@ public class GetJoinInfoThinRequest extends Message {
 
 	@Override
 	public void process(Peer peer) {
+		logger.info("GetJoinInfoThinRequest.process myDhcAddress={}, address={}, amount={}", myDhcAddress, address, amount);
 		ThreadExecutor.getInstance().execute(new DhcRunnable("GetJoinInfoThinRequest") {
 			public void doRun() {
 				getJoinInfo(peer);

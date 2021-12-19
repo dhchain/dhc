@@ -65,6 +65,10 @@ public class JoinAction extends AbstractAction implements Caller {
 			log("Please enter valid DHC Address");
 			return;
 		}
+		if(address.equals(DhcAddress.getMyDhcAddress())) {
+			log("You cannot join to your own DHC Address");
+			return;
+		}
 		Coin amount;
 		try {
 			amount = Coin.ONE.multiply(Double.parseDouble(StringUtil.trim(amountField.getText())));

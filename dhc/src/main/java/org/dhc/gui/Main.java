@@ -144,6 +144,10 @@ public class Main {
 		}
 		File selectedFile = jfc.getSelectedFile();
 		File file = new File(key);
+		File parent = file.getParentFile();
+		if (!parent.exists() && !parent.mkdirs()) {
+		    throw new IllegalStateException("Couldn't create dir: " + parent);
+		}
 		try {
 			if (file.exists()) {
 				Files.copy(file.toPath(), new File(key + ".backupOriginalFile").toPath(),
