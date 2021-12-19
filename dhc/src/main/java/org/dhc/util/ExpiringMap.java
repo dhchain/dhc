@@ -46,7 +46,6 @@ public class ExpiringMap<K, V> implements Map<K, V> {
 	}
 
 	public synchronized V put(K key, V value) {
-		logger.trace("ExpiringMap.put() key={}, value={}", key, value);
 		return put(key, value, defaultTimeout);
 	}
 	
