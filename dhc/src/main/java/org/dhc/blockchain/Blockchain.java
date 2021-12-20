@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
 
 import org.dhc.gui.promote.JoinLine;
+import org.dhc.lite.SecureMessage;
 import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.consensus.BucketHash;
@@ -824,6 +825,38 @@ public class Blockchain {
 		long start = System.currentTimeMillis();
 		try {
 			return tree.getBits(blockhash);
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
+	public List<SecureMessage> getSecureMessages(DhcAddress dhcAddress) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return tree.getSecureMessages(dhcAddress);
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
+	public PublicKey getPublicKey(DhcAddress address) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return tree.getPublicKey(address);
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;

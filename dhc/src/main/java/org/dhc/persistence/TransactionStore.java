@@ -6,6 +6,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +24,8 @@ import org.dhc.blockchain.TransactionOutput;
 import org.dhc.blockchain.TransactionType;
 import org.dhc.gui.promote.JoinLine;
 import org.dhc.gui.promote.JoinTransactionEvent;
+import org.dhc.lite.SecureMessage;
+import org.dhc.util.Applications;
 import org.dhc.util.Base58;
 import org.dhc.util.Coin;
 import org.dhc.util.CryptoUtil;
@@ -521,6 +524,65 @@ public class TransactionStore {
 			logger.error(e.getMessage(), e);
 		}
 		return lines;
+	}
+
+	public List<SecureMessage> getSecureMessages(DhcAddress dhcAddress) {
+		List<SecureMessage> messages = new ArrayList<>();
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select t.*, td.* from trans_action t "
+							+ " left outer join transaction_data td on td.transactionId = t.transaction_id "
+							+ " where t.app = ? and t.receiver = ? "
+							+ " WITH UR";
+					ps = conn.prepareStatement(sql);
+					int i = 1;
+					ps.setString(i++, Applications.MESSAGING);
+					ps.setString(i++, dhcAddress.toString());
+					rs = ps.executeQuery();
+					while (rs.next()) {
+						
+						SecureMessage message = new SecureMessage();
+						message.setExpire(rs.getLong("validForNumberOfBlocks"));
+						message.setFee(new Coin(rs.getLong("fee")));
+						message.setRecipient(rs.getString("receiver"));
+						message.setSender(rs.getString("sender"));
+						message.setText(rs.getString("data"));
+						message.setTimeStamp(rs.getLong("timeStamp"));
+						message.setTransactionId(rs.getString("transaction_id"));
+						message.setValue(new Coin(rs.getLong("value")));
+						messages.add(message);
+						
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return messages;
+	}
+
+	public PublicKey getPublicKey(DhcAddress dhcAddress) {
+		PublicKey[] key = new PublicKey[1];
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select t.sender from trans_action t "
+							+ " where t.senderAddress = ? "
+							+ " WITH UR";
+					ps = conn.prepareStatement(sql);
+					int i = 1;
+					ps.setString(i++, dhcAddress.toString());
+					rs = ps.executeQuery();
+					if (rs.next()) {
+						key[0] = CryptoUtil.loadPublicKey(rs.getString("sender"));
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return key[0];
 	}
 
 

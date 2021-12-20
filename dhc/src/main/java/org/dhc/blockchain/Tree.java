@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.dhc.gui.promote.JoinLine;
+import org.dhc.lite.SecureMessage;
 import org.dhc.persistence.BlockStore;
 import org.dhc.persistence.ConnectionPool;
 import org.dhc.persistence.TransactionInputStore;
@@ -607,6 +608,38 @@ public class Tree {
 		long start = System.currentTimeMillis();
 		try {
 			return BlockStore.getInstance().getBits(blockhash);
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
+	public List<SecureMessage> getSecureMessages(DhcAddress dhcAddress) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return TransactionStore.getInstance().getSecureMessages(dhcAddress);
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
+	public PublicKey getPublicKey(DhcAddress dhcAddress) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return TransactionStore.getInstance().getPublicKey(dhcAddress);
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;

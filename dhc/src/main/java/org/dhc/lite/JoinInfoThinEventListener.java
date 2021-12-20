@@ -22,7 +22,7 @@ public class JoinInfoThinEventListener implements EventListener {
 	private DhcAddress myDhcAddress;
 	private String correlationId;
 	private Peer peer;
-	ScheduledFuture<?> future;
+	private ScheduledFuture<?> future;
 
 	public JoinInfoThinEventListener(DhcAddress myDhcAddress, String correlationId, Peer peer) {
 		logger.info("JoinInfoThinEventListener.init() myDhcAddress={}, correlationId={}, peer={}", myDhcAddress, correlationId, peer);
