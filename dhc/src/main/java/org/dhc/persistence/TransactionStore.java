@@ -534,7 +534,8 @@ public class TransactionStore {
 					String sql = "select t.*, td.* from trans_action t "
 							+ " left outer join transaction_data td on td.transactionId = t.transaction_id "
 							+ " where t.app = ? and t.receiver = ? "
-							+ " WITH UR";
+							+ " order by timeStamp desc "
+							+ " FETCH FIRST 100 ROWS ONLY WITH UR ";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setString(i++, Applications.MESSAGING);

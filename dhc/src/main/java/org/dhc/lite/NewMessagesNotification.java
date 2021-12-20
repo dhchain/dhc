@@ -1,12 +1,9 @@
 package org.dhc.lite;
 
 import org.dhc.network.Peer;
-import org.dhc.util.Listeners;
 import org.dhc.util.Message;
 
 public class NewMessagesNotification extends Message {
-	
-	private static final Listeners listeners = Listeners.getInstance();
 	
 	private SecureMessage secureMessage;
 
@@ -16,10 +13,7 @@ public class NewMessagesNotification extends Message {
 
 	@Override
 	public void process(Peer peer) {
-		if (alreadySent(toString())) {
-			return;
-		}
-		listeners.sendEvent(new NewMessageEvent(secureMessage));
+
 	}
 
 	public SecureMessage getSecureMessage() {

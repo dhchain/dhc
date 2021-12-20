@@ -30,7 +30,7 @@ public class GetSenderPublicKeyAsyncReply extends Message {
 			return;
 		}
 		
-		logger.info("process {}", this);
+		logger.trace("process {}", this);
 
 		if(DhcAddress.getMyDhcAddress().equals(from)) {
 			GetSenderPublicKeyEvent event = new GetSenderPublicKeyEvent(publicKey, getCorrelationId());
@@ -38,7 +38,7 @@ public class GetSenderPublicKeyAsyncReply extends Message {
 		}
 		Network network = Network.getInstance();
 		network.sendToAddress(from, this);
-		logger.info("sent to {} message {}", from, this);
+		logger.trace("sent to {} message {}", from, this);
 		
 	}
 	

@@ -11,6 +11,8 @@ import org.dhc.network.Peer;
 
 public class ThinPeerNotifier {
 	
+	private static final DhcLogger logger = DhcLogger.getLogger();
+	
 	public void notifyTransaction(Transaction transaction) {
 		ThreadExecutor.getInstance().execute(new DhcRunnable("notifyTransaction") {
 			public void doRun() {
@@ -18,13 +20,18 @@ public class ThinPeerNotifier {
 			}
 		});
 	}
+	
+	public void notifySecureMessage(Transaction transaction) {
+		ThreadExecutor.getInstance().execute(new DhcRunnable("notifyTransaction") {
+			public void doRun() {
+				doNotifySecureMessage(transaction);
+			}
+		});
+	}
 
-	private void doNotifyTransaction(Transaction transaction) {
+	private void doNotifySecureMessage(Transaction transaction) {
 		List<Peer> thinPeers = Network.getInstance().getThinPeers();
 		for(Peer peer: thinPeers) {
-			if(transaction.getSenderDhcAddress().startsWith(peer.getTAddress()) || transaction.getReceiver().startsWith(peer.getTAddress())) {
-				peer.send(new NotifyTransactionMessage(transaction));
-			}
 			if(transaction.getReceiver().startsWith(peer.getTAddress()) && Applications.MESSAGING.equals(transaction.getApp())) {
 				SecureMessage message = new SecureMessage();
 				message.setExpire(transaction.getExpiringData().getValidForNumberOfBlocks());
@@ -36,6 +43,17 @@ public class ThinPeerNotifier {
 				message.setTransactionId(transaction.getTransactionId());
 				message.setValue(transaction.getValue());
 				peer.send(new NewMessagesNotification(message));
+				logger.trace("sent to {} message {}", peer, message);
+			}
+		}
+		
+	}
+
+	private void doNotifyTransaction(Transaction transaction) {
+		List<Peer> thinPeers = Network.getInstance().getThinPeers();
+		for(Peer peer: thinPeers) {
+			if(transaction.getSenderDhcAddress().startsWith(peer.getTAddress()) || transaction.getReceiver().startsWith(peer.getTAddress())) {
+				peer.send(new NotifyTransactionMessage(transaction));
 			}
 		}
 	}
