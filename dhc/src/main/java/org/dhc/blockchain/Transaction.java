@@ -431,7 +431,7 @@ public class Transaction {
 				}
 				
 				
-				TransactionOutput output = TransactionOutputStore.getInstance().getByOutputId(input.getOutputId());
+				TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), null);
 				if(output == null) {
 					Block block = BlockStore.getInstance().getByBlockhash(input.getOutputBlockHash());
 					if (block != null && block.isPruned()) {
@@ -577,7 +577,7 @@ public class Transaction {
 
 				return false;
 			}
-			TransactionOutput output = TransactionOutputStore.getInstance().getByOutputId(input.getOutputId());
+			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), null);
 			if(output != null && !output.getRecipient().equals(input.getSender()) && !isPruning()) {
 				logger.info("output recipient is not the same as input sender");
 				logger.info("Output recipient:      {}", output.getRecipient());
@@ -606,7 +606,7 @@ public class Transaction {
 
 				return false;
 			}
-			TransactionOutput output = TransactionOutputStore.getInstance().getByOutputId(input.getOutputId());
+			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), null);
 			if(output != null && !output.getRecipient().equals(input.getSender()) && !isPruning()) {
 				logger.info("output recipient is not the same as input sender");
 				logger.info("Output recipient:      {}", output.getRecipient());

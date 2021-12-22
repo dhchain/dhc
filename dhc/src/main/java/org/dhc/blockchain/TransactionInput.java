@@ -4,12 +4,11 @@ import java.util.Set;
 
 import org.dhc.network.ChainSync;
 import org.dhc.persistence.BlockStore;
-import org.dhc.persistence.TransactionOutputStore;
 import org.dhc.util.Coin;
 import org.dhc.util.Constants;
-import org.dhc.util.Registry;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Registry;
 
 public class TransactionInput {
 	
@@ -136,8 +135,8 @@ public class TransactionInput {
 			return true;
 		}
 		
-
-		if (TransactionOutputStore.getInstance().getByOutputId(getOutputId()) == null) {
+		TransactionOutput output = TransactionOutputFinder.getByOutputId(getOutputId(), null);
+		if (output == null) {
 			logger.info("No output for {}", this);
 			logger.info("missing transactionId {}", this.getOutputTransactionId());
 			Block block = BlockStore.getInstance().getByBlockhash(getOutputBlockHash());
