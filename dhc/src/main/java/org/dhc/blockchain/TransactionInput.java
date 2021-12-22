@@ -118,7 +118,7 @@ public class TransactionInput {
 		return false;
 	}
 	
-	public boolean hasOutput() {
+	public boolean hasOutput(Set<TransactionOutput> pendingOutputs) {
 		
 		if(!outputBlockHashExists()) {
 			return false;
@@ -135,7 +135,7 @@ public class TransactionInput {
 			return true;
 		}
 		
-		TransactionOutput output = TransactionOutputFinder.getByOutputId(getOutputId(), null);
+		TransactionOutput output = TransactionOutputFinder.getByOutputId(getOutputId(), pendingOutputs);
 		if (output == null) {
 			logger.info("No output for {}", this);
 			logger.info("missing transactionId {}", this.getOutputTransactionId());

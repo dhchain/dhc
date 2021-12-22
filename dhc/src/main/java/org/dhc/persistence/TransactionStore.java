@@ -75,7 +75,7 @@ public class TransactionStore {
 		if(!transaction.outputBlockHashExist()) {
 			return false;
 		}
-		if(!transaction.isValid()) {
+		if(!transaction.isValid(null)) {
 			logger.info("Transaction is not valid: {}", transaction);
 			return false;
 		}
@@ -201,7 +201,10 @@ public class TransactionStore {
 			return false;
 		}
 		boolean result = false;
-		for (Transaction transaction : transactions) {
+		
+		Set<Transaction> sortedDependencySet = new TransactionDependencySorter(transactions).sortByInputsOutputs();
+		
+		for (Transaction transaction : sortedDependencySet) {
 			try {
 				if(saveTransaction(transaction)) {
 					result = true;
@@ -214,6 +217,8 @@ public class TransactionStore {
 		}
 		return result;
 	}
+	
+
 	
 	private void verifyTable() throws Exception {
 		

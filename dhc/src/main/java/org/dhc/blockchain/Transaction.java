@@ -391,7 +391,7 @@ public class Transaction {
 		return true;
 	}
 	
-	public boolean isValid() {
+	public boolean isValid(Set<TransactionOutput> pendingOutputs) {
 		
 		if(getValue().less(Coin.ZERO)) {
 			logger.info("Value {} is less than zero", getValue());
@@ -431,7 +431,7 @@ public class Transaction {
 				}
 				
 				
-				TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), null);
+				TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), pendingOutputs);
 				if(output == null) {
 					Block block = BlockStore.getInstance().getByBlockhash(input.getOutputBlockHash());
 					if (block != null && block.isPruned()) {
@@ -570,14 +570,14 @@ public class Transaction {
 		}
 
 		for(TransactionInput input: inputs) {
-			if(!input.hasOutput()) {
+			if(!input.hasOutput(block.getOutputs())) {
 				Registry.getInstance().getMissingOutputs().put(new TransactionKey(input.getOutputTransactionId(), input.getOutputBlockHash()), block);
 				
 				input.findMissingOutput();
 
 				return false;
 			}
-			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), null);
+			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), block.getOutputs());
 			if(output != null && !output.getRecipient().equals(input.getSender()) && !isPruning()) {
 				logger.info("output recipient is not the same as input sender");
 				logger.info("Output recipient:      {}", output.getRecipient());
@@ -589,7 +589,7 @@ public class Transaction {
 		return true;
 	}
 	
-	public boolean hasOutputsForAllInputs() {
+	public boolean hasOutputsForAllInputs(Set<TransactionOutput> pendingOutputs) {
 		if(!outputBlockHashExist()) {
 			return false;
 		}
@@ -598,7 +598,7 @@ public class Transaction {
 			return true;
 		}
 		for(TransactionInput input: inputs) {
-			if(!input.hasOutput()) {
+			if(!input.hasOutput(pendingOutputs)) {
 				
 				Registry.getInstance().getMissingOutputsForTransaction().put(new TransactionKey(input.getOutputTransactionId(), input.getOutputBlockHash()), this);
 				
@@ -606,7 +606,7 @@ public class Transaction {
 
 				return false;
 			}
-			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), null);
+			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), pendingOutputs);
 			if(output != null && !output.getRecipient().equals(input.getSender()) && !isPruning()) {
 				logger.info("output recipient is not the same as input sender");
 				logger.info("Output recipient:      {}", output.getRecipient());

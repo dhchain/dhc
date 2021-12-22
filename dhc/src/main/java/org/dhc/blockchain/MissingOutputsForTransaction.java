@@ -36,7 +36,7 @@ public class MissingOutputsForTransaction {
 			return;
 		}
 		
-		if(!transaction.isValid()) {
+		if(!transaction.isValid(null)) {
 			return;
 		}
 

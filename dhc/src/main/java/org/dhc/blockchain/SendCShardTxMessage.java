@@ -47,7 +47,7 @@ public class SendCShardTxMessage extends Message {
 
 		long lastIndex = Math.max(Blockchain.getInstance().getIndex(), ChainSync.getInstance().getLastBlockchainIndex());
 		
-		if(!transaction.isValid()) {
+		if(!transaction.isValid(null)) {
 			logger.info("{}-{} SendCShardTxMessage transaction not valid {}", Network.getInstance().getBucketKey(), lastIndex, transaction);
 			return false;
 		}

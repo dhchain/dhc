@@ -674,6 +674,15 @@ public class Block {
 	public void setNextBits(long nextBits) {
 		this.nextBits = nextBits;
 	}
+
+	public Set<TransactionOutput> getOutputs() {
+		Set<Transaction> set = getAllTransactions();
+		Set<TransactionOutput> outputs = new HashSet<>();
+		for (Transaction transaction : set) {
+			outputs.addAll(transaction.getOutputs());
+		}
+		return outputs;
+	}
 	
 
 }

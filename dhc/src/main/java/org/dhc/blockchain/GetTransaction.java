@@ -36,7 +36,7 @@ public class GetTransaction {
 	public void process(Transaction transaction) {
 
 
-		if(!transaction.isValid()) {
+		if(!transaction.isValid(null)) {
 			return;
 		}
 

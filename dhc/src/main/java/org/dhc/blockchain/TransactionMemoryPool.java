@@ -38,7 +38,7 @@ public class TransactionMemoryPool {
 		if (!transaction.inputAlreadySpent()) {
 			return false;
 		}
-		if (!transaction.isValid()) {
+		if (!transaction.isValid(getOutputs())) {
 			return false;
 		}		
 		
@@ -88,7 +88,7 @@ public class TransactionMemoryPool {
 		Set<Transaction> result = new HashSet<>(set);
 
 		for (Transaction transaction : set) {
-			if (!transaction.isValid()) {
+			if (!transaction.isValid(getOutputs())) {
 				result.remove(transaction);
 				remove(transaction);
 			}
@@ -100,7 +100,7 @@ public class TransactionMemoryPool {
 				result.remove(transaction);//when power increases a transaction might now have a sender from a different shard. We should remove such transaction from the memory pool.
 				remove(transaction);
 			}
-			if (!transaction.hasOutputsForAllInputs()) {
+			if (!transaction.hasOutputsForAllInputs(getOutputs())) {
 				result.remove(transaction);
 				remove(transaction);
 			}
@@ -138,6 +138,15 @@ public class TransactionMemoryPool {
 			inputs.addAll(transaction.getInputs());
 		}
 		return inputs;
+	}
+	
+	private Set<TransactionOutput> getOutputs() {
+		Set<Transaction> set = getCopyOfTransactions();
+		Set<TransactionOutput> outputs = new HashSet<>();
+		for (Transaction transaction : set) {
+			outputs.addAll(transaction.getOutputs());
+		}
+		return outputs;
 	}
 
 	public void removeByOutputBlockhash(String outputBlockhash) {
