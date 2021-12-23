@@ -30,18 +30,26 @@ public class TransactionMemoryPool {
 	}
 	
 	private boolean dependencyNeeded(Transaction transaction) {
-		Set<TransactionOutput> outputs = getOutputs();
-		for(TransactionInput input: transaction.getInputs()) {
-			if(input.getOutputBlockHash() != null) {
-				continue;
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		try {
+			Set<TransactionOutput> outputs = getOutputs();
+			for (TransactionInput input : transaction.getInputs()) {
+				if (input.getOutputBlockHash() != null) {
+					continue;
+				}
+				TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), outputs);
+				if (output == null) {
+					dependantTransactions.put(input.getOutputId(), transaction);
+					logger.info("dependency needed for transaction {}", transaction);
+					return true;
+				}
 			}
-			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), outputs);
-			if(output == null) {
-				dependantTransactions.put(input.getOutputId(), transaction);
-				return true;
-			}
+			return false;
+		} finally {
+			readLock.unlock();
+			// logger.trace("unlock");
 		}
-		return false;
 	}
 	
 	public boolean add(Transaction transaction) {
@@ -79,6 +87,8 @@ public class TransactionMemoryPool {
 				for(TransactionOutput output: transaction.getOutputs()) {
 					Transaction dependantTransaction = dependantTransactions.remove(output.getOutputId());
 					if(dependantTransaction != null) {
+						logger.info("found dependantTransaction {}", dependantTransaction);
+						logger.info("it depended on transaction  {}", transaction);
 						add(dependantTransaction);
 					}
 				}
