@@ -90,6 +90,8 @@ public class BlockStore {
 		Registry.getInstance().getPendingTransactions().process(block.getIndex());
 		
 		setMinCompeting(-1);
+		
+		TransactionDataStore.getInstance().remove();
 
 		return true;
 	}

@@ -82,7 +82,6 @@ public class TransactionDataStore {
 	            ps.executeUpdate();
 			}
 		}.execute();
-		remove();
 	}
 
 	public TransactionData getExpiringData(String transactionId) {
