@@ -44,6 +44,7 @@ public class TransactionDataStore {
 	}
 	
 	private void verifyTable() throws Exception {
+		String tableName = "transaction_data".toUpperCase();
 		new DBExecutor() {
 			public void doWork() throws Exception {
 				DatabaseMetaData dbmd = conn.getMetaData();
@@ -56,10 +57,11 @@ public class TransactionDataStore {
 							+ " data varchar(32672) , expirationIndex bigint not null "
 							+ " )");
 					s.execute("CREATE INDEX transaction_data_transactionId ON transaction_data(transactionId)");
-					s.execute("CREATE INDEX transaction_data_validForNumberOfBlocks ON transaction_data(validForNumberOfBlocks)");
+					s.execute("CREATE INDEX transaction_data_expirationIndex ON transaction_data(expirationIndex)");
 					s.execute("ALTER TABLE transaction_data ADD CONSTRAINT transaction_data_tr_id_BLOCKHASH_FK FOREIGN KEY (transactionId, blockHash) REFERENCES trans_action(transaction_id, blockHash) ON DELETE CASCADE");
 				}
 				rs.close();
+				addIndex(dbmd, tableName, "transaction_data_expirationIndex", "CREATE INDEX transaction_data_expirationIndex ON " + tableName + "(expirationIndex)");
 			}
 		}.execute();
 		setId();
