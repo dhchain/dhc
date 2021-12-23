@@ -180,7 +180,7 @@ public class Block {
 			logger.info("****************************************************************");
 			logger.info("Invalid block, not all transactions have inputs from the branch {}", this);
 			allTransactions.removeAll(myBranchTransactions);
-			new InvalidTransactions(this, allTransactions).process();
+			new InvalidTransactions(this).process();
 			return false;
 		}
 
@@ -472,9 +472,26 @@ public class Block {
 		Set<String> blockhashes = Blockchain.getInstance().getBranchBlockhashes(this);
 		long minCompeting = BlockStore.getInstance().getMinCompeting();
 		long branchIndex = minCompeting == 0 || minCompeting > getIndex() ? getIndex() : minCompeting;
+		
+		Set<String> outputIds = new HashSet<>();
+		for (Transaction transaction : transactions) {
+			for(TransactionOutput output: transaction.getOutputs()) {
+				outputIds.add(output.getOutputId());
+			}
+		}
+		
+		
+		
 		for (Transaction transaction : transactions) {
 			boolean inputsValid = true;
 			for (TransactionInput input : transaction.getInputs()) {
+				
+				//skip if dependency is on another transaction in this set of transactions
+				if(outputIds.contains(input.getOutputId())) {
+					continue;
+				}
+				
+				
 				// this checks that all transactions inputs come from the branch, no other
 				// branches
 				// but there is a possibility that some inputs already used in the branch

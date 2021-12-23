@@ -1,5 +1,6 @@
 package org.dhc.blockchain;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.dhc.network.Network;
@@ -13,11 +14,9 @@ public class InvalidTransactions {
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	
 	private Block block;
-	private Set<Transaction> transactions;
 
-	public InvalidTransactions(Block block, Set<Transaction> transactions) {
+	public InvalidTransactions(Block block) {
 		this.block = block;
-		this.transactions = transactions;
 	}
 
 	public void process() {
@@ -28,7 +27,7 @@ public class InvalidTransactions {
 		});
 	}
 	private void doProcess() {
-		for(Transaction transaction: transactions) {
+		for(Transaction transaction: block.getAllTransactions()) {
 			processTransaction(transaction);
 		}
 		
@@ -47,7 +46,19 @@ public class InvalidTransactions {
 		long minCompeting = BlockStore.getInstance().getMinCompeting();
 		long branchIndex = minCompeting == 0 || minCompeting > previousBlock.getIndex() ? previousBlock.getIndex() : minCompeting;
 		
+		Set<String> outputIds = new HashSet<>();
+		for (Transaction t : block.getAllTransactions()) {
+			for(TransactionOutput output: t.getOutputs()) {
+				outputIds.add(output.getOutputId());
+			}
+		}
+		
 		for (TransactionInput input : transaction.getInputs()) {
+			//skip if dependency is on another transaction in this set of transactions
+			if(outputIds.contains(input.getOutputId())) {
+				continue;
+			}
+			
 			// this checks that all transactions inputs come from the branch, no other
 			// branches
 			// but there is a possibility that some inputs already used in the branch

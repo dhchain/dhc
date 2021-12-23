@@ -11,13 +11,11 @@ import org.dhc.blockchain.Transaction;
 import org.dhc.blockchain.TransactionMemoryPool;
 import org.dhc.network.Network;
 import org.dhc.util.Coin;
-import org.dhc.util.Constants;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.Event;
 import org.dhc.util.EventListener;
 import org.dhc.util.Listeners;
-import org.dhc.util.ThreadExecutor;
 
 public class JoinInfoEventListener implements EventListener {
 	
@@ -62,7 +60,6 @@ public class JoinInfoEventListener implements EventListener {
 			if (TransactionMemoryPool.getInstance().add(transaction)) {
 				Listeners.getInstance().addEventListener(JoinTransactionEvent.class, new JoinTransactionEventListener(amount, transaction, joinInfo));
 				Network.getInstance().sendToAllMyPeers(new SendTransactionMessage(transaction));
-				ThreadExecutor.sleep(Constants.SECOND * 5);
 				Listeners.getInstance().sendEvent(new JoinTransactionEvent(transaction));
 				return;
 			}

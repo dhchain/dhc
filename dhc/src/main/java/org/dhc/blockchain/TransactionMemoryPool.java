@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.dhc.network.Network;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.ExpiringMap;
 
 public class TransactionMemoryPool {
 
@@ -22,9 +23,25 @@ public class TransactionMemoryPool {
 	
 	private Set<Transaction> transactions = Collections.synchronizedSet(new HashSet<>());
 	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+	private ExpiringMap<String, Transaction> dependantTransactions = new ExpiringMap<>();
 	
 	private TransactionMemoryPool() {
 		
+	}
+	
+	private boolean dependencyNeeded(Transaction transaction) {
+		Set<TransactionOutput> outputs = getOutputs();
+		for(TransactionInput input: transaction.getInputs()) {
+			if(input.getOutputBlockHash() != null) {
+				continue;
+			}
+			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), outputs);
+			if(output == null) {
+				dependantTransactions.put(input.getOutputId(), transaction);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public boolean add(Transaction transaction) {
@@ -33,6 +50,9 @@ public class TransactionMemoryPool {
 		}
 		Blockchain blockchain = Blockchain.getInstance();
 		if (blockchain.contains(transaction)) {
+			return false;
+		}
+		if(dependencyNeeded(transaction)) {
 			return false;
 		}
 		if (!transaction.inputAlreadySpent(getOutputs())) {
@@ -53,8 +73,18 @@ public class TransactionMemoryPool {
 			if (!set.isEmpty()) {
 				return false;
 			}
-			
-			return transactions.add(transaction);
+			boolean result = transactions.add(transaction);
+			if(result) {
+				
+				for(TransactionOutput output: transaction.getOutputs()) {
+					Transaction dependantTransaction = dependantTransactions.remove(output.getOutputId());
+					if(dependantTransaction != null) {
+						add(dependantTransaction);
+					}
+				}
+				
+			}
+			return result;
 		} finally {
 			writeLock.unlock();
 		}
