@@ -35,7 +35,7 @@ public class TransactionMemoryPool {
 		if (blockchain.contains(transaction)) {
 			return false;
 		}
-		if (!transaction.inputAlreadySpent()) {
+		if (!transaction.inputAlreadySpent(getOutputs())) {
 			return false;
 		}
 		if (!transaction.isValid(getOutputs())) {
@@ -92,7 +92,7 @@ public class TransactionMemoryPool {
 				result.remove(transaction);
 				remove(transaction);
 			}
-			if (!transaction.inputAlreadySpent()) {
+			if (!transaction.inputAlreadySpent(getOutputs())) {
 				result.remove(transaction);
 				remove(transaction);
 			}

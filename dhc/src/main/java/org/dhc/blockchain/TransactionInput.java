@@ -120,10 +120,6 @@ public class TransactionInput {
 	
 	public boolean hasOutput(Set<TransactionOutput> pendingOutputs) {
 		
-		if(!outputBlockHashExists()) {
-			return false;
-		}
-		
 		long lastIndex = Math.max(Blockchain.getInstance().getIndex(), ChainSync.getInstance().getLastBlockchainIndex());
 		
 		if(lastIndex - getOutputBlockIndex() > Constants.MAX_NUMBER_OF_BLOCKS) {
@@ -136,6 +132,14 @@ public class TransactionInput {
 		}
 		
 		TransactionOutput output = TransactionOutputFinder.getByOutputId(getOutputId(), pendingOutputs);
+		
+		if(output == null) {
+			if(!outputBlockHashExists()) {
+				logger.info("Output blockhash does not exists for input: {}", this);
+				return false;
+			}
+		}
+		
 		if (output == null) {
 			logger.info("No output for {}", this);
 			logger.info("missing transactionId {}", this.getOutputTransactionId());
@@ -154,6 +158,9 @@ public class TransactionInput {
 	}
 	
 	public boolean outputBlockHashExists() {
+		if(getOutputBlockHash() == null) {
+			return false;
+		}
 		return Blockchain.getInstance().contains(getOutputBlockHash());
 	}
 

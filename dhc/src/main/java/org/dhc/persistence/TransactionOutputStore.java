@@ -54,7 +54,7 @@ public class TransactionOutputStore {
 	}
 	
 	// Return unspent output for outputId or null if there is no output or if output is already spent
-	public TransactionOutput get(String outputId) {
+	public TransactionOutput getUnspentByOutputId(String outputId) {
 		TransactionOutput[] transactionOutput = new TransactionOutput[1];
 		try {
 			new DBExecutor() {
@@ -84,7 +84,8 @@ public class TransactionOutputStore {
 		}
 		return transactionOutput[0];
 	}
-
+	
+	//this APi is needed in case output was spent in a competing block
 	public TransactionOutput getByOutputId(String outputId) {
 		TransactionOutput[] transactionOutput = new TransactionOutput[1];
 		try {

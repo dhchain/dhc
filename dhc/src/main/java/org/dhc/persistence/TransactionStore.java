@@ -72,7 +72,8 @@ public class TransactionStore {
 	
 	public boolean saveTransaction(Transaction transaction) throws Exception {
 		logger.trace("Will try to add transaction {}", transaction);
-		if(!transaction.outputBlockHashExist()) {
+		transaction.setOutputBlockHashForInputs();
+		if(!transaction.outputBlockHashExist(null)) {
 			return false;
 		}
 		if(!transaction.isValid(null)) {

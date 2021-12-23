@@ -560,7 +560,7 @@ public class Transaction {
 	
 	public boolean hasOutputsForAllInputs(Block block) {
 		
-		if(!outputBlockHashExist()) {
+		if(!outputBlockHashExist(block.getOutputs())) {
 			return false;
 		}
 		
@@ -590,7 +590,7 @@ public class Transaction {
 	}
 	
 	public boolean hasOutputsForAllInputs(Set<TransactionOutput> pendingOutputs) {
-		if(!outputBlockHashExist()) {
+		if(!outputBlockHashExist(pendingOutputs)) {
 			return false;
 		}
 		int power = Blockchain.getInstance().getPower();
@@ -618,21 +618,25 @@ public class Transaction {
 		return true;
 	}
 	
-	public boolean outputBlockHashExist() {
+	public boolean outputBlockHashExist(Set<TransactionOutput> pendingOutputs) {
 		for(TransactionInput input: inputs) {
-			if(!input.outputBlockHashExists()) {
-				logger.info("Output blockhash does not exists for input: {}", input);
-				logger.info("Output blockhash does not exists for input for transaction: {}", this);
-				return false;
+			TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), pendingOutputs);
+			if(output == null) {
+				if(!input.outputBlockHashExists()) {
+					logger.info("Output blockhash does not exists for input: {}", input);
+					logger.info("Output blockhash does not exists for input for transaction: {}", this);
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 	
-	public boolean inputAlreadySpent() {
+	public boolean inputAlreadySpent(Set<TransactionOutput> pendingOutputs) {
 		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(getSenderDhcAddress(), Blockchain.getInstance().getPower())) {
 			for(TransactionInput input: inputs) {
-				if(TransactionOutputStore.getInstance().get(input.getOutputId()) == null) {
+				TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), pendingOutputs);
+				if(output == null) {
 					logger.trace("Transaction is no valid {}", this);
 					logger.trace("No unspent output found for input {}", input);
 					return false;
@@ -995,6 +999,21 @@ public class Transaction {
 			}
 		}
 		return null;
+	}
+
+	public void setOutputBlockHashForInputs() {
+		for(TransactionInput input: inputs) {
+			if(input.getOutputBlockHash() == null) {
+				TransactionOutput output = TransactionOutputStore.getInstance().getByOutputId(input.getOutputId());
+				if(output == null) {
+					String str = String.format("output does not exists for input %s", input);
+					throw new RuntimeException(str);
+				}
+				input.setOutputBlockIndex(output.getOutputBlockIndex());
+				input.setOutputBlockHash(output.getOutputBlockHash());
+			}
+		}
+		
 	}
 
 }
