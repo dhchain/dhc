@@ -39,6 +39,7 @@ public class JoinTransactionEventListener implements EventListener {
 		if(!transaction.equals(joinTransactionEvent.getTransaction())) {
 			return;
 		}
+		Listeners.getInstance().removeEventListener(JoinTransactionEvent.class, this);
 		logger.info("Received join transaction {}", transaction);
 
 		Set<TransactionOutput> set = joinTransactionEvent.getTransaction().getOutputs();
@@ -59,7 +60,7 @@ public class JoinTransactionEventListener implements EventListener {
 		}
 		
 		
-		Listeners.getInstance().removeEventListener(JoinTransactionEvent.class, this);
+		
 
 	}
 	
