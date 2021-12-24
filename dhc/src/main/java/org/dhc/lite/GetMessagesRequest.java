@@ -20,7 +20,7 @@ public class GetMessagesRequest extends Message {
 
 	@Override
 	public void process(Peer peer) {
-		logger.info("GetMessagesRequest.process() START");
+		logger.trace("GetMessagesRequest.process() START");
 		List<SecureMessage> messages = null;
 		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(dhcAddress, Blockchain.getInstance().getPower())) {
 			messages = Blockchain.getInstance().getSecureMessages(dhcAddress);
@@ -28,7 +28,7 @@ public class GetMessagesRequest extends Message {
 		Message message  = new GetMessagesReply(messages);
 		message.setCorrelationId(getCorrelationId());
 		peer.send(message);
-		logger.info("GetMessagesRequest.process() END messages={}", messages);
+		logger.trace("GetMessagesRequest.process() END messages={}", messages.size());
 
 	}
 

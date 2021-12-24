@@ -120,7 +120,9 @@ public class TransactionDataStore {
 					String sql = "update transaction_data set data = null where expirationIndex < ?";
 					ps = conn.prepareStatement(sql);
 					ps.setLong(1, Blockchain.getInstance().getIndex());
+					long start = System.currentTimeMillis();
 					ps.executeUpdate();
+					logger.trace("Query TransactionDataStore.remove() took {} ms. '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {
