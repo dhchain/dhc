@@ -375,6 +375,7 @@ public class BlockStore {
 				addNewColumn(dbmd, tableName, "timeStamp", "ALTER TABLE " + tableName + " ADD timeStamp bigint");
 				addIndex(dbmd, tableName, "block_timeStamp", "CREATE INDEX block_timeStamp ON " + tableName + "(timeStamp)");
 				addNewColumn(dbmd, tableName, "nextBits", "ALTER TABLE " + tableName + " ADD nextBits bigint DEFAULT " + Difficulty.INITIAL_BITS);
+				addIndex(dbmd, tableName, "block_miner", "CREATE INDEX block_miner ON " + tableName + "(miner)");
 				
 			}
 		}.execute();
@@ -776,10 +777,12 @@ public class BlockStore {
 				public void doWork() throws Exception {
 					String sql = "select coalesce(min(index), -1) counter from block where miner is not null";
 					ps = conn.prepareStatement(sql);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					if (rs.next()) {
 						result[0] = rs.getLong("counter");
 					}
+					logger.trace("Query getMinUnprunedIndex() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {
@@ -854,6 +857,7 @@ public class BlockStore {
 					int i = 1;
 					ps.setLong(i++, firstIndex);
 					ps.setLong(i++, lastIndex);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					String branchHash = block.getBlockHash();
 					double sum = 0;
@@ -865,6 +869,7 @@ public class BlockStore {
 						}
 					}
 					result[0] = Difficulty.convertDifficultyToBits(sum / (lastIndex - firstIndex));
+					logger.trace("Query getAverageBits() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 

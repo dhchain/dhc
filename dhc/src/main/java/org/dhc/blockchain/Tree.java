@@ -25,7 +25,7 @@ public class Tree {
 	private long lastIndex;
 	private final SharedLock readWriteLock = SharedLock.getInstance();
 	private List<Block> lastBlocks;
-	private int averagePower;
+	private int averagePower = -1;
 	private int lastAveragePower;
 	private int power;
 
@@ -144,7 +144,7 @@ public class Tree {
 				this.lastIndex = lastIndex;
 			}
 			lastBlocks = null;
-			averagePower = BlockStore.getInstance().getAveragePower(this.lastIndex);
+			averagePower = -1;
 			lastAveragePower = BlockStore.getInstance().getLastAveragePower(this.lastIndex);
 			power = BlockStore.getInstance().getMaxPower();
 		} finally {
@@ -164,7 +164,7 @@ public class Tree {
 		try {
 			lastIndex = BlockStore.getInstance().getLastIndex();
 			lastBlocks = null;
-			averagePower = BlockStore.getInstance().getAveragePower(lastIndex);
+			averagePower = -1;
 			lastAveragePower = BlockStore.getInstance().getLastAveragePower(lastIndex);
 			power = BlockStore.getInstance().getMaxPower();
 		} finally {
@@ -343,6 +343,9 @@ public class Tree {
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
+			if(averagePower == -1) {
+				averagePower = BlockStore.getInstance().getAveragePower(lastIndex);
+			}
 			return averagePower;
 		} finally {
 			readLock.unlock();
