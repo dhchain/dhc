@@ -202,6 +202,17 @@ public class Buckets {
 		long start = System.currentTimeMillis();
 		try {
 			Network network = Network.getInstance();
+			
+			logger.info("Thin peers");
+			for (Peer peer : Peer.getThinPeers()) {
+				if(peer.getTAddress() == null) {
+					continue;
+				}
+				logger.info("\t{} {}", peer.getTAddress().getBinary(), peer);
+			}
+			logger.info("\n");
+			
+			
 			logger.info("Non bucket peers");
 			List<Peer> peers = Peer.getPeers();
 			peers.removeAll(network.getAllPeers());
