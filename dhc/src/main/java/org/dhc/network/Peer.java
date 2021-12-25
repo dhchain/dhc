@@ -106,7 +106,17 @@ public class Peer {
 	}
 
 	private void trimPeer() {
-		if(isClosed() || !Peer.getPeers().contains(this)) {
+		if(isClosed()) {
+			return;
+		}
+		if(isThin()) {
+			if(System.currentTimeMillis() - getLastSeen() > Constants.MINUTE * 10) {
+				send(new KeepAliveMessage());
+			}
+			return;
+		}
+		if(!peers.values().contains(this)) {
+			close();
 			return;
 		}
 		if(getTAddress() == null) {
@@ -452,7 +462,7 @@ public class Peer {
 	public static List<Peer> getPeers() {
 		List<Peer> result = new ArrayList<Peer>();
 		for(Peer peer: new ArrayList<>(peers.values())) {
-			if(!PeerType.THIN.equals(peer.getType())) {
+			if(!peer.isThin()) {
 				result.add(peer);
 			}
 		}
@@ -462,11 +472,15 @@ public class Peer {
 	public static List<Peer> getThinPeers() {
 		List<Peer> result = new ArrayList<Peer>();
 		for(Peer peer: new ArrayList<>(peers.values())) {
-			if(PeerType.THIN.equals(peer.getType())) {
+			if(peer.isThin()) {
 				result.add(peer);
 			}
 		}
 		return result;
+	}
+	
+	public boolean isThin() {
+		return PeerType.THIN.equals(getType());
 	}
 
 	public static List<Peer> getClosestKPeers(TAddress tAddress) {
