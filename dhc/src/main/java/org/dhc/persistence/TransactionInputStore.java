@@ -58,6 +58,7 @@ public class TransactionInputStore {
 					int i = 1;
 					ps.setString(i++, inputTransactionId);
 					ps.setString(i++, inputBlockHash);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					while (rs.next()) {
 						TransactionInput input = new TransactionInput();
@@ -73,6 +74,7 @@ public class TransactionInputStore {
 						
 						inputs.add(input);
 					}
+					logger.trace("Query getByInputTransactionId() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {

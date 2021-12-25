@@ -177,11 +177,13 @@ public class TransactionStore {
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setString(i++, blockhash);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					while (rs.next()) {
 						Transaction transaction = populateTransaction(rs);
 						transactions.add(transaction);
 					}
+					logger.trace("Query getTransactions() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {

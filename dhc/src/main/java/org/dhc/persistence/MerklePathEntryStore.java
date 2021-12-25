@@ -75,11 +75,13 @@ public class MerklePathEntryStore {
 					
 					ps.setString(i++, transactionId);
 					ps.setString(i++, blockHash);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					while (rs.next()) {
 						SimpleEntry<String, String> entry = new SimpleEntry<String, String>(rs.getString("entry_key"), rs.getString("entry_hash"));
 						merklePath.add(entry);
 					}
+					logger.trace("Query getMerklePath() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {

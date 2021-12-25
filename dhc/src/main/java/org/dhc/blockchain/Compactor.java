@@ -46,7 +46,7 @@ public class Compactor {
 			return;
 		}
 		long index = blockchain.getIndex() - Constants.MAX_NUMBER_OF_BLOCKS;
-		long unprunedIndex = blockchain.getMinUnprunedIndex();
+		long unprunedIndex = getPrunedIndex() + 1;
 		logger.trace("Min unprunedIndex={}", unprunedIndex);
 		if (unprunedIndex != -1 && unprunedIndex < index) {
 			for (long i = unprunedIndex; i < index; i++) {

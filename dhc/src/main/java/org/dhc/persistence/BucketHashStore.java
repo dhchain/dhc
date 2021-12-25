@@ -87,6 +87,7 @@ public class BucketHashStore {
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setString(i++, blockHash);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					while (rs.next()) {
 						String previousHash = rs.getString("previousHash");
@@ -103,6 +104,7 @@ public class BucketHashStore {
 						}
 						bucketHashes[0].set(bucketHash);
 					}
+					logger.trace("Query getBucketHashes() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {

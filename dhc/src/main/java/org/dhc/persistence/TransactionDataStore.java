@@ -94,6 +94,7 @@ public class TransactionDataStore {
 					String sql = "select * from transaction_data where transactionId = ?";
 					ps = conn.prepareStatement(sql);
 					ps.setString(1, transactionId);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					if (rs.next()) {
 						TransactionData transactionData = new TransactionData(rs.getString("data"));
@@ -105,6 +106,7 @@ public class TransactionDataStore {
 						transactionData.setExpirationIndex(rs.getLong("expirationIndex"));
 						holder[0] = transactionData;
 					}
+					logger.trace("Query getExpiringData() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {

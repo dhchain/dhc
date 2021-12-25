@@ -154,6 +154,7 @@ public class TransactionOutputStore {
 					int i = 1;
 					ps.setString(i++, outputTransactionId);
 					ps.setString(i++, outputBlockHash);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					while (rs.next()) {
 						TransactionOutput transactionOutput = new TransactionOutput(new DhcAddress(rs.getString("recipient")), new Coin(rs.getLong("value")));
@@ -164,7 +165,7 @@ public class TransactionOutputStore {
 						
 						inputs.add(transactionOutput);
 					}
-					
+					logger.trace("Query getByOutputTransactionId() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 					
 				}
 			}.execute();

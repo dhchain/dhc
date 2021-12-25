@@ -113,6 +113,7 @@ public class KeywordStore {
 					String sql = "select * from keyword where transactionId = ?";
 					ps = conn.prepareStatement(sql);
 					ps.setString(1, transactionId);
+					long start = System.currentTimeMillis();
 					rs = ps.executeQuery();
 					while (rs.next()) {
 						String name = rs.getString("name");
@@ -121,6 +122,7 @@ public class KeywordStore {
 						keywords.put(name, keyword);
 						keywords.setBlockHash(blockhash);
 					}
+					logger.trace("Query getKeywords() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {
