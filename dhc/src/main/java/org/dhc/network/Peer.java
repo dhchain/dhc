@@ -115,7 +115,7 @@ public class Peer {
 			return;
 		}
 		if(getTAddress() == null) {
-			scheduleTrim();
+			close();
 			return;
 		}
 		
