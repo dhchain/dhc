@@ -109,22 +109,33 @@ public class Peer {
 		if(isClosed()) {
 			return;
 		}
-		if(isThin()) {
-			if(System.currentTimeMillis() - getLastSeen() > Constants.MINUTE * 10) {
-				send(new KeepAliveMessage());
-			}
-			return;
-		}
+		
 		if(!peers.values().contains(this)) {
 			close();
 			return;
 		}
 		if(getTAddress() == null) {
+			scheduleTrim();
 			return;
 		}
+		
+		if(isThin()) {
+			long ago = System.currentTimeMillis() - getLastSeen();
+			if(ago > Constants.HOUR) {
+				close();
+				return;
+			}
+			if(ago > Constants.MINUTE * 10) {
+				send(new KeepAliveMessage());
+			}
+			scheduleTrim();
+			return;
+		}
+		
 		Network network = Network.getInstance();
 		if(!network.getAllPeers().contains(this) && !getInUse()) {
 			close();
+			return;
 		}
 		scheduleTrim();
 	}
