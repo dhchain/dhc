@@ -11,15 +11,7 @@
 	<property name="izpack.lib" location="Z:\IzPack\lib" />
  
     <target name="create_run_jar">
-        <jar destfile="${dir.jarfile}/dhc.jar">
-            <manifest>
-                <attribute name="Main-Class" value="org.dhc.Main"/>
-                <attribute name="Class-Path" value=". lib/derby-10.14.2.0.jar lib/derbytools-10.14.2.0.jar lib/args4j-2.33.jar 
-                	lib/gson-2.8.6.jar lib/bcprov-jdk15on-1.65.01.jar lib/tinylog-impl-2.1.2.jar lib/tinylog-api-2.1.2.jar 
-                	lib/miglayout-core-5.3.jar lib/miglayout-swing-5.3.jar"/>
-            </manifest>
-            <fileset dir="${dir.jarfile}/classes"/>
-        </jar>
+        
         <delete dir="${dir.jarfile}/lib"/>
         <mkdir dir="${dir.jarfile}/lib"/>
         <copy file="${dir.repository}/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar" todir="${dir.jarfile}/lib"/>
@@ -31,6 +23,22 @@
         <copy file="${dir.repository}/org/tinylog/tinylog-api/2.1.2/tinylog-api-2.1.2.jar" todir="${dir.jarfile}/lib"/>
     	<copy file="${dir.repository}/com/miglayout/miglayout-core/5.3/miglayout-core-5.3.jar" todir="${dir.jarfile}/lib"/>
     	<copy file="${dir.repository}/com/miglayout/miglayout-swing/5.3/miglayout-swing-5.3.jar" todir="${dir.jarfile}/lib"/>
+    	
+    	<path id="classpath">
+    	    <fileset dir="${dir.jarfile}/lib" includes="**/*.jar"/>
+    	</path>
+
+    	<manifestclasspath property="manifest.classpath" jarfile="${dir.jarfile}/dhc.jar">
+    	    <classpath refid="classpath"/>
+    	</manifestclasspath>
+    	
+    	<jar destfile="${dir.jarfile}/dhc.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.dhc.Main"/>
+            	<attribute name="Class-Path" value=". ${manifest.classpath}"/>
+            </manifest>
+            <fileset dir="${dir.jarfile}/classes"/>
+    	</jar>
     </target>
 	
   <taskdef name="mkinstaller" classname="com.izforge.izpack.ant.IzPackTask">
