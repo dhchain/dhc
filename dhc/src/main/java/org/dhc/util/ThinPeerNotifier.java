@@ -2,10 +2,12 @@ package org.dhc.util;
 
 import java.util.List;
 
+import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.Transaction;
 import org.dhc.lite.NewMessagesNotification;
 import org.dhc.lite.NotifyTransactionMessage;
 import org.dhc.lite.SecureMessage;
+import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
 
@@ -50,6 +52,13 @@ public class ThinPeerNotifier {
 	}
 
 	private void doNotifyTransaction(Transaction transaction) {
+		
+		long index = transaction.getBlockIndex();
+		long lastIndex = Math.max(Blockchain.getInstance().getIndex(), ChainSync.getInstance().getLastBlockchainIndex());
+		if(index < lastIndex) {
+			return;
+		}
+		
 		List<Peer> thinPeers = Network.getInstance().getThinPeers();
 		for(Peer peer: thinPeers) {
 			if(transaction.getSenderDhcAddress().startsWith(peer.getTAddress()) || transaction.getReceiver().startsWith(peer.getTAddress())) {
