@@ -19,6 +19,7 @@ import org.dhc.persistence.BlockStore;
 import org.dhc.persistence.ConnectionPool;
 import org.dhc.persistence.TransactionOutputStore;
 import org.dhc.persistence.TransactionStore;
+import org.dhc.plugin.PluginRegistry;
 import org.dhc.util.BlockEvent;
 import org.dhc.util.Coin;
 import org.dhc.util.Constants;
@@ -73,6 +74,7 @@ public class Blockchain {
 	}
 	
 	private void init() {
+		PluginRegistry.getInstance().init();
 		pendingNodesLoader();
 		tree.resetLastIndex();
 		long lastIndex = tree.getLastIndex();
@@ -131,6 +133,8 @@ public class Blockchain {
 			logger.info("block signature valid={}", block.verifySignature());
 			
 			add(block);
+			
+			PluginRegistry.getInstance().init();
 			
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
