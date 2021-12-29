@@ -14,7 +14,7 @@ public class PluginRegistry {
 	}
 	
 	public void init() {
-		logger.info("init() START");
+		logger.trace("init() START");
 
 		try {
 			ServiceLoader<PluginInterface> serviceLoader = ServiceLoader.load(PluginInterface.class);
@@ -26,7 +26,7 @@ public class PluginRegistry {
 			logger.error(e.getMessage(), e);
 		}
 		
-		logger.info("init() END");
+		logger.trace("init() END");
 	}
 
 }
