@@ -86,6 +86,11 @@ public class Block {
 		}
 		//blockHash = calculateHash();
 		getBucketHashes().getLastBucketHash().setBlockHash(blockHash, getIndex());
+		correctInputsForDependentTransactions();
+	}
+
+	private void correctInputsForDependentTransactions() {
+		getBucketHashes().correctInputsForDependentTransactions(blockHash, index);
 	}
 
 	public void setBlockHash(String blockHash) {

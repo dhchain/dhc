@@ -9,8 +9,11 @@ import java.util.Set;
 import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.Transaction;
+import org.dhc.blockchain.TransactionInput;
+import org.dhc.blockchain.TransactionOutput;
 import org.dhc.network.BucketKey;
 import org.dhc.network.Network;
+import org.dhc.persistence.TransactionOutputStore;
 import org.dhc.util.Coin;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
@@ -656,6 +659,39 @@ public class BucketHash {
 
 	public void setBits(long bits) {
 		this.bits = bits;
+	}
+	
+	public void correctInputsForDependentTransactions(String blockHash, long index) {
+		Set<String> outputIds = new HashSet<>();
+		for (Transaction transaction : transactions) {
+			for(TransactionOutput output: transaction.getOutputs()) {
+				outputIds.add(output.getOutputId());
+			}
+		}
+		
+		for (Transaction transaction : transactions) {
+			for (TransactionInput input : transaction.getInputs()) {
+				if(input.getOutputBlockHash() != null) {
+					continue;
+				}
+				if(outputIds.contains(input.getOutputId())) {
+					input.setOutputBlockHash(blockHash);
+					input.setOutputBlockIndex(index);
+				} else {
+					TransactionOutput output = TransactionOutputStore.getInstance().getByOutputId(input.getOutputId());
+					if(output == null) {
+						String str = String.format("output does not exists for input %s", input);
+						logger.info(str);
+						logger.info("transaction {}", transaction);
+						logger.info("block {}", this);
+						throw new RuntimeException(str);
+					}
+					input.setOutputBlockIndex(output.getOutputBlockIndex());
+					input.setOutputBlockHash(output.getOutputBlockHash());
+				}
+			}
+		}
+		
 	}
 
 

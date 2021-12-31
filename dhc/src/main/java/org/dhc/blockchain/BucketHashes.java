@@ -433,5 +433,9 @@ public class BucketHashes {
 	public Set<Transaction> getReceivedTx(String bucketKey) {
 		return getLastBucketHash().getReceivedTx(bucketKey);
 	}
+	
+	public void correctInputsForDependentTransactions(String blockHash, long index) {
+		getLastBucketHash().correctInputsForDependentTransactions(blockHash, index);
+	}
 
 }

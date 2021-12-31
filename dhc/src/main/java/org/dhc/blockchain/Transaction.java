@@ -14,7 +14,6 @@ import java.util.Set;
 import org.dhc.network.ChainSync;
 import org.dhc.network.consensus.BucketHash;
 import org.dhc.persistence.BlockStore;
-import org.dhc.persistence.TransactionOutputStore;
 import org.dhc.util.Base58;
 import org.dhc.util.Coin;
 import org.dhc.util.Constants;
@@ -999,21 +998,6 @@ public class Transaction {
 			}
 		}
 		return null;
-	}
-
-	public void setOutputBlockHashForInputs() {
-		for(TransactionInput input: inputs) {
-			if(input.getOutputBlockHash() == null) {
-				TransactionOutput output = TransactionOutputStore.getInstance().getByOutputId(input.getOutputId());
-				if(output == null) {
-					String str = String.format("output does not exists for input %s", input);
-					throw new RuntimeException(str);
-				}
-				input.setOutputBlockIndex(output.getOutputBlockIndex());
-				input.setOutputBlockHash(output.getOutputBlockHash());
-			}
-		}
-		
 	}
 
 }
