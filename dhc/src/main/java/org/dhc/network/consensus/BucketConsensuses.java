@@ -213,7 +213,14 @@ public class BucketConsensuses {
 		logger.trace("Has coinbase: {}", block.getCoinbase());
 		
 		Transaction coinbase = block.getCoinbase();
+		int originalAveragePower = block.getAveragePower();
+		int newAveragePower = hashes.getAveragePower();
+		if(originalAveragePower != newAveragePower) {
+			logger.info("******************************************************************");
+			logger.info("originalAveragePower={}, newAveragePower={}", originalAveragePower, newAveragePower);
+		}
 		block.setBucketHashes(hashes); // I suspect this might remove coinbase in some cases so we need to add it back
+		
 		block.cleanCoinbase();
 		if(coinbase != null && coinbase.getReceiver().isMyKey(block.getBucketKey()) && block.getCoinbase() == null) {
 			block.addTransaction(coinbase);
