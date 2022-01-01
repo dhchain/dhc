@@ -45,8 +45,6 @@ public class ShowAddress extends AbstractAction implements Caller {
 
 		Blockchain blockchain = Blockchain.getInstance();
 		Block block = blockchain.getLastBlocks().get(0);
-		String blockhash = block.getPreviousHash();
-		block = blockchain.getByHash(blockhash);
 		Coin balance = blockchain.sumByRecipient(DhcAddress.getMyDhcAddress().toString(), block);
 		return balance.toNumberOfCoins();
 	}

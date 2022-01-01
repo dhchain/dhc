@@ -1,6 +1,5 @@
 package org.dhc.lite;
 
-import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
@@ -30,11 +29,9 @@ public class GetBalanceRequest extends Message {
 	}
 	
 	private void getBalance(Peer peer, String correlationId) {
-		
 		Network network = Network.getInstance();
 		Blockchain blockchain = Blockchain.getInstance();
-		Block block = blockchain.getLastBlocks().get(0);
-		String blockhash = block.getPreviousHash();
+		String blockhash = blockchain.getLastBlockHashes().get(0);
 		DhcAddress myAddress = DhcAddress.getMyDhcAddress();
 		DhcAddress toAddress = address;
 		Message message = new GetBalanceAsyncRequest(toAddress, myAddress, blockhash);

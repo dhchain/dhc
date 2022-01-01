@@ -1,8 +1,11 @@
 package org.dhc.lite;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.dhc.blockchain.Blockchain;
+import org.dhc.blockchain.TransactionInput;
+import org.dhc.blockchain.TransactionMemoryPool;
 import org.dhc.blockchain.TransactionOutput;
 import org.dhc.network.Peer;
 import org.dhc.util.DhcAddress;
@@ -21,6 +24,18 @@ public class GetTransactionOutputsRequest extends Message {
 		Set<TransactionOutput> transactionOutputs = null;
 		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(myDhcAddress, Blockchain.getInstance().getPower())) {
 			transactionOutputs = Blockchain.getInstance().getTransactionOutputs(myDhcAddress);
+			Set<TransactionInput> pendingInputs = TransactionMemoryPool.getInstance().getInputs();
+			
+			for(Iterator<TransactionOutput> iterator = transactionOutputs.iterator(); iterator.hasNext();) {
+				TransactionOutput output = iterator.next();
+				for(TransactionInput input: pendingInputs) {
+					if(output.getOutputId().equals(input.getOutputId())) {
+						iterator.remove();
+						break;
+					}
+				}
+			}
+			
 		}
 		Message message  = new GetTransactionOutputsReply(transactionOutputs);
 		message.setCorrelationId(getCorrelationId());

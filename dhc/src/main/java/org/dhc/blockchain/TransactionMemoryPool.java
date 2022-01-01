@@ -171,7 +171,7 @@ public class TransactionMemoryPool {
 		}
 	}
 	
-	private Set<TransactionInput> getInputs() {
+	public Set<TransactionInput> getInputs() {
 		Set<Transaction> set = getCopyOfTransactions();
 		Set<TransactionInput> inputs = new HashSet<>();
 		for (Transaction transaction : set) {
