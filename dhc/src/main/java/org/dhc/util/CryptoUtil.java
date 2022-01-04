@@ -51,6 +51,11 @@ public class CryptoUtil {
 		return getDhcAddressFromBytes(publicKey);
 	}
 	
+	public static DhcAddress getDhcAddressFromString(String str) {
+		byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+		return getDhcAddressFromBytes(bytes);
+	}
+	
 	public static DhcAddress getDhcAddressFromBytes(byte[] bytes) {
 		RIPEMD160Digest ripemd160 = new RIPEMD160Digest();
 		MessageDigest sha256;
