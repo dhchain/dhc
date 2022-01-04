@@ -124,7 +124,7 @@ public class Consensus {
 			
 		}
 		readyConsensuses.process(blockchainIndex);
-		logger.trace("{} ********************* initiate() END *************************", blockchainIndex);
+		logger.trace("{} #blocks={} ********************* initiate() END *************************", blockchainIndex, lastBlocks.size());
 		
 	}
 	

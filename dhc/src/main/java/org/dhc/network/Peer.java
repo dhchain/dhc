@@ -257,7 +257,7 @@ public class Peer {
 			setPower(message.getPower());
 			setInUse(message.isInUse());
 			setPossiblePower(message.getPossiblePower());
-			setTAddress(message.getDhcAddress());
+			setTAddress(message.getTAddress());
 			message.process(this);
 			putResponse(message);
 			callback(message);

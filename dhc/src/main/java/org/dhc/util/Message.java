@@ -34,7 +34,7 @@ public abstract class Message {
 		return networkIdentifier;
 	}
 
-	public TAddress getDhcAddress() {
+	public TAddress getTAddress() {
 		return tAddress;
 	}
 
