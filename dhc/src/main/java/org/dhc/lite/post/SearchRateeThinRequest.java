@@ -1,9 +1,10 @@
 package org.dhc.lite.post;
 
-import org.dhc.blockchain.Blockchain;
+import org.dhc.network.Network;
 import org.dhc.network.Peer;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
+import org.dhc.util.Listeners;
 import org.dhc.util.Message;
 
 public class SearchRateeThinRequest extends Message {
@@ -22,19 +23,15 @@ public class SearchRateeThinRequest extends Message {
 	@Override
 	public void process(Peer peer) {
 		logger.trace("SearchRateeRequest.process() START");
-		Ratee ratee = null;
-		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(dhcAddress, Blockchain.getInstance().getPower())) {
-			ratee = null;
-		}
-		Message message  = new SearchRateeThinResponse(ratee);
+		Network network = Network.getInstance();
+		DhcAddress myAddress = DhcAddress.getMyDhcAddress();
+		Message message = new SearchRateeAsyncRequest(myAddress, dhcAddress, transactionId);
 		message.setCorrelationId(getCorrelationId());
-		peer.send(message);
-		logger.trace("SearchRateeRequest.process() END ratee={}", ratee);
-
+		Listeners.getInstance().addEventListener(SearchRateeEvent.class, new SearchRateeEventThinListener(peer, getCorrelationId()));
+		network.sendToAddress(dhcAddress, message);
+		logger.trace("SearchRateeRequest.process() END");
 	}
 
-	public String getTransactionId() {
-		return transactionId;
-	}
+
 
 }

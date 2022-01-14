@@ -41,7 +41,7 @@ public class GetSenderPublicKeyEventThinListener implements EventListener {
 	public void onEvent(Event event) {
 		GetSenderPublicKeyEvent getSenderPublicKeyEvent = (GetSenderPublicKeyEvent)event;
 		if(!correlationId.equals(getSenderPublicKeyEvent.getCorrelationId())) {
-			logger.info("correlation ids are not equal correlationId={}, getBalanceEvent.getCorrelationId()={}", correlationId, getSenderPublicKeyEvent.getCorrelationId());
+			logger.info("correlation ids are not equal correlationId={}, getSenderPublicKeyEvent.getCorrelationId()={}", correlationId, getSenderPublicKeyEvent.getCorrelationId());
 			return;
 		}
 		Listeners.getInstance().removeEventListener(GetSenderPublicKeyEvent.class, this);

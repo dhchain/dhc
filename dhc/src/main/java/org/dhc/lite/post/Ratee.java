@@ -11,13 +11,13 @@ public class Ratee implements Serializable {
 	private long timeStamp;
 	private String transactionId;
 	private long totalRating;
-	private String creatorTmaAddress;
+	private String creatorDhcAddress;
 	
-	public String getCreatorTmaAddress() {
-		return creatorTmaAddress;
+	public String getCreatorDhcAddress() {
+		return creatorDhcAddress;
 	}
-	public void setCreatorTmaAddress(String creatorTmaAddress) {
-		this.creatorTmaAddress = creatorTmaAddress;
+	public void setCreatorDhcAddress(String creatorTmaAddress) {
+		this.creatorDhcAddress = creatorTmaAddress;
 	}
 	
 	public long getTotalRating() {

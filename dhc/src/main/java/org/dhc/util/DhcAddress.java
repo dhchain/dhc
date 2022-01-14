@@ -117,4 +117,8 @@ public class DhcAddress {
 		return new TAddress(Base58.encode(subArray));
 	}
 
+	public String getAddress() {
+		return address;
+	}
+
 }

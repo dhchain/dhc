@@ -25,6 +25,7 @@ import org.dhc.blockchain.TransactionType;
 import org.dhc.gui.promote.JoinLine;
 import org.dhc.gui.promote.JoinTransactionEvent;
 import org.dhc.lite.SecureMessage;
+import org.dhc.lite.post.Ratee;
 import org.dhc.util.Applications;
 import org.dhc.util.Base58;
 import org.dhc.util.Coin;
@@ -592,6 +593,55 @@ public class TransactionStore {
 			logger.error(e.getMessage(), e);
 		}
 		return key[0];
+	}
+
+	public Ratee getRatee(String transactionId) {
+		Ratee[] result = new Ratee[1];
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transactionId, t.senderAddress, " + 
+							"	sum( " + 
+							"	CASE " + 
+							"		WHEN k2.keyword='Yes' THEN t1.fee " + 
+							"		WHEN k2.keyword='No' THEN -t1.fee " + 
+							"		ELSE 0 " + 
+							"	END) totalRating " + 
+							" from trans_action t " + 
+							" join block b on b.blockHash=t.blockhash " + 
+							" join keyword k on t.transactionid=k.transactionid and k.name ='create' " + 
+							" join keyword kk on t.transactionid=kk.transactionid and kk.name ='first' and k.keyword = kk.keyword " + 
+							" left outer join transaction_data tdata on tdata.transactionId = t.transaction_id " + 
+							" left outer join keyword kt on t.transactionid=kt.transactionid and kt.name = 'transactionId' " +
+							" left outer join keyword k1 on t.transactionid=k1.keyword and k1.name ='transactionId' " + 
+							" left outer join keyword k3 on k1.transactionid=k3.transactionid and k3.name = 'rater' " +
+							" left outer join keyword k2 on k3.transactionid=k2.transactionid and k2.name ='rating' " + 
+							" left outer join trans_action t1 on t1.transactionid=k2.transactionid and t1.receiver=t.receiver " + 
+							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name ='delete' " + 
+							" left outer join trans_action td on td.transactionid = kd.transactionid and t.senderAddress = td.senderAddress " +
+							" where t.app = 'ratee' and t.transactionid = ? and td.transactionid is null and kt.name is null " + 
+							" group by b.timeStamp, k.keyword, t.data, t.transactionId, t.senderAddress " + 
+							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
+					logger.trace("transactionId={}, sql={}", transactionId, sql);
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, transactionId);
+					rs = ps.executeQuery();
+					if (rs.next()) {
+						Ratee ratee = new Ratee();
+						ratee.setName(rs.getString("accountName"));
+						ratee.setDescription(rs.getString("description"));
+						ratee.setTimeStamp(rs.getLong("timeStamp"));
+						ratee.setTransactionId(rs.getString("transactionId"));
+						ratee.setTotalRating(rs.getLong("totalRating"));
+						ratee.setCreatorDhcAddress(rs.getString("senderAddress"));
+						result[0] = ratee;
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return result[0];
 	}
 
 
