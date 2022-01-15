@@ -621,7 +621,7 @@ public class TransactionStore {
 							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name ='delete' " + 
 							" left outer join trans_action td on td.transactionid = kd.transactionid and t.senderAddress = td.senderAddress " +
 							" where t.app = 'ratee' and t.transactionid = ? and td.transactionid is null and kt.name is null " + 
-							" group by b.timeStamp, k.keyword, t.data, t.transactionId, t.senderAddress " + 
+							" group by b.timeStamp, k.keyword, tdata.data, t.transactionId, t.senderAddress " + 
 							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
 					logger.trace("transactionId={}, sql={}", transactionId, sql);
 					ps = conn.prepareStatement(sql);
@@ -670,7 +670,7 @@ public class TransactionStore {
 							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name ='delete' " +
 							" left outer join trans_action td on td.transactionid=kd.transactionid and td.senderAddress = t.senderAddress " +
 							" where t.app = 'ratee' and td.transactionid is null and kt.name is null " + 
-							" group by b.timeStamp, k.keyword, t.data, t.transactionId " + 
+							" group by b.timeStamp, k.keyword, tdata.data, t.transactionId " + 
 							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
 					logger.trace("dhcAddress={}, sql={}", dhcAddress, sql);
 					ps = conn.prepareStatement(sql);
@@ -686,6 +686,141 @@ public class TransactionStore {
 						ratee.setTransactionId(rs.getString("transactionId"));
 						ratee.setTotalRating(rs.getLong("totalRating"));
 						ratee.setCreatorDhcAddress(dhcAddress.getAddress());
+						map.put(ratee.getTransactionId(), ratee);
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new ArrayList<Ratee>(map.values());
+	}
+
+	public List<Ratee> getRatees(String account, Set<String> words) {
+		if(!"".equals(account.trim())) {
+			return getRatees(account);
+		}
+		return getRatees(words);
+	}
+	
+	private List<Ratee> getRatees(Set<String> words) {
+		String first = words.iterator().next();
+		words.remove(first);
+		List<Ratee> list = new ArrayList<Ratee>();
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, kt.keyword transactionId, t.senderAddress, "
+							+ "	sum( "
+							+ "	CASE " 
+							+ "		WHEN kw2.keyword='Yes' THEN t1.fee "
+							+ "		WHEN kw2.keyword='No' THEN -t1.fee "
+							+ "		ELSE 0 "
+							+ "	END) totalRating "
+							+ " from trans_action t " // t is transaction for keyword first
+							+ " join block b on b.hash=t.blockhash "
+							+ " join keyword k on t.transactionid=k.transactionid and k.name ='create' "
+							+ " join keyword kk on t.transactionid=kk.transactionid and kk.name ='first' "
+							+ " join keyword kt on t.transactionid=kt.transactionid and kt.name ='transactionId' "
+							
+							
+							;
+					
+					int i = 0;
+					String where = "";
+					for(@SuppressWarnings("unused") String word: words) {
+						i++;
+						sql = sql + " join keyword k" + i + " on t.transactionid=k" + i + ".transactionid ";
+						where = where + " and k" + i + ".name = ? ";
+					}
+					
+					sql = sql + " left outer join keyword kw1 on kt.keyword=kw1.keyword and kw1.name ='transactionId' "
+							+ " left outer join keyword kw2 on kw1.transactionid=kw2.transactionid and kw2.name ='rating' "
+							+ " left outer join keyword kw3 on kw3.transactionid=kw2.transactionid and kw3.name ='rater' "
+							+ " left outer join trans_action t1 on t1.transactionid=kw2.transactionid and t1.receiver=t.receiver "; //t1 is transaction for rating
+					
+					
+					sql = sql + " left outer join keyword kd on kt.keyword = kd.keyword and kd.name ='delete' "
+							+ " left outer join trans_action td on td.transactionid=kd.transactionid and td.senderAddress = t.senderAddress "
+							+ " left outer join transaction_data tdata on tdata.transactionId = t.transaction_id "
+					        + " where t.app = 'ratee' and kk.keyword = ? and td.transactionid is null and kw3.name is null " + where
+							+ " group by b.timeStamp, k.keyword, tdata.data, kt.keyword, t.senderAddress "
+							+ " order by totalRating desc, b.timeStamp "
+							+ " FETCH FIRST 100 ROWS ONLY WITH UR ";
+					
+					logger.trace("first={}, words={}, sql={}", first, words, sql);
+					ps = conn.prepareStatement(sql);
+					
+					i = 1;
+					ps.setString(i++, first);
+					for(String word: words) {
+						ps.setString(i++, word);
+					}
+					
+					long start = System.currentTimeMillis();
+					rs = ps.executeQuery();
+					logger.trace("query took {} ms", System.currentTimeMillis() - start);
+					while (rs.next()) {
+						Ratee ratee = new Ratee();
+						ratee.setName(rs.getString("accountName"));
+						ratee.setDescription(rs.getString("description"));
+						ratee.setTimeStamp(rs.getLong("timeStamp"));
+						ratee.setTransactionId(rs.getString("transactionId"));
+						ratee.setTotalRating(rs.getLong("totalRating"));
+						ratee.setCreatorDhcAddress(rs.getString("senderAddress"));
+						list.add(ratee);
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return list;
+	}
+
+	private List<Ratee> getRatees(String account) {
+		Map<String, Ratee> map = new LinkedHashMap<String, Ratee>();
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transactionId, t.senderAddress " + 
+							"	, sum( " + 
+							"	CASE " + 
+							"		WHEN k2.keyword='Yes' THEN t1.fee " + 
+							"		WHEN k2.keyword='No' THEN -t1.fee " + 
+							"		ELSE 0 " + 
+							"	END) totalRating " + 
+							" from trans_action t " + 
+							" join block b on b.hash=t.blockhash " + 
+							" join keyword k on t.transactionid=k.transactionid and k.name = 'create' " + 
+							" join keyword kk on t.transactionid=kk.transactionid and kk.name = 'first' and k.keyword = kk.keyword " + 
+							" left outer join transaction_data tdata on tdata.transactionId = t.transaction_id " + 
+							" left outer join keyword kt on t.transactionid=kt.transactionid and kt.name = 'transactionId' " + 
+							" left outer join keyword k1 on t.transactionid=k1.keyword and k1.name = 'transactionId' " + 
+							" left outer join keyword k3 on k1.transactionid=k3.transactionid and k3.name = 'rater' " +
+							" left outer join keyword k2 on k3.transactionid=k2.transactionid and k2.name = 'rating' " + 
+							" left outer join trans_action t1 on t1.transactionid=k2.transactionid and t1.receiver=t.receiver " + 
+							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name = 'delete' " +
+							" left outer join trans_action td on td.transactionid=kd.transactionid and t.senderAddress = td.senderAddress " +
+							" where t.app = 'ratee' and k.keyword = ? and td.transactionid is null and kt.name is null " + 
+							" group by b.timeStamp, k.keyword, tdata.data, t.transactionId, t.sender_address " + 
+							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
+					logger.trace("account={}, sql={}", account, sql);
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, account);
+					
+					long start = System.currentTimeMillis();
+					rs = ps.executeQuery();
+					logger.trace("query took {} ms", System.currentTimeMillis() - start);
+					
+					while (rs.next()) {
+						Ratee ratee = new Ratee();
+						ratee.setName(rs.getString("accountName"));
+						ratee.setDescription(rs.getString("description"));
+						ratee.setTimeStamp(rs.getLong("timeStamp"));
+						ratee.setTransactionId(rs.getString("transactionId"));
+						ratee.setTotalRating(rs.getLong("totalRating"));
+						ratee.setCreatorDhcAddress(rs.getString("senderAddress"));
 						map.put(ratee.getTransactionId(), ratee);
 					}
 				}
