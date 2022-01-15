@@ -12,7 +12,7 @@ import org.dhc.util.Listeners;
 import org.dhc.util.Message;
 import org.dhc.util.ThreadExecutor;
 
-public class SearchRateeEventThinListener implements EventListener {
+public class SearchPostsEventThinListener implements EventListener {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
 
@@ -20,7 +20,7 @@ public class SearchRateeEventThinListener implements EventListener {
 	private String correlationId;
 	private ScheduledFuture<?> future;
 
-	public SearchRateeEventThinListener(Peer peer, String correlationId) {
+	public SearchPostsEventThinListener(Peer peer, String correlationId) {
 		this.peer = peer;
 		this.correlationId = correlationId;
 		schedule();
@@ -28,25 +28,25 @@ public class SearchRateeEventThinListener implements EventListener {
 
 	private void schedule() {
 
-		future = ThreadExecutor.getInstance().schedule(new DhcRunnable("SearchRateeEventThinListener") {
+		future = ThreadExecutor.getInstance().schedule(new DhcRunnable("SearchPostsEventThinListener") {
 
 			@Override
 			public void doRun() {
-				Listeners.getInstance().removeEventListener(SearchRateeEvent.class, SearchRateeEventThinListener.this);
+				Listeners.getInstance().removeEventListener(SearchPostsEvent.class, SearchPostsEventThinListener.this);
 			}
 		}, Constants.MINUTE * 10);
 	}
 
 	@Override
 	public void onEvent(Event event) {
-		SearchRateeEvent searchRateeEvent = (SearchRateeEvent)event;
-		if(!correlationId.equals(searchRateeEvent.getCorrelationId())) {
-			logger.info("correlation ids are not equal correlationId={}, searchRateeEvent.getCorrelationId()={}", correlationId, searchRateeEvent.getCorrelationId());
+		SearchPostsEvent searchPostsEvent = (SearchPostsEvent)event;
+		if(!correlationId.equals(searchPostsEvent.getCorrelationId())) {
+			logger.info("correlation ids are not equal correlationId={}, searchPostsEvent.getCorrelationId()={}", correlationId, searchPostsEvent.getCorrelationId());
 			return;
 		}
-		Listeners.getInstance().removeEventListener(SearchRateeEvent.class, this);
+		Listeners.getInstance().removeEventListener(SearchPostsEvent.class, this);
 		future.cancel(true);
-		Message message  = new SearchRateeThinResponse(searchRateeEvent.getRatee());
+		Message message  = new SearchPostsThinResponse(searchPostsEvent.getRatees());
 		message.setCorrelationId(correlationId);
 		peer.send(message);
 

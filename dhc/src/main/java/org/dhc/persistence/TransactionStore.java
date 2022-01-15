@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -642,6 +643,57 @@ public class TransactionStore {
 			logger.error(e.getMessage(), e);
 		}
 		return result[0];
+	}
+	
+	public List<Ratee> getPosts(DhcAddress dhcAddress) {
+		Map<String, Ratee> map = new LinkedHashMap<String, Ratee>();
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transactionId " + 
+							"	, sum( " + 
+							"	CASE " + 
+							"		WHEN k2.keyword='Yes' THEN t1.fee " + 
+							"		WHEN k2.keyword='No' THEN -t1.fee " + 
+							"		ELSE 0 " + 
+							"	END) totalRating " + 
+							" from trans_action t " + 
+							" join block b on b.hash=t.blockhash " + 
+							" join keyword k on t.transactionid=k.transactionid and k.name ='create' and t.sender_address = ? " + 
+							" join keyword kk on t.transactionid=kk.transactionid and kk.name ='first' and k.keyword = kk.keyword " + 
+							" left outer join transaction_data tdata on tdata.transactionId = t.transaction_id " + 
+							" left outer join keyword kt on t.transactionid = kt.transactionid and kt.name ='transactionId' " +
+							" left outer join keyword k1 on t.transactionid=k1.keyword and k1.name ='transactionId' " + 
+							" left outer join keyword k3 on k1.transactionid=k3.transactionid and k3.name = 'rater' " +
+							" left outer join keyword k2 on k3.transactionid=k2.transactionid and k2.name ='rating' " + 
+							" left outer join trans_action t1 on t1.transactionid=k2.transactionid and t1.receiver = t.receiver " + 
+							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name ='delete' " +
+							" left outer join trans_action td on td.transactionid=kd.transactionid and td.senderAddress = t.senderAddress " +
+							" where t.app = 'ratee' and td.transactionid is null and kt.name is null " + 
+							" group by b.timeStamp, k.keyword, t.data, t.transactionId " + 
+							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
+					logger.trace("dhcAddress={}, sql={}", dhcAddress, sql);
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, dhcAddress.getAddress());
+					long start = System.currentTimeMillis();
+					rs = ps.executeQuery();
+					logger.trace("query took {} ms to execute", System.currentTimeMillis() - start);
+					while (rs.next()) {
+						Ratee ratee = new Ratee();
+						ratee.setName(rs.getString("accountName"));
+						ratee.setDescription(rs.getString("description"));
+						ratee.setTimeStamp(rs.getLong("timeStamp"));
+						ratee.setTransactionId(rs.getString("transactionId"));
+						ratee.setTotalRating(rs.getLong("totalRating"));
+						ratee.setCreatorDhcAddress(dhcAddress.getAddress());
+						map.put(ratee.getTransactionId(), ratee);
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new ArrayList<Ratee>(map.values());
 	}
 
 
