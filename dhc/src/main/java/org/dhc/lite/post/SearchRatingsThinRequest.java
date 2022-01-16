@@ -15,29 +15,18 @@ public class SearchRatingsThinRequest extends Message {
 	public SearchRatingsThinRequest(String rateeName, String transactionId) {
 		this.rateeName = rateeName;
 		this.transactionId = transactionId;
-		
 	}
 
 	@Override
 	public void process(Peer peer) {
-		
 		Network network = Network.getInstance();
 		DhcAddress from = DhcAddress.getMyDhcAddress();
 		DhcAddress to = CryptoUtil.getDhcAddressFromString(rateeName);
 		String correlationId = getCorrelationId();
-		Message message = new SearchRatingsAsyncRequest(from, to, transactionId);
+		Message message = new SearchRatingsAsyncRequest(from, to, rateeName, transactionId);
 		message.setCorrelationId(correlationId);
 		Listeners.getInstance().addEventListener(SearchRatingsEvent.class, new SearchRatingsListener(peer, correlationId));
 		network.sendToAddress(to, message);
-
-	}
-
-	public String getRateeName() {
-		return rateeName;
-	}
-
-	public String getTransactionId() {
-		return transactionId;
 	}
 
 }

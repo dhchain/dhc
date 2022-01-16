@@ -15,7 +15,7 @@ public class GetKeywordsThinResponse extends Message {
 
 	@Override
 	public void process(Peer peer) {
-		// TODO Auto-generated method stub
+		
 
 	}
 

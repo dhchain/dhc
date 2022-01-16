@@ -12,7 +12,7 @@ import org.dhc.util.Listeners;
 import org.dhc.util.Message;
 import org.dhc.util.ThreadExecutor;
 
-public class SearchRatingsListener implements EventListener {
+public class GetKeywordsListener implements EventListener {
 
 	private static final DhcLogger logger = DhcLogger.getLogger();
 
@@ -20,7 +20,7 @@ public class SearchRatingsListener implements EventListener {
 	private String correlationId;
 	private ScheduledFuture<?> future;
 
-	public SearchRatingsListener(Peer peer, String correlationId) {
+	public GetKeywordsListener(Peer peer, String correlationId) {
 		this.peer = peer;
 		this.correlationId = correlationId;
 		schedule();
@@ -28,25 +28,25 @@ public class SearchRatingsListener implements EventListener {
 
 	private void schedule() {
 
-		future = ThreadExecutor.getInstance().schedule(new DhcRunnable("SearchRatingsListener") {
+		future = ThreadExecutor.getInstance().schedule(new DhcRunnable("GetKeywordsListener") {
 
 			@Override
 			public void doRun() {
-				Listeners.getInstance().removeEventListener(SearchRatingsEvent.class, SearchRatingsListener.this);
+				Listeners.getInstance().removeEventListener(GetKeywordsEvent.class, GetKeywordsListener.this);
 			}
 		}, Constants.MINUTE * 10);
 	}
 
 	@Override
 	public void onEvent(Event e) {
-		SearchRatingsEvent event = (SearchRatingsEvent)e;
+		GetKeywordsEvent event = (GetKeywordsEvent)e;
 		if(!correlationId.equals(event.getCorrelationId())) {
-			logger.info("correlation ids are not equal correlationId={}, searchPostsEvent.getCorrelationId()={}", correlationId, event.getCorrelationId());
+			logger.info("correlation ids are not equal correlationId={}, event.getCorrelationId()={}", correlationId, event.getCorrelationId());
 			return;
 		}
-		Listeners.getInstance().removeEventListener(SearchRatingsEvent.class, this);
+		Listeners.getInstance().removeEventListener(GetKeywordsEvent.class, this);
 		future.cancel(true);
-		Message message  = new SearchRatingsThinResponse(event.getRatings());
+		Message message  = new GetKeywordsThinResponse(event.getKeywords());
 		message.setCorrelationId(correlationId);
 		peer.send(message);
 

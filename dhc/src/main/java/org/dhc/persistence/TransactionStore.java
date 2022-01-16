@@ -874,5 +874,54 @@ public class TransactionStore {
 		return list;
 	}
 
+	public List<Rating> getRatings(String account, String transactionId) {
+		Set<Rating> set = new LinkedHashSet<Rating>();
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select b.timeStamp, k.keyword ratee, tdata.data comment, kk.keyword rate, t.sender, kt.keyword transactionId from trans_action t "
+							+ " join block b on b.hash=t.blockhash "
+							+ " join keyword k on t.transactionid=k.transactionid and k.name ='ratee' "
+							+ " join keyword kk on t.transactionid=kk.transactionid and kk.name ='rating' "
+							+ " join keyword kt on t.transactionid=kt.transactionid and kt.name ='transactionId' "
+							+ " left outer join keyword kd on kt.keyword = kd.keyword and kd.name = 'delete' "
+							+ " left outer join transaction_data tdata on tdata.transactionId = t.transaction_id "
+							+ " left outer join trans_action td on td.transactionid = kd.transactionid and t.senderAddress = td.senderAddress "
+							+ " where t.app = 'ratee' and k.keyword = ? and kt.keyword = ? and t.receiver = ? and td.transactionid is null "
+							+ " order by b.timeStamp desc FETCH FIRST 100 ROWS ONLY WITH UR ";
+					logger.trace("account={}, transactionId={}, sql={}", account, transactionId, sql);
+					String receiver = CryptoUtil.getDhcAddressFromString(account).getAddress();
+					
+					ps = conn.prepareStatement(sql);
+					int i = 1;
+					ps.setString(i++, account);
+					ps.setString(i++, transactionId);
+					ps.setString(i++, receiver);
+					
+					long start = System.currentTimeMillis();
+					rs = ps.executeQuery();
+					logger.trace("query took {} ms", System.currentTimeMillis() - start);
+					
+					while (rs.next()) {
+						Rating rating = new Rating();
+						
+						Transaction transaction = new Transaction();
+						transaction.setSender(rs.getString("sender"));
+						rating.setRater(transaction.getSenderDhcAddress().getAddress());
+						rating.setComment(rs.getString("comment"));
+						rating.setRate(rs.getString("rate"));
+						rating.setRatee(rs.getString("ratee"));
+						rating.setTimeStamp(rs.getLong("timeStamp"));
+						rating.setTransactionId(rs.getString("transactionid"));
+						set.add(rating);
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return new ArrayList<Rating>(set);
+	}
+
 
 }
