@@ -27,6 +27,7 @@ import org.dhc.gui.promote.JoinLine;
 import org.dhc.gui.promote.JoinTransactionEvent;
 import org.dhc.lite.SecureMessage;
 import org.dhc.lite.post.Ratee;
+import org.dhc.lite.post.Rating;
 import org.dhc.util.Applications;
 import org.dhc.util.Base58;
 import org.dhc.util.Coin;
@@ -659,7 +660,7 @@ public class TransactionStore {
 							"	END) totalRating " + 
 							" from trans_action t " + 
 							" join block b on b.hash=t.blockhash " + 
-							" join keyword k on t.transactionid=k.transactionid and k.name ='create' and t.sender_address = ? " + 
+							" join keyword k on t.transactionid=k.transactionid and k.name ='create' and t.senderAddress = ? " + 
 							" join keyword kk on t.transactionid=kk.transactionid and kk.name ='first' and k.keyword = kk.keyword " + 
 							" left outer join transaction_data tdata on tdata.transactionId = t.transaction_id " + 
 							" left outer join keyword kt on t.transactionid = kt.transactionid and kt.name ='transactionId' " +
@@ -803,7 +804,7 @@ public class TransactionStore {
 							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name = 'delete' " +
 							" left outer join trans_action td on td.transactionid=kd.transactionid and t.senderAddress = td.senderAddress " +
 							" where t.app = 'ratee' and k.keyword = ? and td.transactionid is null and kt.name is null " + 
-							" group by b.timeStamp, k.keyword, tdata.data, t.transactionId, t.sender_address " + 
+							" group by b.timeStamp, k.keyword, tdata.data, t.transactionId, t.senderAddress " + 
 							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
 					logger.trace("account={}, sql={}", account, sql);
 					ps = conn.prepareStatement(sql);
@@ -829,6 +830,48 @@ public class TransactionStore {
 			logger.error(e.getMessage(), e);
 		}
 		return new ArrayList<Ratee>(map.values());
+	}
+
+	public List<Rating> getRatings(String rater) {
+		List<Rating> list = new ArrayList<Rating>();
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select b.timeStamp, k.keyword ratee, tdata.data comment, kk.keyword rate, kt.keyword transactionId"
+							+ " from trans_action t "
+							+ " join block b on b.hash=t.blockhash "
+							+ " join keyword kr on t.transactionid=kr.transactionid and kr.name ='rater'"
+							+ " join keyword k on t.transactionid=k.transactionid and k.name ='ratee' "
+							+ " join keyword kk on t.transactionid=kk.transactionid and kk.name ='rating' "
+							+ " join keyword kt on t.transactionid=kt.transactionid and kt.name ='transactionId' "
+							+ " left outer join transaction_data tdata on tdata.transactionId = t.transaction_id "
+							+ " left outer join keyword kd on kt.keyword = kd.keyword and kd.name = 'delete' "
+							+ " left outer join trans_action td on td.transactionid=kd.transactionid and t.senderAddress = ? "
+							+ " where t.app = 'ratee' and kr.keyword = ? and td.transactionid is null "
+							+ " order by b.timeStamp desc FETCH FIRST 100 ROWS ONLY WITH UR ";
+					logger.trace("rater={}, sql={}", rater, sql);
+					ps = conn.prepareStatement(sql);
+					int i = 1;
+					ps.setString(i++, rater);
+					ps.setString(i++, rater);
+					rs = ps.executeQuery();
+					while (rs.next()) {
+						Rating rating = new Rating();
+						
+						rating.setRater(rater);
+						rating.setComment(rs.getString("comment"));
+						rating.setRate(rs.getString("rate"));
+						rating.setRatee(rs.getString("ratee"));
+						rating.setTimeStamp(rs.getLong("timeStamp"));
+						rating.setTransactionId(rs.getString("transactionid"));
+						list.add(rating);
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return list;
 	}
 
 
