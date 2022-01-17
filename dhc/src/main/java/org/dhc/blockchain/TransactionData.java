@@ -29,6 +29,14 @@ public class TransactionData {
 		this(data, YEAR);
 	}
 	
+	public TransactionData clone() {
+		TransactionData clone = new TransactionData(data, validForNumberOfBlocks);
+		clone.transactionId = transactionId;
+		clone.blockHash = blockHash;
+		clone.expirationIndex = expirationIndex;
+		return clone;
+	}
+	
 	public String getTransactionId() {
 		return transactionId;
 	}

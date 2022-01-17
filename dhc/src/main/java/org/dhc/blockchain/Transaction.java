@@ -62,9 +62,9 @@ public class Transaction {
 		clone.outputs = cloneOutputs();
 		clone.value = value;
 		clone.fee = fee;
-		clone.expiringData = expiringData;
+		clone.expiringData = expiringData.clone();
 		clone.app = app;
-		clone.keywords = keywords;
+		clone.keywords = keywords.clone();
 		clone.type = type;
 		clone.timeStamp = timeStamp;
 		

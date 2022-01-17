@@ -19,6 +19,15 @@ public class Keywords {
 	private String transactionId;
 	private String blockHash;
 	
+	public Keywords clone() {
+		Keywords clone = new Keywords();
+		clone.putAll(getMap());
+		clone.hash = hash;
+		clone.transactionId = transactionId;
+		clone.blockHash = blockHash;
+		return clone;
+	}
+	
 	private String calculateHash() {
 		List<String> keys = new ArrayList<String>(map.keySet());
 		List<String> values = new ArrayList<String>(map.values());

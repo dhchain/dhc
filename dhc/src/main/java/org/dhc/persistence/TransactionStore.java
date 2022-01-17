@@ -490,6 +490,7 @@ public class TransactionStore {
 							if(name != null) {
 								keywords = new Keywords();
 								keywords.setTransactionId(transactionId);
+								keywords.setBlockHash(rs.getString("blockhash"));
 								String keyword = rs.getString("keyword");
 								keywords.put(name, keyword);
 								transaction.setKeywords(keywords);
