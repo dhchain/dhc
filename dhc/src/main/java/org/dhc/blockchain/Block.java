@@ -560,6 +560,7 @@ public class Block {
 		}
 		for(Transaction transaction: set) {
 			if(!transaction.hasOutputsForAllInputs(this)) {
+				logger.info("transaction {}", transaction);
 				logger.info("block {}", this);
 				return false;
 			}
