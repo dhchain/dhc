@@ -662,6 +662,9 @@ public class BucketHash {
 	}
 	
 	public void correctInputsForDependentTransactions(String blockHash, long index) {
+		if(transactions == null) {
+			return;
+		}
 		Set<String> outputIds = new HashSet<>();
 		for (Transaction transaction : transactions) {
 			for(TransactionOutput output: transaction.getOutputs()) {

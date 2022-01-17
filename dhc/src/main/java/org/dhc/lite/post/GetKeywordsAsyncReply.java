@@ -13,12 +13,10 @@ public class GetKeywordsAsyncReply extends Message {
 	private static final DhcLogger logger = DhcLogger.getLogger();
 
 	private DhcAddress myAddress;
-	private DhcAddress dhcAddress;
 	private Keywords keywords;
 
-	public GetKeywordsAsyncReply(DhcAddress myAddress, DhcAddress dhcAddress, Keywords keywords) {
+	public GetKeywordsAsyncReply(DhcAddress myAddress, Keywords keywords) {
 		this.myAddress = myAddress;
-		this.dhcAddress = dhcAddress;
 		this.keywords = keywords;
 	}
 
@@ -42,7 +40,7 @@ public class GetKeywordsAsyncReply extends Message {
 	
 	@Override
 	public String toString() {
-		String str = String.format("GetKeywordsAsyncReply %s-%s-%s", myAddress, dhcAddress, getCorrelationId());
+		String str = String.format("GetKeywordsAsyncReply %s-%s", myAddress, getCorrelationId());
 		return str;
 	}
 
