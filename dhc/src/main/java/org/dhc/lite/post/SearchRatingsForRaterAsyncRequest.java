@@ -96,7 +96,7 @@ public class SearchRatingsForRaterAsyncRequest extends Message {
 	
 	@Override
 	public String toString() {
-		String str = String.format("SearchRatingsForRaterAsyncRequest %s-%s-%s-%s", myAddress, dhcAddress, getCorrelationId());
+		String str = String.format("SearchRatingsForRaterAsyncRequest %s-%s-%s", myAddress, dhcAddress, getCorrelationId());
 		return str;
 	}
 
