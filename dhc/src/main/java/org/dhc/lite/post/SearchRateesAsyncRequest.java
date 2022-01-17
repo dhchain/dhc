@@ -106,7 +106,7 @@ public class SearchRateesAsyncRequest extends Message {
 	
 	@Override
 	public String toString() {
-		String str = String.format("SearchRateesAsyncRequest %s-%s-%s-%s", myAddress, dhcAddress, getCorrelationId());
+		String str = String.format("SearchRateesAsyncRequest %s-%s-%s", myAddress, dhcAddress, getCorrelationId());
 		return str;
 	}
 
