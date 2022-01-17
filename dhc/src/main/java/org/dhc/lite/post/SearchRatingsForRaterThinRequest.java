@@ -23,9 +23,9 @@ public class SearchRatingsForRaterThinRequest extends Message {
 		Network network = Network.getInstance();
 		DhcAddress myAddress = DhcAddress.getMyDhcAddress();
 		DhcAddress dhcAddress = new DhcAddress(rater);
-		Message message = new SearchPostsAsyncRequest(myAddress, dhcAddress);
+		Message message = new SearchRatingsForRaterAsyncRequest(myAddress, dhcAddress, rater);
 		message.setCorrelationId(getCorrelationId());
-		Listeners.getInstance().addEventListener(SearchPostsEvent.class, new SearchPostsEventThinListener(peer, getCorrelationId()));
+		Listeners.getInstance().addEventListener(SearchRatingsForRaterEvent.class, new SearchRatingsForRaterEventThinListener(peer, getCorrelationId()));
 		network.sendToAddress(dhcAddress, message);
 		logger.trace("SearchRatingsForRaterThinRequest.process() END");
 	}

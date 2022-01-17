@@ -38,15 +38,15 @@ public class SearchRateesEventThinListener implements EventListener {
 	}
 
 	@Override
-	public void onEvent(Event event) {
-		SearchRateesEvent searchRateesEvent = (SearchRateesEvent)event;
-		if(!correlationId.equals(searchRateesEvent.getCorrelationId())) {
-			logger.info("correlation ids are not equal correlationId={}, searchPostsEvent.getCorrelationId()={}", correlationId, searchRateesEvent.getCorrelationId());
+	public void onEvent(Event e) {
+		SearchRateesEvent event = (SearchRateesEvent)e;
+		if(!correlationId.equals(event.getCorrelationId())) {
+			logger.info("correlation ids are not equal correlationId={}, event.getCorrelationId()={}", correlationId, event.getCorrelationId());
 			return;
 		}
 		Listeners.getInstance().removeEventListener(SearchRateesEvent.class, this);
 		future.cancel(true);
-		Message message  = new SearchRateesThinResponse(searchRateesEvent.getRatees());
+		Message message  = new SearchRateesThinResponse(event.getRatees());
 		message.setCorrelationId(correlationId);
 		peer.send(message);
 

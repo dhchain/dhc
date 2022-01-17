@@ -41,7 +41,7 @@ public class SearchRatingsListener implements EventListener {
 	public void onEvent(Event e) {
 		SearchRatingsEvent event = (SearchRatingsEvent)e;
 		if(!correlationId.equals(event.getCorrelationId())) {
-			logger.info("correlation ids are not equal correlationId={}, searchPostsEvent.getCorrelationId()={}", correlationId, event.getCorrelationId());
+			logger.info("correlation ids are not equal correlationId={}, event.getCorrelationId()={}", correlationId, event.getCorrelationId());
 			return;
 		}
 		Listeners.getInstance().removeEventListener(SearchRatingsEvent.class, this);
