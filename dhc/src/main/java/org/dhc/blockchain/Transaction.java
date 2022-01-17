@@ -910,8 +910,10 @@ public class Transaction {
 		transaction.setValue(amount);
 		transaction.setFee(Coin.ZERO);
 		
-		TransactionOutput output =  new TransactionOutput(transaction.getReceiver(), transaction.getValue());
-		transaction.getOutputs().add(output);
+		if(!Coin.ZERO.equals(transaction.getValue())) {
+			TransactionOutput output =  new TransactionOutput(transaction.getReceiver(), transaction.getValue());
+			transaction.getOutputs().add(output);
+		}
 
 		transaction.signTransaction(wallet.getPrivateKey());
 		transaction.setTransactionId();
