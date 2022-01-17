@@ -602,7 +602,7 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transactionId, t.senderAddress, " + 
+					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transaction_id, t.senderAddress, " + 
 							"	sum( " + 
 							"	CASE " + 
 							"		WHEN k2.keyword='Yes' THEN t1.fee " + 
@@ -610,19 +610,19 @@ public class TransactionStore {
 							"		ELSE 0 " + 
 							"	END) totalRating " + 
 							" from trans_action t " + 
-							" join block b on b.blockHash=t.blockhash " + 
-							" join keyword k on t.transactionid=k.transactionid and k.name ='create' " + 
-							" join keyword kk on t.transactionid=kk.transactionid and kk.name ='first' and k.keyword = kk.keyword " + 
+							" join block b on b.blockHash = t.blockhash " + 
+							" join keyword k on t.transaction_id = k.transactionid and k.name ='create' " + 
+							" join keyword kk on t.transaction_id = kk.transactionid and kk.name ='first' and k.keyword = kk.keyword " + 
 							" left outer join transaction_data tdata on tdata.transactionId = t.transaction_id " + 
-							" left outer join keyword kt on t.transactionid=kt.transactionid and kt.name = 'transactionId' " +
-							" left outer join keyword k1 on t.transactionid=k1.keyword and k1.name ='transactionId' " + 
-							" left outer join keyword k3 on k1.transactionid=k3.transactionid and k3.name = 'rater' " +
-							" left outer join keyword k2 on k3.transactionid=k2.transactionid and k2.name ='rating' " + 
-							" left outer join trans_action t1 on t1.transactionid=k2.transactionid and t1.receiver=t.receiver " + 
-							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name ='delete' " + 
-							" left outer join trans_action td on td.transactionid = kd.transactionid and t.senderAddress = td.senderAddress " +
-							" where t.app = 'ratee' and t.transactionid = ? and td.transactionid is null and kt.name is null " + 
-							" group by b.timeStamp, k.keyword, tdata.data, t.transactionId, t.senderAddress " + 
+							" left outer join keyword kt on t.transaction_id = kt.transactionid and kt.name = 'transactionId' " +
+							" left outer join keyword k1 on t.transaction_id = k1.keyword and k1.name ='transactionId' " + 
+							" left outer join keyword k3 on k1.transactionid = k3.transactionid and k3.name = 'rater' " +
+							" left outer join keyword k2 on k3.transactionid = k2.transactionid and k2.name ='rating' " + 
+							" left outer join trans_action t1 on t1.transaction_id = k2.transactionid and t1.receiver=t.receiver " + 
+							" left outer join keyword kd on t.transaction_id = kd.keyword and kd.name ='delete' " + 
+							" left outer join trans_action td on td.transaction_id = kd.transactionid and t.senderAddress = td.senderAddress " +
+							" where t.app = 'ratee' and t.transaction_id = ? and td.transaction_id is null and kt.name is null " + 
+							" group by b.timeStamp, k.keyword, tdata.data, t.transaction_id, t.senderAddress " + 
 							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
 					logger.trace("transactionId={}, sql={}", transactionId, sql);
 					ps = conn.prepareStatement(sql);
@@ -633,7 +633,7 @@ public class TransactionStore {
 						ratee.setName(rs.getString("accountName"));
 						ratee.setDescription(rs.getString("description"));
 						ratee.setTimeStamp(rs.getLong("timeStamp"));
-						ratee.setTransactionId(rs.getString("transactionId"));
+						ratee.setTransactionId(rs.getString("transaction_id"));
 						ratee.setTotalRating(rs.getLong("totalRating"));
 						ratee.setCreatorDhcAddress(rs.getString("senderAddress"));
 						result[0] = ratee;
@@ -651,7 +651,7 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transactionId " + 
+					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transaction_id " + 
 							"	, sum( " + 
 							"	CASE " + 
 							"		WHEN k2.keyword='Yes' THEN t1.fee " + 
@@ -659,19 +659,19 @@ public class TransactionStore {
 							"		ELSE 0 " + 
 							"	END) totalRating " + 
 							" from trans_action t " + 
-							" join block b on b.hash=t.blockhash " + 
-							" join keyword k on t.transactionid=k.transactionid and k.name ='create' and t.senderAddress = ? " + 
-							" join keyword kk on t.transactionid=kk.transactionid and kk.name ='first' and k.keyword = kk.keyword " + 
+							" join block b on b.blockHash = t.blockhash " + 
+							" join keyword k on t.transaction_id = k.transactionid and k.name ='create' and t.senderAddress = ? " + 
+							" join keyword kk on t.transaction_id = kk.transactionid and kk.name ='first' and k.keyword = kk.keyword " + 
 							" left outer join transaction_data tdata on tdata.transactionId = t.transaction_id " + 
-							" left outer join keyword kt on t.transactionid = kt.transactionid and kt.name ='transactionId' " +
-							" left outer join keyword k1 on t.transactionid=k1.keyword and k1.name ='transactionId' " + 
-							" left outer join keyword k3 on k1.transactionid=k3.transactionid and k3.name = 'rater' " +
-							" left outer join keyword k2 on k3.transactionid=k2.transactionid and k2.name ='rating' " + 
-							" left outer join trans_action t1 on t1.transactionid=k2.transactionid and t1.receiver = t.receiver " + 
-							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name ='delete' " +
-							" left outer join trans_action td on td.transactionid=kd.transactionid and td.senderAddress = t.senderAddress " +
-							" where t.app = 'ratee' and td.transactionid is null and kt.name is null " + 
-							" group by b.timeStamp, k.keyword, tdata.data, t.transactionId " + 
+							" left outer join keyword kt on t.transaction_id = kt.transactionid and kt.name ='transactionId' " +
+							" left outer join keyword k1 on t.transaction_id = k1.keyword and k1.name ='transactionId' " + 
+							" left outer join keyword k3 on k1.transactionid = k3.transactionid and k3.name = 'rater' " +
+							" left outer join keyword k2 on k3.transactionid = k2.transactionid and k2.name ='rating' " + 
+							" left outer join trans_action t1 on t1.transaction_id = k2.transactionid and t1.receiver = t.receiver " + 
+							" left outer join keyword kd on t.transaction_id = kd.keyword and kd.name ='delete' " +
+							" left outer join trans_action td on td.transaction_id = kd.transactionid and td.senderAddress = t.senderAddress " +
+							" where t.app = 'ratee' and td.transaction_id is null and kt.name is null " + 
+							" group by b.timeStamp, k.keyword, tdata.data, t.transaction_id " + 
 							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
 					logger.trace("dhcAddress={}, sql={}", dhcAddress, sql);
 					ps = conn.prepareStatement(sql);
@@ -684,7 +684,7 @@ public class TransactionStore {
 						ratee.setName(rs.getString("accountName"));
 						ratee.setDescription(rs.getString("description"));
 						ratee.setTimeStamp(rs.getLong("timeStamp"));
-						ratee.setTransactionId(rs.getString("transactionId"));
+						ratee.setTransactionId(rs.getString("transaction_id"));
 						ratee.setTotalRating(rs.getLong("totalRating"));
 						ratee.setCreatorDhcAddress(dhcAddress.getAddress());
 						map.put(ratee.getTransactionId(), ratee);
@@ -719,10 +719,10 @@ public class TransactionStore {
 							+ "		ELSE 0 "
 							+ "	END) totalRating "
 							+ " from trans_action t " // t is transaction for keyword first
-							+ " join block b on b.hash=t.blockhash "
-							+ " join keyword k on t.transactionid=k.transactionid and k.name ='create' "
-							+ " join keyword kk on t.transactionid=kk.transactionid and kk.name ='first' "
-							+ " join keyword kt on t.transactionid=kt.transactionid and kt.name ='transactionId' "
+							+ " join block b on b.blockHash = t.blockhash "
+							+ " join keyword k on t.transaction_id = k.transactionid and k.name ='create' "
+							+ " join keyword kk on t.transaction_id = kk.transactionid and kk.name ='first' "
+							+ " join keyword kt on t.transaction_id = kt.transactionid and kt.name ='transactionId' "
 							
 							
 							;
@@ -731,20 +731,20 @@ public class TransactionStore {
 					String where = "";
 					for(@SuppressWarnings("unused") String word: words) {
 						i++;
-						sql = sql + " join keyword k" + i + " on t.transactionid=k" + i + ".transactionid ";
+						sql = sql + " join keyword k" + i + " on t.transaction_id = k" + i + ".transactionid ";
 						where = where + " and k" + i + ".name = ? ";
 					}
 					
-					sql = sql + " left outer join keyword kw1 on kt.keyword=kw1.keyword and kw1.name ='transactionId' "
-							+ " left outer join keyword kw2 on kw1.transactionid=kw2.transactionid and kw2.name ='rating' "
-							+ " left outer join keyword kw3 on kw3.transactionid=kw2.transactionid and kw3.name ='rater' "
-							+ " left outer join trans_action t1 on t1.transactionid=kw2.transactionid and t1.receiver=t.receiver "; //t1 is transaction for rating
+					sql = sql + " left outer join keyword kw1 on kt.keyword = kw1.keyword and kw1.name ='transactionId' "
+							+ " left outer join keyword kw2 on kw1.transactionid = kw2.transactionid and kw2.name ='rating' "
+							+ " left outer join keyword kw3 on kw3.transactionid = kw2.transactionid and kw3.name ='rater' "
+							+ " left outer join trans_action t1 on t1.transaction_id = kw2.transactionid and t1.receiver = t.receiver "; //t1 is transaction for rating
 					
 					
 					sql = sql + " left outer join keyword kd on kt.keyword = kd.keyword and kd.name ='delete' "
-							+ " left outer join trans_action td on td.transactionid=kd.transactionid and td.senderAddress = t.senderAddress "
+							+ " left outer join trans_action td on td.transaction_id = kd.transactionid and td.senderAddress = t.senderAddress "
 							+ " left outer join transaction_data tdata on tdata.transactionId = t.transaction_id "
-					        + " where t.app = 'ratee' and kk.keyword = ? and td.transactionid is null and kw3.name is null " + where
+					        + " where t.app = 'ratee' and kk.keyword = ? and td.transaction_id is null and kw3.name is null " + where
 							+ " group by b.timeStamp, k.keyword, tdata.data, kt.keyword, t.senderAddress "
 							+ " order by totalRating desc, b.timeStamp "
 							+ " FETCH FIRST 100 ROWS ONLY WITH UR ";
@@ -784,7 +784,7 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transactionId, t.senderAddress " + 
+					String sql = "select b.timeStamp, k.keyword accountName, tdata.data description, t.transaction_id, t.senderAddress " + 
 							"	, sum( " + 
 							"	CASE " + 
 							"		WHEN k2.keyword='Yes' THEN t1.fee " + 
@@ -792,19 +792,19 @@ public class TransactionStore {
 							"		ELSE 0 " + 
 							"	END) totalRating " + 
 							" from trans_action t " + 
-							" join block b on b.hash=t.blockhash " + 
-							" join keyword k on t.transactionid=k.transactionid and k.name = 'create' " + 
-							" join keyword kk on t.transactionid=kk.transactionid and kk.name = 'first' and k.keyword = kk.keyword " + 
+							" join block b on b.blockHash = t.blockhash " + 
+							" join keyword k on t.transaction_id = k.transactionid and k.name = 'create' " + 
+							" join keyword kk on t.transaction_id = kk.transactionid and kk.name = 'first' and k.keyword = kk.keyword " + 
 							" left outer join transaction_data tdata on tdata.transactionId = t.transaction_id " + 
-							" left outer join keyword kt on t.transactionid=kt.transactionid and kt.name = 'transactionId' " + 
-							" left outer join keyword k1 on t.transactionid=k1.keyword and k1.name = 'transactionId' " + 
-							" left outer join keyword k3 on k1.transactionid=k3.transactionid and k3.name = 'rater' " +
-							" left outer join keyword k2 on k3.transactionid=k2.transactionid and k2.name = 'rating' " + 
-							" left outer join trans_action t1 on t1.transactionid=k2.transactionid and t1.receiver=t.receiver " + 
-							" left outer join keyword kd on t.transactionid=kd.keyword and kd.name = 'delete' " +
-							" left outer join trans_action td on td.transactionid=kd.transactionid and t.senderAddress = td.senderAddress " +
-							" where t.app = 'ratee' and k.keyword = ? and td.transactionid is null and kt.name is null " + 
-							" group by b.timeStamp, k.keyword, tdata.data, t.transactionId, t.senderAddress " + 
+							" left outer join keyword kt on t.transaction_id = kt.transactionid and kt.name = 'transactionId' " + 
+							" left outer join keyword k1 on t.transaction_id = k1.keyword and k1.name = 'transactionId' " + 
+							" left outer join keyword k3 on k1.transactionid = k3.transactionid and k3.name = 'rater' " +
+							" left outer join keyword k2 on k3.transactionid = k2.transactionid and k2.name = 'rating' " + 
+							" left outer join trans_action t1 on t1.transaction_id = k2.transactionid and t1.receiver = t.receiver " + 
+							" left outer join keyword kd on t.transaction_id = kd.keyword and kd.name = 'delete' " +
+							" left outer join trans_action td on td.transaction_id = kd.transactionid and t.senderAddress = td.senderAddress " +
+							" where t.app = 'ratee' and k.keyword = ? and td.transaction_id is null and kt.name is null " + 
+							" group by b.timeStamp, k.keyword, tdata.data, t.transaction_id, t.senderAddress " + 
 							" order by totalRating desc, b.timeStamp FETCH FIRST 100 ROWS ONLY WITH UR ";
 					logger.trace("account={}, sql={}", account, sql);
 					ps = conn.prepareStatement(sql);
@@ -819,7 +819,7 @@ public class TransactionStore {
 						ratee.setName(rs.getString("accountName"));
 						ratee.setDescription(rs.getString("description"));
 						ratee.setTimeStamp(rs.getLong("timeStamp"));
-						ratee.setTransactionId(rs.getString("transactionId"));
+						ratee.setTransactionId(rs.getString("transaction_id"));
 						ratee.setTotalRating(rs.getLong("totalRating"));
 						ratee.setCreatorDhcAddress(rs.getString("senderAddress"));
 						map.put(ratee.getTransactionId(), ratee);
@@ -839,15 +839,15 @@ public class TransactionStore {
 				public void doWork() throws Exception {
 					String sql = "select b.timeStamp, k.keyword ratee, tdata.data comment, kk.keyword rate, kt.keyword transactionId"
 							+ " from trans_action t "
-							+ " join block b on b.hash=t.blockhash "
-							+ " join keyword kr on t.transactionid=kr.transactionid and kr.name ='rater'"
-							+ " join keyword k on t.transactionid=k.transactionid and k.name ='ratee' "
-							+ " join keyword kk on t.transactionid=kk.transactionid and kk.name ='rating' "
-							+ " join keyword kt on t.transactionid=kt.transactionid and kt.name ='transactionId' "
+							+ " join block b on b.blockHash = t.blockhash "
+							+ " join keyword kr on t.transaction_id = kr.transactionid and kr.name ='rater'"
+							+ " join keyword k on t.transaction_id = k.transactionid and k.name ='ratee' "
+							+ " join keyword kk on t.transaction_id = kk.transactionid and kk.name ='rating' "
+							+ " join keyword kt on t.transaction_id = kt.transactionid and kt.name ='transactionId' "
 							+ " left outer join transaction_data tdata on tdata.transactionId = t.transaction_id "
 							+ " left outer join keyword kd on kt.keyword = kd.keyword and kd.name = 'delete' "
-							+ " left outer join trans_action td on td.transactionid=kd.transactionid and t.senderAddress = ? "
-							+ " where t.app = 'ratee' and kr.keyword = ? and td.transactionid is null "
+							+ " left outer join trans_action td on td.transaction_id = kd.transactionid and t.senderAddress = ? "
+							+ " where t.app = 'ratee' and kr.keyword = ? and td.transaction_id is null "
 							+ " order by b.timeStamp desc FETCH FIRST 100 ROWS ONLY WITH UR ";
 					logger.trace("rater={}, sql={}", rater, sql);
 					ps = conn.prepareStatement(sql);
@@ -879,15 +879,16 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select b.timeStamp, k.keyword ratee, tdata.data comment, kk.keyword rate, t.sender, kt.keyword transactionId from trans_action t "
-							+ " join block b on b.hash=t.blockhash "
-							+ " join keyword k on t.transactionid=k.transactionid and k.name ='ratee' "
-							+ " join keyword kk on t.transactionid=kk.transactionid and kk.name ='rating' "
-							+ " join keyword kt on t.transactionid=kt.transactionid and kt.name ='transactionId' "
+					String sql = "select b.timeStamp, k.keyword ratee, tdata.data comment, kk.keyword rate, t.sender, kt.keyword transactionId "
+							+ " from trans_action t "
+							+ " join block b on b.blockHash = t.blockhash "
+							+ " join keyword k on t.transaction_id = k.transactionid and k.name ='ratee' "
+							+ " join keyword kk on t.transaction_id = kk.transactionid and kk.name ='rating' "
+							+ " join keyword kt on t.transaction_id = kt.transactionid and kt.name ='transactionId' "
 							+ " left outer join keyword kd on kt.keyword = kd.keyword and kd.name = 'delete' "
 							+ " left outer join transaction_data tdata on tdata.transactionId = t.transaction_id "
-							+ " left outer join trans_action td on td.transactionid = kd.transactionid and t.senderAddress = td.senderAddress "
-							+ " where t.app = 'ratee' and k.keyword = ? and kt.keyword = ? and t.receiver = ? and td.transactionid is null "
+							+ " left outer join trans_action td on td.transaction_id = kd.transactionid and t.senderAddress = td.senderAddress "
+							+ " where t.app = 'ratee' and k.keyword = ? and kt.keyword = ? and t.receiver = ? and td.transaction_id is null "
 							+ " order by b.timeStamp desc FETCH FIRST 100 ROWS ONLY WITH UR ";
 					logger.trace("account={}, transactionId={}, sql={}", account, transactionId, sql);
 					String receiver = CryptoUtil.getDhcAddressFromString(account).getAddress();
