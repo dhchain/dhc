@@ -29,7 +29,7 @@ public class ReceiverPool {
 			"receiver-pool", new ReceiverLinkedBlockingQueue<>(500));
 	private DoubleMap<Peer, Message, Long> currentlyExecuting = new DoubleMap<>();
 	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-	private final BoundedMap<String, String> boundedMap = new BoundedMap<>(100);
+	private final BoundedMap<String, String> alreadyReceivedMessages = new BoundedMap<>(100);
 	
 	public static ReceiverPool getInstance() {
 		return instance;
@@ -98,10 +98,10 @@ public class ReceiverPool {
 
 		listHangedMessages();
 		String key = message.toString();
-		if(boundedMap.containsKey(key)) {
+		if(alreadyReceivedMessages.containsKey(key)) {
 			return;
 		}
-		boundedMap.put(key, key);
+		alreadyReceivedMessages.put(key, key);
 		try {
 			executorService.execute(new ReceiverRunnable(peer, message, this));
 		} catch (RejectedExecutionException e) {

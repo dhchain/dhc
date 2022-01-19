@@ -48,5 +48,11 @@ public class SendTransactionMessage extends Message {
 		String str = String.format("SendTransactionMessage-%s", transaction.getTransactionId());
 		return str;
 	}
+	
+	@Override
+	public void failedToSend(Peer peer, Exception e) {
+		logger.trace("Failed to send  {}", this);
+		logger.trace("Failed to send to peer {}", peer);
+	}
 
 }
