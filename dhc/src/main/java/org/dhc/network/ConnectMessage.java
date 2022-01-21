@@ -61,6 +61,11 @@ public class ConnectMessage extends Message {
 			candidate.setType(PeerType.TO);
 			
 			if(Peer.getAllToPeers().contains(candidate) || Bootstrap.getInstance().getCandidatePeers().contains(candidate)) {
+				if(candidate.isClosed()) {
+					//logger.info("closed candidate peer {}", candidate);
+					//logger.info("closed inetSocketAddress {}", inetSocketAddress);
+					candidate.close();
+				}
 				return;
 			}
 			

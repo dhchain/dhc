@@ -106,6 +106,7 @@ public class Peer {
 	}
 
 	private void trimPeer() {
+		//logger.info("trimPeer() peer: {}", this);
 		if(isClosed()) {
 			close();
 			return;
@@ -196,6 +197,7 @@ public class Peer {
 	}
 
 	public boolean startReceiver() {
+		//logger.info("startReceiver() receiverStarted={} peer: {}", receiverStarted, this);
 		if (receiverStarted) {
 			return true;
 		}
