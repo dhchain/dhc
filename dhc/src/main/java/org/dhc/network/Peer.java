@@ -212,24 +212,28 @@ public class Peer {
 		}
 		
 		if(isClosed()) {
+			peers.remove(inetSocketAddress);
 			return false;
 		}
 
 		try {
+			
 			getReader();
+			ThreadExecutor.getInstance().execute(new DhcRunnable("Peer receiver " + socketToString()) {
+				public void doRun() {
+					receive();
+				}
+			});
+	
+			reloadBuckets();
+			scheduleTrim();
+			
 		} catch (Exception e) {
 			logger.trace(e.getMessage());
+			peers.remove(inetSocketAddress);
 			return false;
 		}
 
-		ThreadExecutor.getInstance().execute(new DhcRunnable("Peer receiver " + socketToString()) {
-			public void doRun() {
-				receive();
-			}
-		});
-
-		reloadBuckets();
-		scheduleTrim();
 		return true;
 	}
 	
