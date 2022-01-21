@@ -233,6 +233,8 @@ public class Peer {
 			peers.remove(inetSocketAddress);
 			return false;
 		}
+		
+		peers.put(inetSocketAddress, this);
 
 		return true;
 	}
