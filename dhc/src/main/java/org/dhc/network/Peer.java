@@ -452,7 +452,7 @@ public class Peer {
 	}
 	
 	public String toString() {
-		return socket + " \t\t\t\t\t\t" + networkIdentifier + " \t" + tAddress + " \tclosed=" + isClosed() + " \tinUse=" + getInUse() + 
+		return (socket != null? socket: inetSocketAddress) + " \t\t\t\t\t\t" + networkIdentifier + " \t" + tAddress + " \tclosed=" + isClosed() + " \tinUse=" + getInUse() + 
 				" \t\tlastSeen=" + new Date(getLastSeen()) + " \ttimeAdded=" + new Date(getTimeAdded()) + " \t" + getType() + " \t";
 	}
 	
