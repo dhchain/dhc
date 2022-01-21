@@ -107,6 +107,7 @@ public class Peer {
 
 	private void trimPeer() {
 		if(isClosed()) {
+			close();
 			return;
 		}
 		
@@ -212,7 +213,7 @@ public class Peer {
 		}
 		
 		if(isClosed()) {
-			peers.remove(inetSocketAddress);
+			close();
 			return false;
 		}
 
@@ -230,7 +231,7 @@ public class Peer {
 			
 		} catch (Exception e) {
 			logger.trace(e.getMessage());
-			peers.remove(inetSocketAddress);
+			close();
 			return false;
 		}
 		
