@@ -39,6 +39,9 @@ public class BucketHash {
 	private transient volatile boolean stop;
 	private long bits;
 	
+	private long blockIndex;
+	private String blockHash;
+	
 	public BucketHash() {
 		
 	}
@@ -58,6 +61,9 @@ public class BucketHash {
 		clone.timestamp = timestamp;
 		clone.nonce = nonce;
 		clone.bits = bits;
+		
+		clone.blockIndex = blockIndex;
+		clone.blockHash = blockHash;
 
 		return clone;
 	}
@@ -75,6 +81,9 @@ public class BucketHash {
 		clone.timestamp = timestamp;
 		clone.nonce = nonce;
 		clone.bits = bits;
+		
+		clone.blockIndex = blockIndex;
+		clone.blockHash = blockHash;
 
 		return clone;
 	}
@@ -119,6 +128,11 @@ public class BucketHash {
 			throw new RuntimeException("Child and otherChild have different previous block hashes");
 		}
 		previousBlockHash = child.previousBlockHash;
+		blockIndex = child.blockIndex;
+		blockHash = child.blockHash;
+		
+		
+		
 	    addChild(child);
 
 	    if(!child.getKey().getOtherBucketKey().getKey().equals(otherChild.getBinaryStringKey())) {
@@ -396,6 +410,8 @@ public class BucketHash {
 	}
 
 	public synchronized void setBlockHash(String blockHash, long blockIndex) {
+		setBlockIndex(blockIndex);
+		setBlockHash(blockHash);
 		Set<Transaction> set = transactions;
 		if(set == null || set.isEmpty()) {
 			return;
@@ -695,6 +711,22 @@ public class BucketHash {
 			}
 		}
 		
+	}
+
+	public long getBlockIndex() {
+		return blockIndex;
+	}
+
+	public void setBlockIndex(long blockIndex) {
+		this.blockIndex = blockIndex;
+	}
+
+	public String getBlockHash() {
+		return blockHash;
+	}
+
+	public void setBlockHash(String blockHash) {
+		this.blockHash = blockHash;
 	}
 
 

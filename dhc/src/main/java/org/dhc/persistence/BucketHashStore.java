@@ -49,10 +49,10 @@ public class BucketHashStore {
 
 	}
 	
-	private void saveBucketHash(String blockHash, BucketHash bucketHash) throws Exception {
+	private void saveBucketHash(BucketHash bucketHash) throws Exception {
 		new DBExecutor() {
 			public void doWork() throws Exception {
-	            String sql = "insert into buckethash (buckethash_id,bucket_key, bucket_hash, left_hash, right_hash, blockHash, previousHash, averagePower, fee) values (?,?,?,?,?,?,?,?,?)";
+	            String sql = "insert into buckethash (buckethash_id,bucket_key, bucket_hash, left_hash, right_hash, blockIndex, blockHash, previousHash, averagePower, fee) values (?,?,?,?,?,?,?,?,?,?)";
 	            ps = conn.prepareStatement(sql);
 	            int i = 1;
 	            ps.setLong(i++, id.getAndIncrement());
@@ -60,7 +60,8 @@ public class BucketHashStore {
 	        	ps.setString(i++, bucketHash.getHash());
 	        	ps.setString(i++, bucketHash.getLeft() == null? null: bucketHash.getLeft().getHash());
 	        	ps.setString(i++, bucketHash.getRight() == null? null: bucketHash.getRight().getHash());
-	        	ps.setString(i++, blockHash);
+	        	ps.setLong(i++, bucketHash.getBlockIndex());
+	        	ps.setString(i++, bucketHash.getBlockHash());
 	        	ps.setString(i++, bucketHash.getPreviousBlockHash());
 	        	ps.setBigDecimal(i++, bucketHash.getAveragePower());
 	        	ps.setLong(i++, bucketHash.getFee().getValue());
@@ -95,11 +96,19 @@ public class BucketHashStore {
 						bucketHash.setAveragePower(rs.getBigDecimal("averagePower"));
 						bucketHash.setFee(new Coin(rs.getLong("fee")));
 
+						long blockIndex = rs.getLong("blockIndex");
+						bucketHash.setBlockIndex(blockIndex);
+						bucketHash.setBlockHash(blockHash);
+
 						String leftHash = rs.getString("left_hash");
 						String rightHash = rs.getString("right_hash");
 						if(leftHash != null && rightHash != null) {
 							BucketHash left = new BucketHash(bucketHash.getKey().getLeftKey().getKey(), leftHash, previousHash);
+							left.setBlockIndex(blockIndex);
+							left.setBlockHash(blockHash);
 							BucketHash right = new BucketHash(bucketHash.getKey().getRightKey().getKey(), rightHash, previousHash);
+							right.setBlockIndex(blockIndex);
+							right.setBlockHash(blockHash);
 							bucketHash.setLeftRight(left, right);
 						}
 						bucketHashes[0].set(bucketHash);
@@ -122,12 +131,14 @@ public class BucketHashStore {
 		return bucketHashes[0];
 	}
 	
-	public void saveBucketHashes(String blockHash, BucketHashes bucketHashes) throws Exception {
+	public void saveBucketHashes(long blockIndex, String blockHash, BucketHashes bucketHashes) throws Exception {
 		if(bucketHashes == null) {
 			return;
 		}
 		for(BucketHash bucketHash: bucketHashes.getBucketHashes()) {
-			saveBucketHash(blockHash, bucketHash);
+			bucketHash.setBlockIndex(blockIndex);
+			bucketHash.setBlockHash(blockHash);
+			saveBucketHash(bucketHash);
 		}
 		map.put(blockHash, bucketHashes);
 	}
@@ -149,8 +160,11 @@ public class BucketHashStore {
 				}
 				rs.close();
 
-				addNewColumn(dbmd, tableName, "fee", "ALTER TABLE buckethash ADD fee BIGINT");
+				addNewColumn(dbmd, tableName, "fee", "ALTER TABLE " + tableName + " ADD fee BIGINT");
 				
+				addNewColumn(dbmd, tableName, "blockIndex", "ALTER TABLE " + tableName + " ADD blockIndex BIGINT");
+				addIndex(dbmd, tableName, "buckethash_blockIndex", "CREATE INDEX buckethash_blockIndex ON " + tableName + "(blockIndex)");
+	
 			}
 		}.execute();
 		setId();

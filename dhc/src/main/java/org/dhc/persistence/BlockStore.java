@@ -75,7 +75,7 @@ public class BlockStore {
 		
 		updateNextBits(block);
 		
-		BucketHashStore.getInstance().saveBucketHashes(block.getBlockHash(), block.getBucketHashes());
+		BucketHashStore.getInstance().saveBucketHashes(block.getIndex(), block.getBlockHash(), block.getBucketHashes());
 		TransactionStore.getInstance().saveTransactions(block.getAllTransactions());
 		
 		if(!ChainSync.getInstance().isRunning()) {
@@ -561,7 +561,7 @@ public class BlockStore {
 
 			BucketHashStore.getInstance().remove(blockHash);
 
-			BucketHashStore.getInstance().saveBucketHashes(blockHash, block.getBucketHashes());
+			BucketHashStore.getInstance().saveBucketHashes(block.getIndex(), blockHash, block.getBucketHashes());
 			if(block.isPruned()) {
 				TransactionStore.getInstance().remove(blockHash);
 			} else {
@@ -585,7 +585,7 @@ public class BlockStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select coalesce(avg(averagePower), 0) averagePower from buckethash bh join block b on bh.blockHash=b.blockHash where bh.bucket_key='' and b.index > ?";
+					String sql = "select coalesce(avg(averagePower), 0) averagePower from buckethash bh where bh.bucket_key='' and bh.blockIndex > ?";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setLong(i++, lastIndex - 10);
@@ -594,7 +594,7 @@ public class BlockStore {
 					if (rs.next()) {
 						result[0] = rs.getBigDecimal("averagePower").intValue();
 					}
-					logger.trace("Query getAveragePower took {} ms. result {} sql '{}' ", System.currentTimeMillis() - start, result[0], sql);
+					logger.info("Query getAveragePower took {} ms. result {} sql '{}' ", System.currentTimeMillis() - start, result[0], sql);
 				}
 			}.execute();
 
