@@ -594,7 +594,7 @@ public class BlockStore {
 					if (rs.next()) {
 						result[0] = rs.getBigDecimal("averagePower").intValue();
 					}
-					logger.info("Query getAveragePower took {} ms. result {} sql '{}' ", System.currentTimeMillis() - start, result[0], sql);
+					logger.trace("Query getAveragePower took {} ms. result {} sql '{}' ", System.currentTimeMillis() - start, result[0], sql);
 				}
 			}.execute();
 
