@@ -139,6 +139,7 @@ public class ChainRest {
 		logger.trace("doBlock() block {}", block);
 		if(!Network.getInstance().isConnected()) {
 			logger.info("Network is not connected");
+			PeerSync.getInstance().executeAndWait();
 			return;
 		}
 		if(block.getPower() <= Network.getInstance().getPower()) {
