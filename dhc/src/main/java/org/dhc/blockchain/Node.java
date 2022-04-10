@@ -31,5 +31,19 @@ public class Node {
 	public boolean isGenesis() {
 		return block.getIndex() == 0;
 	}
+	
+	@Override
+	public int hashCode() {
+		return block.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Node)) {
+			return false;
+		}
+		Node other = (Node) obj;
+		return block.equals(other.block);
+	}
 
 }
