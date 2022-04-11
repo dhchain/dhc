@@ -88,6 +88,10 @@ public class SyncReplyMessage extends Message {
 			return;
 		}
 		
+		while(blockchain.getNumberOfPendingBlocks() > 1000) {
+			ThreadExecutor.sleep(10000);
+		}
+		
 		peer.send(new SyncMessage(synchronizer.next()));
 		
 	}
