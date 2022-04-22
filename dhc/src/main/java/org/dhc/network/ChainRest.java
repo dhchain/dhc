@@ -140,6 +140,7 @@ public class ChainRest {
 		if(!Network.getInstance().isConnected()) {
 			logger.info("Network is not connected");
 			PeerSync.getInstance().executeAndWait();
+			logger.info("Total # peers {}", Peer.getTotalPeerCount());
 			return;
 		}
 		if(block.getPower() <= Network.getInstance().getPower()) {
