@@ -21,10 +21,13 @@ public class PendingIndexes {
 	public synchronized long next() {
 		if(!indexes.isEmpty()) {
 			long index = indexes.remove(0);
-			long lastBlockchainIndex = Blockchain.getInstance().getIndex();
+			Blockchain blockchain = Blockchain.getInstance();
+			long lastBlockchainIndex = blockchain.getIndex();
 			if(index > lastBlockchainIndex) {
-				logger.info("PendingIndexes retrying index={}", index);
-				return register(index);
+				if(!blockchain.pendingIndexesHasIndex(index)) {
+					logger.info("PendingIndexes retrying index={}", index);
+					return register(index);
+				}
 			}
 		}
 		long index  = register(atomicLong.incrementAndGet());

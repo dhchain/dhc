@@ -2,6 +2,7 @@ package org.dhc.blockchain;
 
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,7 @@ public class Blockchain {
 	
 	private Tree tree = new Tree();
 	private DoubleMap<String, String, Node> pendingNodes = new DoubleMap<>();
+	private Map<Long, Long> pendingIndexes = new HashMap<>();
 	private Object consensus;
 	private boolean started;
 	private BlockingQueue<Node> queue = new LinkedBlockingQueue<>();
@@ -165,7 +167,11 @@ public class Blockchain {
 			if(map != null && !map.isEmpty()) {
 				list.addAll(map.values());
 			}
+			for(Node node: list) {
+				pendingIndexes.remove(node.getBlock().getIndex());
+			}
 		}
+		
 		return list;
 	}
 	
@@ -217,6 +223,7 @@ public class Blockchain {
 			if (!tree.add(node)) {
 				synchronized (pendingNodes) {
 					pendingNodes.put(block.getPreviousHash(), block.getBlockHash(), node);
+					pendingIndexes.put(block.getIndex(), block.getIndex());
 				}
 				return false;
 			}
@@ -868,6 +875,12 @@ public class Blockchain {
 				logger.info("took {} ms", duration);
 			}
 			//logger.trace("unlock");
+		}
+	}
+	
+	public boolean pendingIndexesHasIndex(long index) {
+		synchronized(pendingNodes) {
+			return pendingIndexes.containsKey(index);
 		}
 	}
 
