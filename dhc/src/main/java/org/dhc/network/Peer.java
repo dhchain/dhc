@@ -72,7 +72,9 @@ public class Peer {
 		instance = new Peer();
 		instance.setInetSocketAddress(inetSocketAddress);
 		instance.timeAdded = System.currentTimeMillis();
-		peers.put(inetSocketAddress, instance);
+		synchronized (peers) {
+			peers.put(inetSocketAddress, instance);
+		}
     	return instance;
     }
 
@@ -237,7 +239,9 @@ public class Peer {
 			return false;
 		}
 		
-		peers.put(inetSocketAddress, this);
+		synchronized (peers) {
+			peers.put(inetSocketAddress, this);
+		}
 
 		return true;
 	}
@@ -293,7 +297,9 @@ public class Peer {
 	}
 
 	public void close() {
-        peers.remove(inetSocketAddress);
+		synchronized (peers) {
+			peers.remove(inetSocketAddress);
+		}
 		try {
 			if(socket != null) {
 				if(!socket.isClosed()) {
