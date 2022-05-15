@@ -86,6 +86,9 @@ public class ChainSync {
 				logger.info("myPeers.size()={} network.getMyBucketPeers().size()={} skipPeers.size()={}", myPeers.size(), network.getMyBucketPeers().size(), skipPeers.size());
 				skipPeers.clear();
 				int totalPeerCount = Peer.getTotalPeerCount();
+				if(totalPeerCount == 0) {
+					PeerSync.getInstance().executeAndWait();
+				}
 				int i = 0;
 				do {
 					PeersFinder.getInstance().findPeers();

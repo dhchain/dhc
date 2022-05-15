@@ -72,9 +72,7 @@ public class Peer {
 		instance = new Peer();
 		instance.setInetSocketAddress(inetSocketAddress);
 		instance.timeAdded = System.currentTimeMillis();
-		synchronized (peers) {
-			peers.put(inetSocketAddress, instance);
-		}
+		peersPut(inetSocketAddress, instance);
     	return instance;
     }
 
@@ -93,6 +91,18 @@ public class Peer {
     
     private Peer() {
 
+    }
+    
+    private static void peersPut(InetSocketAddress inetSocketAddress, Peer peer) {
+    	synchronized (peers) {
+			peers.put(inetSocketAddress, peer);
+		}
+    }
+    
+    private void peersRemove() {
+    	synchronized (peers) {
+			peers.remove(inetSocketAddress);
+		}
     }
     
     private void scheduleTrim() {
@@ -238,10 +248,8 @@ public class Peer {
 			close();
 			return false;
 		}
-		
-		synchronized (peers) {
-			peers.put(inetSocketAddress, this);
-		}
+
+		peersPut(inetSocketAddress, this);
 
 		return true;
 	}
@@ -255,6 +263,11 @@ public class Peer {
 						setType(PeerType.THIN);
 					}
 					ReceiverPool.getInstance().process(this, message);
+				}
+				if(!peers.containsKey(inetSocketAddress)) {
+					logger.info("***************************************************");
+					logger.info("peers do not contain {}, socket.isClosed()={}", inetSocketAddress, socket.isClosed());
+					peersPut(inetSocketAddress, this);
 				}
 			}
 		} catch (Exception e) {
@@ -297,9 +310,7 @@ public class Peer {
 	}
 
 	public void close() {
-		synchronized (peers) {
-			peers.remove(inetSocketAddress);
-		}
+		peersRemove();
 		try {
 			if(socket != null) {
 				if(!socket.isClosed()) {
