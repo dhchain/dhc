@@ -96,12 +96,14 @@ public class Peer {
     private static void peersPut(InetSocketAddress inetSocketAddress, Peer peer) {
     	synchronized (peers) {
 			peers.put(inetSocketAddress, peer);
+			logger.trace("peersPut inetSocketAddress = {}", inetSocketAddress);
 		}
     }
     
     private void peersRemove() {
     	synchronized (peers) {
 			peers.remove(inetSocketAddress);
+			logger.trace("peersRemove inetSocketAddress = {}", inetSocketAddress);
 		}
     }
     
