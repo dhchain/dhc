@@ -69,6 +69,7 @@ public class BlockStore {
 	}
 
 	public boolean saveBlock(Block block) throws Exception {
+		long start = System.currentTimeMillis();
 		if(!doSaveBlock(block)) {
 			return false;
 		}
@@ -94,6 +95,9 @@ public class BlockStore {
 		TransactionDataStore.getInstance().remove();
 		
 		latestCachedBlocks.put(block.getBlockHash(), block);
+		
+		logger.trace("Function saveBlock took {} ms.", System.currentTimeMillis() - start);
+		
 		return true;
 	}
 	
@@ -125,6 +129,7 @@ public class BlockStore {
 	}
 
 	private boolean doSaveBlock(Block block) throws Exception {
+		long start = System.currentTimeMillis();
 		if (contains(block.getBlockHash())) {
 			return false;
 		}
@@ -192,6 +197,7 @@ public class BlockStore {
 				logger.trace("Query doSaveBlock took {} ms. '{}' ", System.currentTimeMillis() - start, sql);
 			}
 		}.execute();
+		logger.trace("Function doSaveBlock took {} ms.", System.currentTimeMillis() - start);
 		return true;
 	}
 
@@ -479,10 +485,11 @@ public class BlockStore {
 						ps = conn.prepareStatement(sql);
 						 long start = System.currentTimeMillis();
 						rs = ps.executeQuery();
-						logger.trace("Query getMinCompeting took {} ms. '{}' ", System.currentTimeMillis() - start, sql);
+						
 						if (rs.next()) {
 							result[0] = rs.getLong("index");
 						}
+						logger.trace("Query getMinCompeting took {} ms. Result = {}, sql = '{}' ", System.currentTimeMillis() - start, result[0], sql);
 					}
 				}.execute();
 
@@ -753,7 +760,7 @@ public class BlockStore {
 		return result[0];
 	}
 
-	private void setMinCompeting(long minCompeting) {
+	public void setMinCompeting(long minCompeting) {
 		Lock writeLock = readWriteLock.readLock();
 		writeLock.lock();
 		try {

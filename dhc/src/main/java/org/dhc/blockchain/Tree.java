@@ -35,6 +35,9 @@ public class Tree {
 		long start = System.currentTimeMillis();
 		boolean result = true;;
 		try {
+			
+			long localMinCompeting = BlockStore.getInstance().getMinCompeting();
+			long localLastIndex = lastIndex;
 
 			if (!node.isGenesis()) {
 				Block parentBlock = getByHash(node.getBlock().getPreviousHash());
@@ -74,6 +77,10 @@ public class Tree {
 				long index = node.getBlock().getIndex();
 				setLastIndex(index);
 				Registry.getInstance().getCompactor().pruneBlockchain();
+			}
+			
+			if(localLastIndex == lastIndex - 1) { // Added block to the last one so minCompeting should stay the same
+				BlockStore.getInstance().setMinCompeting(localMinCompeting);
 			}
 			
 			return result;
