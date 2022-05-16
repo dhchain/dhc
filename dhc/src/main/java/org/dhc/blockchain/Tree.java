@@ -79,7 +79,7 @@ public class Tree {
 				Registry.getInstance().getCompactor().pruneBlockchain();
 			}
 			
-			if(localLastIndex == lastIndex - 1) { // Added block to the last one so minCompeting should stay the same
+			if(localLastIndex == lastIndex - 1 && localMinCompeting == 0) { // Added block to the last one so minCompeting should stay the same
 				BlockStore.getInstance().setMinCompeting(localMinCompeting);
 			}
 			

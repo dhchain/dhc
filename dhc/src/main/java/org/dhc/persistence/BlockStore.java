@@ -470,7 +470,7 @@ public class BlockStore {
 	}
 
 	public long getMinCompeting() {
-		//long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 		Lock readLock = readWriteLock.readLock();
 		readLock.lock();
 		try {
@@ -499,8 +499,8 @@ public class BlockStore {
 			setMinCompeting(result[0]);
 			return result[0];
 		} finally {
+			logger.trace("getMinCompeting took {} ms, minCompeting = {}", System.currentTimeMillis() - start, minCompeting);
 			readLock.unlock();
-			//logger.info("getMinCompeting took {} ms", System.currentTimeMillis() - start);
 		}
 	}
 
