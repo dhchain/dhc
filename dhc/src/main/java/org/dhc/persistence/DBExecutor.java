@@ -122,7 +122,11 @@ public abstract class DBExecutor {
 	}
 	
 	public static void rebuildIndexes() {
-		logger.debug("Rebuilding indexes");
+		doRebuildIndexes();
+	}
+	
+	private static void doRebuildIndexes() {
+		logger.info("Rebuilding indexes");
 		List<String> tables = new ArrayList<String>();
 		try {
 			new DBExecutor() {
@@ -143,7 +147,7 @@ public abstract class DBExecutor {
 				}
 			}.execute();
 			for(String table: tables) {
-				logger.debug("Rebuilding table {}", table);
+				logger.info("Rebuilding table {}", table);
 				new DBExecutor() {
 					public void doWork() throws Exception {
 						cs = conn.prepareCall("CALL SYSCS_UTIL.SYSCS_COMPRESS_TABLE(?, ?, ?)");
