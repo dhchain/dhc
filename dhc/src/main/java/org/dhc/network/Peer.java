@@ -236,6 +236,7 @@ public class Peer {
 		try {
 			
 			getReader();
+			
 			ThreadExecutor.getInstance().execute(new DhcRunnable("Peer receiver " + socketToString()) {
 				public void doRun() {
 					receive();
@@ -251,13 +252,12 @@ public class Peer {
 			return false;
 		}
 
-		peersPut(inetSocketAddress, this);
-
 		return true;
 	}
 	
 	private void receive() {
 		try {
+			peersPut(inetSocketAddress, this);
 			while(true) {
 				Message message = gsonUtil.read(reader);
 				if(message != null) {

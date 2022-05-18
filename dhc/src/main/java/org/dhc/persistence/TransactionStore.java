@@ -264,6 +264,7 @@ public class TransactionStore {
 		}.execute();
 		setId();
 		TransactionOutputStore.getInstance();
+		TransactionDataStore.getInstance();
 		KeywordStore.getInstance();
 	}
 
