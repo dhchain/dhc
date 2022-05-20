@@ -19,6 +19,7 @@ public class Constants {
 	public static String DATABASE;
 	public static PublicKey PUBLIC_KEY = getPublicKey();
 	public static final boolean showSum = configurator.getBooleanProperty("org.dhc.util.Constants.showSum");
+	public static final boolean compressTables = configurator.getBooleanProperty("org.dhc.util.Constants.compressTables");
 	
 	private static PublicKey getPublicKey() {
 		try {

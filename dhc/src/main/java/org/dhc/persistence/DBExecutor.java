@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dhc.util.Constants;
 import org.dhc.util.DhcLogger;
 
 public abstract class DBExecutor {
@@ -122,7 +123,9 @@ public abstract class DBExecutor {
 	}
 	
 	public static void rebuildIndexes() {
-		doRebuildIndexes();
+		if(Constants.compressTables) {
+			doRebuildIndexes();
+		}
 	}
 	
 	private static void doRebuildIndexes() {
