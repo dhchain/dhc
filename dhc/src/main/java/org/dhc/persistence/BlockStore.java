@@ -90,8 +90,6 @@ public class BlockStore {
 		Registry.getInstance().getPendingCrossShardTransactions().addCrossShardTransactions(block.getBlockHash());
 		Registry.getInstance().getPendingTransactions().process(block.getIndex());
 		
-		setMinCompeting(-1);
-		
 		TransactionDataStore.getInstance().remove();
 		
 		latestCachedBlocks.put(block.getBlockHash(), block);
