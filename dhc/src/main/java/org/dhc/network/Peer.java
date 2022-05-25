@@ -89,17 +89,27 @@ public class Peer {
 
     }
     
-    private static void peersPut(InetSocketAddress inetSocketAddress, Peer peer) {
+    private static boolean peersPut(InetSocketAddress inetSocketAddress, Peer peer) {
     	synchronized (peers) {
-			peers.put(inetSocketAddress, peer);
-			logger.trace("peersPut inetSocketAddress = {} Peer@{}", inetSocketAddress, peer.hashCode());
+    		Peer localVarPeer = peers.get(inetSocketAddress);
+    		if(localVarPeer == null) {
+    			peers.put(inetSocketAddress, peer);
+    			logger.trace("peersPut inetSocketAddress = {} Peer@{}", inetSocketAddress, peer.hashCode());
+    			return true;
+    		}
+    		return false;
 		}
     }
     
-    private void peersRemove() {
+    private boolean peersRemove() {
     	synchronized (peers) {
-			peers.remove(inetSocketAddress);
-			logger.trace("peersRemove inetSocketAddress = {} Peer@{}", inetSocketAddress, this.hashCode());
+    		Peer localVarPeer = peers.get(inetSocketAddress);
+    		if(localVarPeer != null && this == localVarPeer) {
+    			peers.remove(inetSocketAddress);
+    			logger.trace("peersRemove inetSocketAddress = {} Peer@{}", inetSocketAddress, this.hashCode());
+    			return true;
+    		}
+    		return false;
 		}
     }
     
@@ -177,7 +187,9 @@ public class Peer {
 					close();
 					throw e;
 				}
+				logger.trace("socket before {}", socket);
 				socket = localSocket;
+				logger.trace("socket after  {}", socket);
 				logger.trace("Connected to socket {}, Peer@{}", socketToString(), this.hashCode());
 				
 			} finally {
