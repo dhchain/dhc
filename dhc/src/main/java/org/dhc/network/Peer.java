@@ -310,15 +310,23 @@ public class Peer {
 	}
 
 	public void close() {
-		peersRemove();
+		
 		try {
-			if(socket != null) {
-				if(!socket.isClosed()) {
-					socket.close();
-					logger.trace("Closed socket {} Peer@{}", socketToString(), this.hashCode());
-					reloadBuckets();
+			boolean reload =  false;
+			synchronized(this) {
+				peersRemove();
+				if(socket != null) {
+					if(!socket.isClosed()) {
+						socket.close();
+						logger.trace("Closed socket {} Peer@{}", socketToString(), this.hashCode());
+						reload = true;
+					}
 				}
 			}
+			if(reload) {
+				reloadBuckets();
+			}
+			
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
