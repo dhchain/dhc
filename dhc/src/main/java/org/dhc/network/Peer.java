@@ -57,31 +57,35 @@ public class Peer {
     private transient ScheduledFuture<?> trimPeerFuture;
     
     public static Peer getInstance(InetSocketAddress inetSocketAddress) {
-    	Peer instance;
+
     	synchronized (peers) {
-    		instance = peers.get(inetSocketAddress);
+    		Peer instance = peers.get(inetSocketAddress);
         	if(instance != null) {
         		return instance;
         	}
+        	
+        	instance = new Peer();
+    		instance.setInetSocketAddress(inetSocketAddress);
+    		instance.timeAdded = System.currentTimeMillis();
+    		instance.peersPut();
+        	return instance;
     	}
 
-		instance = new Peer();
-		instance.setInetSocketAddress(inetSocketAddress);
-		instance.timeAdded = System.currentTimeMillis();
-		instance.peersPut();
-    	return instance;
+		
     }
 
-    public static synchronized Peer getInstance(Socket socket) {
+    public static Peer getInstance(Socket socket) {
     	InetSocketAddress inetSocketAddress = new InetSocketAddress( socket.getInetAddress(), socket.getPort());
     	Peer instance = getInstance(inetSocketAddress);
     	instance.socket = socket;
     	return instance;
     }
     
-    public static synchronized void closeAllPeers() {
-    	for(Peer peer: peers.values()) {
-    		peer.close();
+    public static void closeAllPeers() {
+    	synchronized (peers) {
+	    	for(Peer peer: peers.values()) {
+	    		peer.close();
+	    	}
     	}
     }
     
@@ -424,10 +428,6 @@ public class Peer {
 	@Override
 	public int hashCode() {
 		return getInetSocketAddress().hashCode();
-	}
-	
-	public int superHashCode() {
-		return super.hashCode();
 	}
 
 	@Override
