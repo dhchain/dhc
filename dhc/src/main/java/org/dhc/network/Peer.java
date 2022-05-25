@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.dhc.util.Callback;
 import org.dhc.util.Constants;
@@ -57,7 +55,6 @@ public class Peer {
     private transient Map<String, PeerLock> locks = new ConcurrentHashMap<String, PeerLock>();
     private transient ExpiringMap<String, Callback> callbacks =  new ExpiringMap<String, Callback>();
     private transient ScheduledFuture<?> trimPeerFuture;
-    private transient volatile Lock writeLock = new ReentrantLock();
     
     public static Peer getInstance(InetSocketAddress inetSocketAddress) {
     	Peer instance;
@@ -161,32 +158,35 @@ public class Peer {
     
 	public void connectSocket() throws Exception {
 		
-		writeLock.lock();
-		
-		logger.trace("Locked writeLock for Peer@{}", this.hashCode());
-
-		try {
-			Socket localSocket = socket;
-			if (localSocket != null && !localSocket.isClosed()) {
-				return;
-			}
-			localSocket = new Socket();
+		synchronized(this) {
+			
+			logger.trace("Locked connectSocket() for Peer@{}", this.hashCode());
 
 			try {
-				logger.trace("Try to connect to inetSocketAddress = {}, Peer@{}", inetSocketAddress, this.hashCode());
-				localSocket.connect(inetSocketAddress, (int) Constants.MINUTE);
+				Socket localSocket = socket;
+				if (localSocket != null && !localSocket.isClosed()) {
+					return;
+				}
+				localSocket = new Socket();
+
+				try {
+					logger.trace("Try to connect to inetSocketAddress = {}, Peer@{}", inetSocketAddress, this.hashCode());
+					localSocket.connect(inetSocketAddress, (int) Constants.MINUTE);
+					
+				} catch (IOException e) {
+					close();
+					throw e;
+				}
+				socket = localSocket;
+				logger.trace("Connected to socket {}, Peer@{}", socketToString(), this.hashCode());
 				
-			} catch (IOException e) {
-				close();
-				throw e;
+			} finally {
+				logger.trace("Unlocked connectSocket() for Peer@{}", this.hashCode());
 			}
-			socket = localSocket;
-			logger.trace("Connected to socket {}, Peer@{}", socketToString(), this.hashCode());
-			startReceiver();
-		} finally {
-			logger.trace("Unlocked writeLock for Peer@{}", this.hashCode());
-			writeLock.unlock();
+			
 		}
+		
+		startReceiver();
 	}
 
 	public String getNetworkIdentifier() {
@@ -219,15 +219,11 @@ public class Peer {
 			return true;
 		}
 
-		writeLock.lock();
-
-		try {
+		synchronized(this) {
 			if (receiverStarted) {
 				return true;
 			}
 			receiverStarted = true;
-		} finally {
-			writeLock.unlock();
 		}
 		
 		if(isClosed()) {
