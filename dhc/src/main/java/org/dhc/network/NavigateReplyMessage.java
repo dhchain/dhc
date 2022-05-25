@@ -32,7 +32,7 @@ public class NavigateReplyMessage extends Message {
 			return;
 		}
 		
-		String str = String.format("NavigateReplyMessage.doIt() index={} peer {}", index, peer);
+		String str = String.format("NavigateReplyMessage@%s.doIt() %s %s", this.hashCode(), index, peer.socketToString());
 		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
 			public void doRun() {
 				doIt(peer);
