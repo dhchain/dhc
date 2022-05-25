@@ -68,7 +68,7 @@ public class Peer {
 		instance = new Peer();
 		instance.setInetSocketAddress(inetSocketAddress);
 		instance.timeAdded = System.currentTimeMillis();
-		peersPut(inetSocketAddress, instance);
+		instance.peersPut();
     	return instance;
     }
 
@@ -89,12 +89,12 @@ public class Peer {
 
     }
     
-    private static boolean peersPut(InetSocketAddress inetSocketAddress, Peer peer) {
+    private boolean peersPut() {
     	synchronized (peers) {
     		Peer localVarPeer = peers.get(inetSocketAddress);
     		if(localVarPeer == null) {
-    			peers.put(inetSocketAddress, peer);
-    			logger.trace("peersPut inetSocketAddress = {} Peer@{}", inetSocketAddress, peer.hashCode());
+    			peers.put(inetSocketAddress, this);
+    			logger.trace("peersPut inetSocketAddress = {} Peer@{}", inetSocketAddress, super.hashCode());
     			return true;
     		}
     		return false;
@@ -106,7 +106,7 @@ public class Peer {
     		Peer localVarPeer = peers.get(inetSocketAddress);
     		if(localVarPeer != null && this == localVarPeer) {
     			peers.remove(inetSocketAddress);
-    			logger.trace("peersRemove inetSocketAddress = {} Peer@{}", inetSocketAddress, this.hashCode());
+    			logger.trace("peersRemove inetSocketAddress = {} Peer@{}", inetSocketAddress, super.hashCode());
     			return true;
     		}
     		return false;
@@ -170,7 +170,7 @@ public class Peer {
 		
 		synchronized(this) {
 			
-			logger.trace("Locked connectSocket() for Peer@{}", this.hashCode());
+			logger.trace("Locked connectSocket() for Peer@{}", super.hashCode());
 
 			try {
 				Socket localSocket = socket;
@@ -180,7 +180,7 @@ public class Peer {
 				localSocket = new Socket();
 
 				try {
-					logger.trace("Try to connect to inetSocketAddress = {}, Peer@{}", inetSocketAddress, this.hashCode());
+					logger.trace("Try to connect to inetSocketAddress = {}, Peer@{}", inetSocketAddress, super.hashCode());
 					localSocket.connect(inetSocketAddress, (int) Constants.MINUTE);
 					
 				} catch (IOException e) {
@@ -190,10 +190,10 @@ public class Peer {
 				logger.trace("socket before {}", socket);
 				socket = localSocket;
 				logger.trace("socket after  {}", socket);
-				logger.trace("Connected to socket {}, Peer@{}", socketToString(), this.hashCode());
+				logger.trace("Connected to socket {}, Peer@{}", socketToString(), super.hashCode());
 				
 			} finally {
-				logger.trace("Unlocked connectSocket() for Peer@{}", this.hashCode());
+				logger.trace("Unlocked connectSocket() for Peer@{}", super.hashCode());
 			}
 			
 		}
@@ -267,7 +267,7 @@ public class Peer {
 	
 	private void receive() {
 		try {
-			peersPut(inetSocketAddress, this);
+			peersPut();
 			while(true) {
 				Message message = gsonUtil.read(reader);
 				if(message != null) {
@@ -279,7 +279,7 @@ public class Peer {
 				if(!peers.containsKey(inetSocketAddress) && !socket.isClosed()) {
 					logger.info("***************************************************");
 					logger.info("peers do not contain {}, socket.isClosed()={}", inetSocketAddress, socket.isClosed());
-					peersPut(inetSocketAddress, this);
+					peersPut();
 				}
 			}
 		} catch (Exception e) {
@@ -330,7 +330,7 @@ public class Peer {
 				if(socket != null) {
 					if(!socket.isClosed()) {
 						socket.close();
-						logger.trace("Closed socket {} Peer@{}", socketToString(), this.hashCode());
+						logger.trace("Closed socket {} Peer@{}", socketToString(), super.hashCode());
 						reload = true;
 					}
 				}
@@ -424,6 +424,10 @@ public class Peer {
 	@Override
 	public int hashCode() {
 		return getInetSocketAddress().hashCode();
+	}
+	
+	public int superHashCode() {
+		return super.hashCode();
 	}
 
 	@Override
