@@ -36,6 +36,7 @@ public class Peer {
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	private static final GsonUtil gsonUtil = GsonUtil.getInstance();
 	private static final Map<InetSocketAddress, Peer> peers = new ConcurrentHashMap<InetSocketAddress, Peer>();
+	private static InetSocketAddress myself;
 
 	private TAddress tAddress;// it is set in process(Message message), don't set it here.
 	private String networkIdentifier;// process(Message message), don't set it here.
@@ -171,6 +172,10 @@ public class Peer {
     }
     
 	public void connectSocket() throws Exception {
+		
+		if(inetSocketAddress.equals(myself)) {
+			return;
+		}
 		
 		synchronized(this) {
 			
@@ -626,6 +631,10 @@ public class Peer {
 
 	public void setTAddress(TAddress tAddress) {
 		this.tAddress = tAddress;
+	}
+
+	public static void setMyself(InetSocketAddress myself) {
+		Peer.myself = myself;
 	}
 
 }

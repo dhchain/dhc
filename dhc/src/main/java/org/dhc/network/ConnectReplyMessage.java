@@ -18,6 +18,8 @@ public class ConnectReplyMessage extends Message {
 	public void process(Peer peer) {
 		if(Network.getInstance().getNetworkIdentifier().equals(peer.getNetworkIdentifier())) {
 			logger.info("ConnectReplyMessage - Cannot connect to yourself");
+			logger.info("*********************************************************");
+			logger.info("ConnectMessage - Cannot connect to yourself {}", peer.getInetSocketAddress());
 			throw new DisconnectException("ConnectReplyMessage - Cannot connect to yourself");
 		}
 		List<Peer> list = Peer.getPeersByNetworkIdentifier(peer.getNetworkIdentifier());

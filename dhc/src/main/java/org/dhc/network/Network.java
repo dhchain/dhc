@@ -1,5 +1,6 @@
 package org.dhc.network;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -247,6 +248,16 @@ public class Network {
 
 	public boolean isConnected() {
 		return !getMyBucketPeers().isEmpty();
+	}
+
+	public Peer getPeerByPort(InetSocketAddress inetSocketAddress) {
+		List<Peer> peers = new ArrayList<Peer>(Peer.getPeers());
+		for(Peer peer: peers) {
+			if(peer.getSocket() != null && peer.getSocket().getLocalPort() == inetSocketAddress.getPort() && peer.getSocket().getLocalAddress().equals(inetSocketAddress.getAddress())) {
+				return peer;
+			}
+		}
+		return null;
 	}
 
 }

@@ -26,6 +26,15 @@ public class ConnectMessage extends Message {
 	public void process(Peer peer) {
 		if(Network.getInstance().getNetworkIdentifier().equals(peer.getNetworkIdentifier())) {
 			//logger.trace("ConnectMessage - Cannot connect to yourself");
+			logger.trace("*********************************************************");
+			logger.trace("ConnectMessage - Cannot connect to yourself {}", peer.getInetSocketAddress());
+			Peer oppositePeer = Network.getInstance().getPeerByPort(peer.getInetSocketAddress());
+			
+			if(oppositePeer != null) {
+				logger.trace("ConnectMessage - Cannot connect to yourself oppositePeer = {}", oppositePeer.getInetSocketAddress());
+				Peer.setMyself(oppositePeer.getInetSocketAddress());
+			}
+			
 			throw new DisconnectException("ConnectMessage - Cannot connect to yourself");
 		}
 		List<Peer> list = Peer.getPeersByNetworkIdentifier(peer.getNetworkIdentifier());
