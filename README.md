@@ -31,8 +31,8 @@ How would we deal with a case when there are $2^2 = 4$ partitions? Now we have 4
 
  1. Nodes on 00 partition collect transactions and exchange hashes with nodes on 01 partition, creating hash 0
  2. Nodes on 10 partition collect transactions and exchange hashes with nodes on 11 partition, creating hash 1
- 3. Nodes on 00, 01 partitions send hash 0 to nodes 10, 11
- 4. Nodes on 10, 11 partitions send hash 1 to nodes 00, 01
+ 3. Nodes on 00, 01 partitions (combined partition 0) send hash 0 to nodes 10, 11
+ 4. Nodes on 10, 11 partitions (combined partition 1) send hash 1 to nodes 00, 01
  5. All nodes combine hashes 0 and 1 and start mining
 
 ```mermaid
@@ -45,8 +45,7 @@ E((Nodes 0)) -- Send hash 0 --> F((Nodes 1))
 F -- Send hash 1 --> E
 ```
 
-
-In steps 3 and 4 hashes 0, 1 include small proof of work to reduce the number of combinations. Transaction are never sent to nodes on other partitions, only hashes.
+In the last diagram Nodes 0 are nodes on combined partition 0 which includes partitions 00 and 01. Similarly for Nodes 1. In steps 3 and 4 hashes 0, 1 include small proof of work to reduce the number of combinations. Transaction are never sent to nodes on other partitions, only hashes.
 
 We would call index length of a partition **power**. Partition 00 has power 2 and partition 110 has power 3.
 
