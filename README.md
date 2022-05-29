@@ -1,10 +1,13 @@
 
+
 # Distributed Hash Chain
-Distributed hash chain or DHC is an extension of blockchain structure first implemented in [Bitcoin](https://bitcoin.org/bitcoin.pdf). Bitcoin and many other blockchains suffer from scalability problem. Bitcoin on average can process only between 3.3 and 7 transactions per second which makes it unsuitable as a currency as transaction fees get very high. The main reason is that every node on the Bitcoin network needs to receive and keep a copy of every transaction. The goal of DHC is to improve scalability of a standard blockchain.
+Distributed hash chain or DHC is an extension of blockchain structure first implemented in [Bitcoin](https://bitcoin.org/bitcoin.pdf). Bitcoin and many other blockchains suffer from scalability problem. Bitcoin on average can process only between 3.3 and 7 transactions per second which makes it unsuitable as a currency as people cannot do many transactions and transaction fees get very high. In comparison VISA processes thousands transactions per second. The main reason is that every node on the Bitcoin network needs to receive and keep a copy of every transaction. The goal of DHC is to improve scalability of a traditional blockchain.
 
 One approach to improve scalability is to use sharding where instead of a single blockchain there are multiple blockchains that store different sets of transactions and they are synchronized between each other in some way.
 
-DHC has a single blockchain, but each node only stores a subset of transactions in a given block. Imagine there are two nodes A and B. Address of node A in binary form starts with 0 and address of node B in binary form starts with 1. Then node A will start collecting all pending transactions from senders which address start with 0 and node B will start collecting all pending transactions from senders which address start with 1. Node A will not even receive transactions from senders which address start with 1 thus reducing network traffic. Similarly for node B. How A and B can work together and create a distributed block? Here are the steps.
+DHC has a single blockchain, but each node only stores a subset of transactions in a given block so it can process them as quickly as possible without any bottleneck inherent in traditional blockchains. When more nodes join the DHC network the partitions of transactions split further so each node processes similar number of transactions as before the split.
+
+Imagine there are two nodes A and B. Address of node A in binary form starts with 0 and address of node B in binary form starts with 1. Then node A will start collecting all pending transactions from senders which address start with 0 and node B will start collecting all pending transactions from senders which address start with 1. Node A will not even receive transactions from senders which address start with 1 thus reducing network traffic. Similarly for node B. How A and B can work together and create a distributed block? Here are the steps.
 
  1. Node A creates hash of transactions it collected and sends that hash to node B
  2. Node B creates hash of transactions it collected and sends that hash to node A
@@ -53,4 +56,14 @@ This approach is easily extended when there are $2^n$ partitions. The number of 
 
 All nodes connect to each other in a [Kademlia](http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf) like network. The difference from Kademlia is that DHC uses TCP instead of UDP and it keeps k-bucket containing its own node (partition) at the same power (index length) without splitting it even if there are many nearby nodes. This is done to mitigate eclipse attacks. In our current implementation k = 8 as in BitTorrent Mainline DHT. Please notice that DHC is not a distributed hash table and only uses Kademlia like network to connect to other nodes.
 
-DHC also implements dynamic partitioning. As more nodes join, partitions split and the number of them increases as the network grows. If enough nodes leave the network then leaf partitions merge automatically.
+Below is an example of Node 001, whose address starts with 001 in binary form, connecting to nodes in required partitions. Since k = 8, the node maintains connections to 8 nodes in each partition.
+
+```mermaid
+graph LR
+A((Node 011)) --> B((Partition 011))
+A((Node 011)) --> C((Partition 010))
+A((Node 011)) --> D((Partition 00))
+A((Node 011)) --> E((Partition 1))
+```
+
+DHC also implements dynamic partitioning. As more nodes join, partitions split and the number of them increases as the network grows. If enough nodes leave the network then leaf partitions merge automatically. This way nodes on average process and store similar number of transaction in a given time period.
