@@ -67,3 +67,23 @@ A((Node 011)) --> E((Partition 1))
 ```
 
 DHC also implements dynamic partitioning. As more nodes join, partitions split and the number of them increases as the network grows. If enough nodes leave the network then leaf partitions merge automatically. This way nodes on average process and store similar number of transaction in a given time period.
+
+##Installations
+
+Installation instructions for full version:
+
+1. Install Java version 8 or 9
+2. Download installer from this <a href="https://drive.google.com/file/d/1QeGQoQCzm0wR4zcNhhS3duOIlLR6Kphh/view?usp=sharing" target="_blank" download="dhc-installer">Download</a> link.
+3. Follow installer instructions and install in a directory where you have full access.
+4. If you already have key.csv file with existing keys you can just copy it to keys folder, otherwise it will create new key. 
+5. Start it by running dhc.sh or dhc.bat depending on your operating system. For graphical version run dhc.sh or dhc.bat
+
+It will ask you to enter passphrase and confirm it. In case you have existing key it will ask you to enter passphrase for it.
+
+Installation instructions for light GUI client for Windows, LINUX, Mac: <a href="https://bitbucket.org/dhchain/dhcclient/src/master/">Lite DHC Client</a>
+
+Installation instructions for for Android client: <a href="https://bitbucket.org/dhchain/dhcandroid/src/master/">Android DHC Client</a>
+
+
+
+
