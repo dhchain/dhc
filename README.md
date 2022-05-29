@@ -45,11 +45,11 @@ E((Node 00 <br/> Node 01)) -- Send hash 0 --> F((Node 10 <br/> Node 11))
 F -- Send hash 1 --> E
 ```
 
-In steps 3 and 4 hashes 0, 1 include small proof of work to reduce the number of combinations. Transaction are never sent to nodes on other partitions, only hashes. Nodes would only need to be connected to some other nodes on opposite partitions. For example Node 00 needs to be connected to some nodes on partition 01 and some nodes on partition 1 (combination of partitions 10 and 11).
+In steps 3 and 4 hashes 0, 1 include small proof of work to reduce the number of combinations. Transactions are never sent to nodes on other partitions, only hashes. Nodes would only need to be connected to some other nodes on its own partition and on opposite partitions. For example Node 00 needs to be connected to some nodes on partition 00 and 01 and some nodes on partition 1 (combination of partitions 10 and 11).
 
 We would call index length of a partition **power**. Partition 00 has power 2 and partition 110 has power 3.
 
-This approach is easily extended when there are $2^n$ partitions. The number of steps would increase but not by much. There will be 10 steps to create combined hash for about a thousand partitions, 20 steps for about a million partitions, 30 steps for a billion partitions.
+This approach is easily extended when there are $2^n$ partitions. The number of steps would increase but not by much. There will be 10 steps to create combined hash for about a thousand partitions, 20 steps for about a million partitions, 30 steps for a billion partitions. If each step takes 1 second on the network then nodes on a billion partition network can create combined hash in 30 seconds.
 
 All nodes connect to each other in a [Kademlia](http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf) like network. The difference from Kademlia is that DHC uses TCP instead of UDP and it keeps k-bucket containing its own node (partition) at the same power (index length) without splitting it even if there are many nearby nodes. This is done to mitigate eclipse attacks. In our current implementation k = 8 as in BitTorrent Mainline DHT. Please notice that DHC is not a distributed hash table and only uses Kademlia like network to connect to other nodes.
 
