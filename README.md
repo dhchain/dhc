@@ -84,6 +84,8 @@ Installation instructions for light GUI client for Windows, LINUX, Mac: <a href=
 
 Installation instructions for for Android client: <a href="https://bitbucket.org/dhchain/dhcandroid/src/master/">Android DHC Client</a>
 
-
+<div align="center">
+	Contact: admin@dhcne.org
+</div>
 
 
