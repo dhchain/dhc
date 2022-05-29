@@ -1,6 +1,6 @@
 
 # Distributed Hash Chain
-Distributed hash chain or DHC is an extension of blockchain structure first implemented in bitcoin. The goal of DHC is to improve scalability of a standard blockchain.
+Distributed hash chain or DHC is an extension of blockchain structure first implemented in [Bitcoin](https://bitcoin.org/bitcoin.pdf). Bitcoin and many other blockchains suffer from scalability problem. Bitcoin on average can process only between 3.3 and 7 transactions per second which makes it unsuitable as a currency as transaction fees get very high. The main reason is that every node on the Bitcoin network needs to receive and keep a copy of every transaction. The goal of DHC is to improve scalability of a standard blockchain.
 
 One approach to improve scalability is to use sharding where instead of a single blockchain there are multiple blockchains that store different sets of transactions and they are synchronized between each other in some way.
 
@@ -41,14 +41,16 @@ A((Node 00)) -- Send hash 00 --> B((Node 01))
 B -- Send hash 10 --> A
 C((Node 10)) -- Send hash 10 --> D((Node 11))
 D -- Send hash 11 --> C
-E((Nodes 0)) -- Send hash 0 --> F((Nodes 1))
+E((Node 00 <br/> Node 01)) -- Send hash 0 --> F((Node 10 <br/> Node 11))
 F -- Send hash 1 --> E
 ```
 
-In the last diagram Nodes 0 are nodes on combined partition 0 which includes partitions 00 and 01. Similarly for Nodes 1. In steps 3 and 4 hashes 0, 1 include small proof of work to reduce the number of combinations. Transaction are never sent to nodes on other partitions, only hashes.
+In steps 3 and 4 hashes 0, 1 include small proof of work to reduce the number of combinations. Transaction are never sent to nodes on other partitions, only hashes. Nodes would only need to be connected to some other nodes on opposite partitions. For example Node 00 needs to be connected to some nodes on partition 01 and some nodes on partition 1 (combination of partitions 10 and 11).
 
 We would call index length of a partition **power**. Partition 00 has power 2 and partition 110 has power 3.
 
 This approach is easily extended when there are $2^n$ partitions. The number of steps would increase but not by much. There will be 10 steps to create combined hash for about a thousand partitions, 20 steps for about a million partitions, 30 steps for a billion partitions.
 
-All nodes connect to each other in a kademlia like network. The difference from kademlia is that DHC uses TCP instead of UDP and it keeps k-bucket containing its own node (partition) at the same power (index length) without splitting it even if there are many nearby nodes. This is done to mitigate eclipse attacks. In our current implementation k = 8 as in BitTorrent Mainline DHT. Please notice that DHC is not a distributed hash table and only uses kademlia like network to connect to other nodes.
+All nodes connect to each other in a [Kademlia](http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf) like network. The difference from Kademlia is that DHC uses TCP instead of UDP and it keeps k-bucket containing its own node (partition) at the same power (index length) without splitting it even if there are many nearby nodes. This is done to mitigate eclipse attacks. In our current implementation k = 8 as in BitTorrent Mainline DHT. Please notice that DHC is not a distributed hash table and only uses Kademlia like network to connect to other nodes.
+
+DHC also implements dynamic partitioning. As more nodes join, partitions split and the number of them increases as the network grows. If enough nodes leave the network then leaf partitions merge automatically.
