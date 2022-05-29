@@ -68,7 +68,7 @@ A((Node 011)) --> E((Partition 1))
 
 DHC also implements dynamic partitioning. As more nodes join, partitions split and the number of them increases as the network grows. If enough nodes leave the network then leaf partitions merge automatically. This way nodes on average process and store similar number of transaction in a given time period.
 
-##Installations
+## Installations
 
 Installation instructions for full version:
 
