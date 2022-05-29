@@ -1,5 +1,6 @@
 
 
+
 # Distributed Hash Chain
 Distributed hash chain or DHC is an extension of blockchain structure first implemented in [Bitcoin](https://bitcoin.org/bitcoin.pdf). Bitcoin and many other blockchains suffer from scalability problem. Bitcoin on average can process only between 3.3 and 7 transactions per second which makes it unsuitable as a currency as people cannot do many transactions and transaction fees get very high. In comparison VISA processes thousands transactions per second. The main reason is that every node on the Bitcoin network needs to receive and keep a copy of every transaction. The goal of DHC is to improve scalability of a traditional blockchain.
 
@@ -54,6 +55,8 @@ We would call index length of a partition **power**. Partition 00 has power 2 an
 
 This approach is easily extended when there are $2^n$ partitions. The number of steps would increase but not by much. There will be 10 steps to create combined hash for about a thousand partitions, 20 steps for about a million partitions, 30 steps for a billion partitions. If each step takes 1 second on the network then nodes on a billion partition network can create combined hash in 30 seconds.
 
+In DHC one block is created on average every minute.
+
 All nodes connect to each other in a [Kademlia](http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf) like network. The difference from Kademlia is that DHC uses TCP instead of UDP and it keeps k-bucket containing its own node (partition) at the same power (index length) without splitting it even if there are many nearby nodes. This is done to mitigate eclipse attacks. In our current implementation k = 8 as in BitTorrent Mainline DHT. Please notice that DHC is not a distributed hash table and only uses Kademlia like network to connect to other nodes.
 
 Below is an example of Node 001, whose address starts with 001 in binary form, connecting to nodes in required partitions. Since k = 8, the node maintains connections to 8 nodes in each partition.
@@ -67,6 +70,8 @@ A((Node 011)) --> E((Partition 1))
 ```
 
 DHC also implements dynamic partitioning. As more nodes join, partitions split and the number of them increases as the network grows. If enough nodes leave the network then leaf partitions merge automatically. This way nodes on average process and store similar number of transaction in a given time period.
+
+There are $2^{63} - 1 = 9223372036854775807$ smallest units created. This number represent maximum long in Java. We called them also as in Bitcoin satoshis. Each coin contains one billion satoshis. Therefore there are 9,223,372,036 coins in circulation.
 
 ## Installations
 
@@ -84,8 +89,7 @@ Installation instructions for light GUI client for Windows, LINUX, Mac: <a href=
 
 Installation instructions for for Android client: <a href="https://bitbucket.org/dhchain/dhcandroid/src/master/">Android DHC Client</a>
 
-<div align="center">
-	Contact: admin@dhcne.org
-</div>
+Contact: admin@dhcne.org
+
 
 
