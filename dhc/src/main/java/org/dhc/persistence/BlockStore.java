@@ -217,7 +217,7 @@ public class BlockStore {
 		TransactionStore.getInstance().remove(blockHash);
 		setMinCompeting(-1);
 		invalidateCachedValue(blockHash);
-		logger.trace("END removeBlock() blockHash=", blockHash);
+		logger.trace("END removeBlock() blockHash={}", blockHash);
 	}
 
 	public List<Block> getByIndex(long index) {
