@@ -73,6 +73,10 @@ DHC also implements dynamic partitioning. As more nodes join, partitions split a
 
 There are $2^{63} - 1 = 9223372036854775807$ smallest units created. This number represent maximum long in Java. We called them also as in Bitcoin satoshis. Each coin contains one billion satoshis. Therefore there are 9,223,372,036 coins in circulation.
 
+## Non publishing attack
+
+We assume that in each partition there is at least one honest node. Partitions over address space are uniform so it would impossible to replace all honest node in some partition by concentrating fake nodes in it. An attacker might create a hash without publishing transaction subset corresponding to it and send to neighboring partition. Honest nodes would create an alert for that and include proof of work relative to the size of partition. Why would honest node do that? Because for them would be risky to continue using that hash and contribute more resources to mining on top of it. If some other honest node produces alert of non publishing and it gets rolled back their effort of mining on top of that hash would be wasted. It is similar to people rejecting fake currency bills. 
+
 ## Installations
 
 Installation instructions for full version:
