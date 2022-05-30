@@ -1,6 +1,7 @@
 
 
 
+
 # Distributed Hash Chain
 Distributed hash chain or DHC is an extension of blockchain structure first implemented in [Bitcoin](https://bitcoin.org/bitcoin.pdf). Bitcoin and many other blockchains suffer from scalability problem. Bitcoin on average can process only between 3.3 and 7 transactions per second which makes it unsuitable as a currency as people cannot do many transactions and transaction fees get very high. In comparison VISA processes thousands transactions per second. The main reason is that every node on the Bitcoin network needs to receive and keep a copy of every transaction. The goal of DHC is to improve scalability of a traditional blockchain.
 
@@ -81,8 +82,8 @@ We assume that in each partition there is at least one honest node. Partitions o
 
 Installation instructions for full version:
 
-1. Install Java version 8 or 9
-2. Download installer from this <a href="https://drive.google.com/file/d/1QeGQoQCzm0wR4zcNhhS3duOIlLR6Kphh/view?usp=sharing" target="_blank" download="dhc-installer">Download</a> link.
+1. Install Java version 8 or 9: <a href="https://www.java.com/en/download/manual.jsp" target="_blank" >Download Java</a>.
+2. Download full DHC installer:  <a href="https://drive.google.com/file/d/1QeGQoQCzm0wR4zcNhhS3duOIlLR6Kphh/view?usp=sharing" target="_blank" download="dhc-installer">DHC Download</a>.
 3. Follow installer instructions and install in a directory where you have full access.
 4. If you already have key.csv file with existing keys you can just copy it to keys folder, otherwise it will create new key. 
 5. Start it by running dhc.sh or dhc.bat depending on your operating system. For graphical version run dhcgui.sh or dhcgui.bat
