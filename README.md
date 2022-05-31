@@ -1,7 +1,3 @@
-
-
-
-
 # Distributed Hash Chain
 Distributed hash chain or DHC is an extension of blockchain structure first implemented in [Bitcoin](https://bitcoin.org/bitcoin.pdf). Bitcoin and many other blockchains suffer from scalability problem. Bitcoin on average can process only between 3.3 and 7 transactions per second which makes it unsuitable as a currency as people cannot do many transactions and transaction fees get very high. In comparison VISA processes thousands transactions per second. The main reason is that every node on the Bitcoin network needs to receive and keep a copy of every transaction. The goal of DHC is to improve scalability of a traditional blockchain.
 
@@ -97,6 +93,13 @@ It will ask you to enter passphrase and confirm it. In case you have existing ke
 Installation instructions for light GUI client for Windows, LINUX, Mac: <a href="https://bitbucket.org/dhchain/dhcclient/src/master/">Lite DHC Client</a>
 
 Installation instructions for for Android client: <a href="https://bitbucket.org/dhchain/dhcandroid/src/master/">Android DHC Client</a>
+
+## Building from the source
+
+ 1. Install IzPack from http://izpack.org/ 
+ 2. Download the source code from DHC repository 
+ 3. Run ANT script build.xml 
+ 4. The resulting installer.jar will be contained in izpack/output directory
 
 ## Contact
 admin@dhcne.org
