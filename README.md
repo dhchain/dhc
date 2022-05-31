@@ -76,7 +76,11 @@ There are $2^{63} - 1 = 9223372036854775807$ smallest units created. This number
 
 ## Non publishing attack
 
-We assume that in each partition there is at least one honest node. Partitions over address space are uniform so it would impossible to replace all honest node in some partition by concentrating fake nodes in it. An attacker might create a hash without publishing transaction subset corresponding to it and send to neighboring partition. Honest nodes would create an alert for that and include proof of work relative to the size of partition. Why would honest node do that? Because for them would be risky to continue using that hash and contribute more resources to mining on top of it. If some other honest node produces alert of non publishing and it gets rolled back their effort of mining on top of that hash would be wasted. It is similar to people rejecting fake currency bills. 
+We assume that in each partition there is at least one honest node. Partitions over address space are uniform so it would impossible to replace all honest node in some partition by concentrating fake nodes in it. An attacker might create a hash without publishing transaction subset corresponding to it and send to neighboring partition. Honest nodes would create an alert for that and include proof of work relative to the size of partition. Why would honest node do that? Because for them would be risky to continue using that hash and contribute more resources to mining on top of it. If some other honest node produces alert of non publishing and it gets rolled back their effort of mining on top of that hash would be wasted. It is similar to people rejecting counterfeit currency bills. 
+
+## Reclaiming Disk Space
+
+Bitcoin white paper mentions possible removing of old spent transaction outputs. We implemented it with reliance on miners. Miners find all unspent transaction outputs older than one year and assign them to their owners in new transactions included in new blocks. This way blocks older than one year contain only spent transaction outputs, transactions in them are pruned and blocks are compacted to contain only headers. This reduces further amount of disc space required to store blockchain in addition to storing only partition transactions.
 
 ## Installations
 
