@@ -28,6 +28,8 @@ Node A ->> Node B: Mined, send blockhash = hash(hash + nonce)
 ```
 When there are more nodes the same approach applies. Any node with address starting with 0 needs to combine hash of transaction it collected with a hash it receives from a node with address starting with 1. It needs to broadcast that information to other nodes on the same partition so they would be able to recover that information once they receive mined block even if that node goes down. To reduce the number of these broadcasts and consequently the number of combinations with other partitions, nodes are required to include small proof of work.
 
+Avoiding possible deadlock. Imagine situation when  two competing blocks were mined at the same time $B_c$, $B_d$. All nodes would need to accept both blocks and send two messages to nodes on other partition. First message would include hash of transaction based on block $B_c$ and second message would include hash of transaction based on block $B_d$. Nodes will start mining whatever combined hash they produce first. This way there is no need for an existence of beacon chain to keep all partitions synchronized between each other.
+
 How would we deal with a case when there are $2^2 = 4$ partitions? Now we have 4 nodes that have addresses in binary form starting with 00, 01, 10, 11. It is happening as following.
 
  1. Nodes on 00 partition collect transactions and exchange hashes with nodes on 01 partition, creating hash 0
