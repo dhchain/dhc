@@ -447,6 +447,8 @@ public class TransactionStore {
 			}.execute();
 			for(Transaction transaction: transactions) {
 				transaction.setExpiringData(TransactionDataStore.getInstance().getExpiringData(transaction.getTransactionId()));
+				Keywords keywords = KeywordStore.getInstance().getKeywords(transaction.getTransactionId());
+				transaction.setKeywords(keywords);
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
