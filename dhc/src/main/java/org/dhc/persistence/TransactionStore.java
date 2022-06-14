@@ -157,7 +157,7 @@ public class TransactionStore {
 	private Transaction populateTransaction(ResultSet rs) throws SQLException, GeneralSecurityException {
 		Transaction transaction = new Transaction();
 		String blockhash = rs.getString("blockhash");
-		transaction.setBlockHash(blockhash, rs.getLong("index"));
+		transaction.setBlockHash(blockhash, rs.getLong("blockIndex"));
 		transaction.setTransactionId(rs.getString("transaction_id"));
 		transaction.setSender(rs.getString("sender"));
 		transaction.setSenderDhcAddress(new DhcAddress(rs.getString("senderAddress")));
@@ -176,7 +176,7 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select t.*, b.index from trans_action t join block b on t.blockhash = b.blockhash where t.blockhash = ?";
+					String sql = "select t.* from trans_action t where t.blockhash = ?";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setString(i++, blockhash);
@@ -258,6 +258,7 @@ public class TransactionStore {
 				
 				
 				addNewColumn(dbmd, tableName, "timeStamp", "ALTER TABLE " + tableName + " ADD timeStamp bigint NOT NULL");
+				addIndex(dbmd, tableName, "trans_action_receiver", "CREATE INDEX trans_action_receiver ON " + tableName + "(receiver)");
 				
 				//s.execute("ALTER TABLE trans_action ALTER COLUMN sender NULL");
 			}
@@ -329,7 +330,7 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select t.*, b.index from trans_action t join block b on t.blockhash = b.blockhash where t.transaction_id = ?";
+					String sql = "select t.* from trans_action t where t.transaction_id = ?";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setString(i++, transactionId);
@@ -381,7 +382,7 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select t.*, b.index from trans_action t join block b on t.blockhash = b.blockhash where t.transaction_id = ? and t.blockhash = ?";
+					String sql = "select t.* from trans_action t where t.transaction_id = ? and t.blockhash = ?";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setString(i++, transactionId);
@@ -426,34 +427,75 @@ public class TransactionStore {
 	
 	// returns first 100 transactions without inputs, outputs for display purpose
 	public Set<Transaction> getTransactionsByAddress(DhcAddress dhcAddress) {
-		Set<Transaction> transactions = new LinkedHashSet<>();
+		long start = System.currentTimeMillis();
+		Map<String, Transaction> transactions = new LinkedHashMap<>();
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String address = dhcAddress.toString();
-					String sql = "select t.*, b.index from trans_action t join block b on t.blockhash = b.blockhash "
-							+ " where t.receiver = ? or t.senderAddress = ? order by b.index desc"
-							+ " FETCH FIRST 100 ROWS ONLY WITH UR";
+					String sql = "select t.*, td.*, k.name, k.keyword " + 
+							" from trans_action t " + 
+							" left outer join transaction_data td on td.transactionId = t.transaction_id " + 
+							" left outer join keyword k on k.transactionId = t.transaction_id " + 
+							" where t.receiver = ? " + 
+							" union " + 
+							" select t.*, td.*, k.name, k.keyword " + 
+							" from trans_action t " + 
+							" left outer join transaction_data td on td.transactionId = t.transaction_id " + 
+							" left outer join keyword k on k.transactionId = t.transaction_id " + 
+							" where t.senderAddress = ? " + 
+							" order by id desc " + 
+							" FETCH FIRST 100 ROWS ONLY WITH UR";
+					logger.trace("Function getTransactionsByAddress sql = {}, dhcAddress = {}", sql, dhcAddress.toString());
 					ps = conn.prepareStatement(sql);
 					int i = 1;
-					ps.setString(i++, address);
-					ps.setString(i++, address);
+					ps.setString(i++, dhcAddress.toString());
+					ps.setString(i++, dhcAddress.toString());
+					
 					rs = ps.executeQuery();
+					Keywords keywords;
 					while (rs.next()) {
-						Transaction transaction = populateTransaction(rs);
-						transactions.add(transaction);
+						String transactionId = rs.getString("transaction_id");
+						Transaction transaction = transactions.get(transactionId);
+						String name = rs.getString("name");
+						if(transaction == null) {
+							transaction = populateTransaction(rs);
+							String data = rs.getString("data");
+							if(data != null) {
+								TransactionData transactionData = new TransactionData(data);
+								transactionData.setTransactionId(transactionId);
+								transactionData.setBlockHash(rs.getString("blockhash"));
+								transactionData.setHash(rs.getString("hash"));
+								transactionData.setValidForNumberOfBlocks(rs.getLong("validForNumberOfBlocks"));
+								transactionData.setExpirationIndex(rs.getLong("expirationIndex"));
+								transaction.setExpiringData(transactionData);
+							}
+							
+							transactions.put(transactionId, transaction);
+							if(name != null) {
+								keywords = new Keywords();
+								keywords.setTransactionId(transactionId);
+								keywords.setBlockHash(rs.getString("blockhash"));
+								String keyword = rs.getString("keyword");
+								keywords.put(name, keyword);
+								transaction.setKeywords(keywords);
+							}
+							
+						}
+						if(name != null) {
+							keywords = transaction.getKeywords();
+							String keyword = rs.getString("keyword");
+							keywords.put(name, keyword);
+						}
+						
 					}
 				}
 			}.execute();
-			for(Transaction transaction: transactions) {
-				transaction.setExpiringData(TransactionDataStore.getInstance().getExpiringData(transaction.getTransactionId()));
-				Keywords keywords = KeywordStore.getInstance().getKeywords(transaction.getTransactionId());
-				transaction.setKeywords(keywords);
-			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		return transactions;
+		
+		logger.trace("Function getTransactionsByAddress took {} ms.", System.currentTimeMillis() - start);
+		return new LinkedHashSet<>(transactions.values());
 	}
 
 	public Set<Transaction> getTransactionsForApp(String app, DhcAddress address) {
@@ -461,7 +503,7 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select t.*, b.index, td.*, k.name, k.keyword from trans_action t join block b on t.blockhash = b.blockhash "
+					String sql = "select t.*, td.*, k.name, k.keyword from trans_action t "
 							+ " left outer join transaction_data td on td.transactionId = t.transaction_id "
 							+ " left outer join keyword k on k.transactionId = t.transaction_id "
 							+ " where t.app = ? and t.senderAddress = ? "
