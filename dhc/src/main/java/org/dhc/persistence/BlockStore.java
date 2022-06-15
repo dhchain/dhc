@@ -250,6 +250,10 @@ public class BlockStore {
 	}
 
 	public Block getByBlockhash(String blockhash) {
+		
+		if(blockhash == null) {
+			return null;
+		}
 		Block[] result = new Block[1];
 		result[0] = latestCachedBlocks.get(blockhash);
 		if(result[0] != null) {
