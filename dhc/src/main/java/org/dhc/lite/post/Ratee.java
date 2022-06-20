@@ -16,8 +16,8 @@ public class Ratee implements Serializable {
 	public String getCreatorDhcAddress() {
 		return creatorDhcAddress;
 	}
-	public void setCreatorDhcAddress(String creatorTmaAddress) {
-		this.creatorDhcAddress = creatorTmaAddress;
+	public void setCreatorDhcAddress(String creatorDhcAddress) {
+		this.creatorDhcAddress = creatorDhcAddress;
 	}
 	
 	public long getTotalRating() {
