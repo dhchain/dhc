@@ -258,6 +258,9 @@ public class Block {
 				logger.error("Inputs Outputs are not valid for transaction {}", transaction);
 				return false;
 			}
+			if(!transaction.isValid(getOutputs())) {
+				return false;
+			}
 		}
 		
 		if(!isCoinBaseValid()) {
