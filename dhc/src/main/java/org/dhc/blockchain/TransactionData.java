@@ -59,7 +59,7 @@ public class TransactionData {
 	}
 
 	public String toString() {
-		return "{data='" +getData() + "', validForNumberOfBlocks=" + validForNumberOfBlocks + "}";
+		return "{data='" +getData() + "', validForNumberOfBlocks=" + validForNumberOfBlocks + ", transactionId=" + transactionId + "}";
 	}
 	
 	public boolean isValid() {

@@ -30,6 +30,10 @@ public class SendTransactionMessage extends Message {
 			return;
 		}
 		
+		if(!transaction.isTransactionDataValid()) {
+			return;
+		}
+		
 		if(Applications.MESSAGING.equals(transaction.getApp())) {
 			Network.getInstance().sendToAddress(transaction.getReceiver(), new SendSMTransactionMessage(transaction));
 		}

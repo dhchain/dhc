@@ -397,6 +397,11 @@ public class Transaction {
 	}
 	
 	public boolean isValid(Set<TransactionOutput> pendingOutputs) {
+
+		if(!isTransactionDataValid()) {
+			logger.info("Transaction data is not valid");
+			return false;
+		}
 		
 		if(getValue().less(Coin.ZERO)) {
 			logger.info("Value {} is less than zero", getValue());
@@ -1006,6 +1011,21 @@ public class Transaction {
 			}
 		}
 		return null;
+	}
+	
+	public boolean isTransactionDataValid() {
+		if(expiringData == null) {
+			return true;
+		}
+		if(!expiringData.isValid()) {
+			return false;
+		}
+		if(!expiringData.getTransactionId().equals(getTransactionId())) {
+			return false;
+		}
+		return true;
+		
+		
 	}
 
 }
