@@ -223,7 +223,7 @@ public class Main {
 	
 	private void parseArgs(final String[] arguments) {
 		final CmdLineParser parser = new CmdLineParser(this);
-		if (arguments.length != 6) {
+		if (arguments.length < 6) {
 			printUsage(parser);
 		}
 		try {
