@@ -21,7 +21,7 @@ public class TransactionData {
 		setData(data);
 		this.validForNumberOfBlocks = validForNumberOfBlocks < YEAR? validForNumberOfBlocks: YEAR;
 		if(data != null) {
-			hash = CryptoUtil.getHashBase58Encoded(getData());
+			setHash(CryptoUtil.getHashBase58Encoded(getData()));
 		}
 	}
 	
@@ -34,6 +34,7 @@ public class TransactionData {
 		clone.transactionId = transactionId;
 		clone.blockHash = blockHash;
 		clone.expirationIndex = expirationIndex;
+		clone.setHash(hash);
 		return clone;
 	}
 	
