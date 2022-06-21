@@ -56,14 +56,19 @@ public class NavigateReplyMessage extends Message {
 			if(!Peer.getPeersByNetworkIdentifier(networkIdentifier).isEmpty()) {
 				continue;
 			}
+			if(Network.getInstance().getNetworkIdentifier().equals(networkIdentifier)) {
+				logger.trace("NavigateReplyMessage.doIt() - Cannot connect to yourself");
+				continue;
+			}
 			Peer foundPeer = Peer.getInstance(p.getInetSocketAddress());
 			foundPeer.setType(PeerType.TO);
+			logger.trace("foundPeer = {}", foundPeer);
 			if(bootstrap.connect(foundPeer)) {
 				new NavigateMessage(hash, index).send(foundPeer);
 				count++;
 			}
 		}
-		if(count > 0) {
+		if(count > 0 ) {
 			new NavigateMessage(hash, index + 1).send(peer);
 		}
 	}

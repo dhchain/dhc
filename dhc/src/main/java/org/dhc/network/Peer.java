@@ -517,7 +517,7 @@ public class Peer {
 				result.add(peer);
 			}
 		}
-		logger.trace("result {}", result);
+		logger.trace("networkIdentifier={} peers={}", networkIdentifier, result);
 		return result;
 	}
 
