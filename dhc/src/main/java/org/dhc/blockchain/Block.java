@@ -258,9 +258,7 @@ public class Block {
 				logger.error("Inputs Outputs are not valid for transaction {}", transaction);
 				return false;
 			}
-			if(!transaction.isValid(getOutputs())) {
-				return false;
-			}
+			
 		}
 		
 		if(!isCoinBaseValid()) {
@@ -561,10 +559,14 @@ public class Block {
 		if(set == null) {
 			return true;
 		}
+		Set<TransactionOutput> allOutputs = getOutputs();
 		for(Transaction transaction: set) {
-			if(!transaction.hasOutputsForAllInputs(this)) {
+			if(!transaction.hasOutputsForAllInputs(this, allOutputs)) {
 				logger.info("transaction {}", transaction);
 				logger.info("block {}", this);
+				return false;
+			}
+			if(!transaction.isValid(allOutputs)) {
 				return false;
 			}
 		}
