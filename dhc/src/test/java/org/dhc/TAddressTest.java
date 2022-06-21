@@ -1,5 +1,6 @@
 package org.dhc;
 
+import java.math.BigInteger;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -61,6 +62,18 @@ public class TAddressTest extends TestCase {
 		expiringMap.put("test", "test1");
 		expiringMap.put("test", "test2");
 		ThreadExecutor.sleep(Constants.MINUTE * 2);
+	}
+	
+	public void testXorInt() {
+		DhcAddress dhcAddress = new DhcAddress("8aTbk8t8Mc23x2mHRskTfESGbWd9gFwCz5oo");
+		TAddress tAddress = dhcAddress.getTAddress();
+		logger.info("tAddress.getBinary()  ={}", tAddress.getBinary());
+		for(int i = 0; i < 50; i++) {
+			TAddress xorAddress = tAddress.xor(i);
+			BigInteger distance = tAddress.xor(xorAddress);
+			logger.info("i={}\t distance={}\t\t\t\t xorAddress.getBinary() = {}", i, distance, xorAddress.getBinary());
+		}
+			
 	}
 	
 }

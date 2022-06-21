@@ -2,6 +2,13 @@ package org.dhc.util;
 
 import java.math.BigInteger;
 
+/**
+ * Truncated DhcAddress. Contains first 4 bites of DhcAddress (first 32 bits)
+ * 
+ * 
+ * @author dhc
+ *
+ */
 public class TAddress {
 	
 	private String address;
@@ -32,7 +39,7 @@ public class TAddress {
 		return new BigInteger(bytes);
 	}
 	
-	private BigInteger xor(TAddress other) {
+	public BigInteger xor(TAddress other) {
 		return toBigInteger().xor(other.toBigInteger());
 	}
 	
