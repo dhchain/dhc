@@ -49,7 +49,7 @@
 	 
   <target name="mk_installer" depends="create_run_jar">
 	    <mkinstaller input="${install.file}"
-	        output="izpack\output\installer.jar"
+	        output="izpack\output\dhc-full-installer.jar"
 	        basedir="izpack\installer"/>
   	    <delete dir="${dir.jarfile}/lib"/>
   	    <delete file="${dir.jarfile}/dhc.jar"/>
