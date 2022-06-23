@@ -60,19 +60,32 @@ public class SendTransactionAction extends AbstractAction implements Caller {
 	
 	private boolean validate() {
 		if(!CryptoUtil.isDhcAddressValid(recipient)) {
+			log("Address of recipient is not valid");
+			logger.info("Address of recipient {} is not valid", recipient);
 			return false;
 		}
 		try {
 			if(Double.parseDouble(amount) <= 0) {
+				log("Amount should be greater than zerod");
+				logger.info("Amount {} should be greater than zero", amount);
 				return false;
 			}
 			if(Long.parseLong(fee) < 0) {
+				log("Fee cannot be negative");
+				logger.info("Fee {} cannot be negative", fee);
 				return false;
 			}
 			if(expiringData != null) {
-				Long.parseLong(expire);
+				try {
+					Long.parseLong(expire);
+				} catch (Exception e) {
+					log("Please enter valid expire after number of blocks value");
+					logger.info("Please enter valid expire after number of blocks value");
+					return false;
+				}
 			}
 		} catch (Exception e) {
+			log(e.getMessage());
 			return false;
 		}
 		return true;
@@ -98,7 +111,7 @@ public class SendTransactionAction extends AbstractAction implements Caller {
 		load();
 		
 		if(!validate()) {
-			log("Please verify inputs");
+			//log("Please verify inputs");
 			return;
 		}
 
