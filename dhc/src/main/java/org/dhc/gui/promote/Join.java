@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -48,13 +49,22 @@ public class Join extends AbstractAction implements Caller {
 		JLabel label = new JLabel("Enter Passphrase:");
 		form.add(label);
 		
-		passwordField = new JPasswordField(45);
-		form.add(passwordField);
+		JPasswordField passwordFieldLocal = new JPasswordField(45);
+		form.add(passwordFieldLocal);
 		
 		JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JButton btnSubmit = new JButton("Submit");
 		btnSubmit.setAction(this);
 		btnSubmit.setText("Submit");
+		
+		btnSubmit.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		    	passwordField = passwordFieldLocal;
+		    }
+		});
+		
 		p.add(btnSubmit);
 		form.add(p);
 
@@ -68,12 +78,13 @@ public class Join extends AbstractAction implements Caller {
 			return;
 		}
 		String passphrase = StringUtil.trim(new String(passwordField.getPassword()));
+		passwordField = null;
 		PasswordHelper passwordHelper = new PasswordHelper(main.getKey());
 		if(!passwordHelper.verifyPassphrase(passphrase)) {
 			JOptionPane.showMessageDialog(main.getFrame(), "Passphrase entered was not correct. Try again.");
 			return;
 		}
-		passwordField = null;
+		
 		showJoinForm();
 	}
 
