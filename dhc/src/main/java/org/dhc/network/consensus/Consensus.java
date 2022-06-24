@@ -448,7 +448,7 @@ public class Consensus {
 			return;
 		}
 		
-		if(earlierBucketHash != null && earlierBucketHash.hasBothChildren()) {
+		if(earlierBucketHash != null && earlierBucketHash.hasBothChildren() && earlierBucketHash.isMined()) {
 			if(earlierBucketHash.hasChild(consensusHash)) {
 				logger.trace("{} {} sendNextProposal replace with earlier {}", blockchainIndex, earlierBucketHash.isMined(), earlierBucketHash.toStringFull());
 				parentBucketHash = earlierBucketHash;
@@ -465,7 +465,7 @@ public class Consensus {
 				}
 			}
 		} else {
-			logger.trace("earlierBucketHash is null or does not have both children so cannot use it");
+			logger.trace("earlierBucketHash is null or not mined or does not have both children so cannot use it");
 		}
 
 		

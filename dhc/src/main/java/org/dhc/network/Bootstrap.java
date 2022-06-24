@@ -175,6 +175,10 @@ public class Bootstrap {
 			if(!Peer.getPeersByNetworkIdentifier(networkIdentifier).isEmpty()) {
 				continue;
 			}
+			if(networkIdentifier.equals(Network.getInstance().getNetworkIdentifier())) {
+				logger.trace("Bootstrap.addPeers() - Cannot connect to yourself");
+				continue;
+			}
 			Peer foundPeer = Peer.getInstance(p.getInetSocketAddress());
 			foundPeer.setType(PeerType.TO);
 			calls.add(new Callable<Boolean>() {

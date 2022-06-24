@@ -97,6 +97,7 @@ public class ConnectMessage extends Message {
 		//this method will not be triggered by connectCandidate() but can be triggered from Bootstrap.connectPeers()
 		Bootstrap.getInstance().getCandidatePeers().remove(peer);
 		logger.trace("Failed to connect to candidate {}", peer.getInetSocketAddress());
+		logger.trace("peer.getSocket()={}", peer.getSocket());
 		logger.trace(e.getMessage(), e);
 	}
 
