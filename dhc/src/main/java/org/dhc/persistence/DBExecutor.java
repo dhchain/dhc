@@ -95,6 +95,14 @@ public abstract class DBExecutor {
 		rs.close();
 	}
 	
+	public void addView(DatabaseMetaData dbmd, String viewName, String viewStatement) throws Exception {
+		rs = dbmd.getTables(null, ConnectionPool.USER, viewName, null);
+		if (!rs.next()) {
+			s.execute(viewStatement);
+		}
+		rs.close();
+	}
+	
 	public void addIndex(DatabaseMetaData dbmd, String tableName, String indexName, String createIndexStatement) throws Exception {
 		rs = dbmd.getIndexInfo(null, ConnectionPool.USER, tableName, false, false);
 		boolean dataIndexAlreadyExists = false;

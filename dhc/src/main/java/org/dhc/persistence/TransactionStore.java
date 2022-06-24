@@ -259,6 +259,8 @@ public class TransactionStore {
 				
 				addNewColumn(dbmd, tableName, "timeStamp", "ALTER TABLE " + tableName + " ADD timeStamp bigint NOT NULL");
 				addIndex(dbmd, tableName, "trans_action_receiver", "CREATE INDEX trans_action_receiver ON " + tableName + "(receiver)");
+				addIndex(dbmd, tableName, "trans_action__id_desc", "CREATE UNIQUE INDEX trans_action_id_desc ON " + tableName + "(id desc)");
+				//addView(dbmd, "trans_action_desc".toUpperCase(), "CREATE VIEW trans_action_desc AS SELECT * FROM trans_action order by id desc FETCH FIRST 100 ROWS ONLY");
 				
 				//s.execute("ALTER TABLE trans_action ALTER COLUMN sender NULL");
 			}
@@ -432,19 +434,13 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select t.*, td.*, k.name, k.keyword " + 
-							" from trans_action t " + 
-							" left outer join transaction_data td on td.transactionId = t.transaction_id " + 
-							" left outer join keyword k on k.transactionId = t.transaction_id " + 
-							" where t.receiver = ? " + 
-							" union " + 
-							" select t.*, td.*, k.name, k.keyword " + 
-							" from trans_action t " + 
-							" left outer join transaction_data td on td.transactionId = t.transaction_id " + 
-							" left outer join keyword k on k.transactionId = t.transaction_id " + 
-							" where t.senderAddress = ? " + 
-							" order by id desc " + 
-							" FETCH FIRST 100 ROWS ONLY WITH UR";
+					String sql = "select t.*, td.*, k.name, k.keyword from ( " + 
+							"select * from (select * from trans_action t where t.receiver = ? order by id desc FETCH FIRST 100 ROWS ONLY) a " + 
+							"union " + 
+							"select * from (select * from trans_action t where t.senderAddress = ? order by id desc FETCH FIRST 100 ROWS ONLY) b ) t " + 
+							"left outer join transaction_data td on td.transactionId = t.transaction_id   " + 
+							"left outer join keyword k on k.transactionId = t.transaction_id " + 
+							"order by t.id desc  FETCH FIRST 100 ROWS ONLY WITH UR";
 					logger.trace("Function getTransactionsByAddress sql = {}, dhcAddress = {}", sql, dhcAddress.toString());
 					ps = conn.prepareStatement(sql);
 					int i = 1;
@@ -507,7 +503,7 @@ public class TransactionStore {
 							+ " left outer join transaction_data td on td.transactionId = t.transaction_id "
 							+ " left outer join keyword k on k.transactionId = t.transaction_id "
 							+ " where t.app = ? and t.senderAddress = ? "
-							+ " WITH UR";
+							+ " order by t.id desc FETCH FIRST 100 ROWS ONLY WITH UR";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
 					ps.setString(i++, app);
