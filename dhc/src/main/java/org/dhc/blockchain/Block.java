@@ -497,7 +497,12 @@ public class Block {
 					continue;
 				}
 				
-				
+				if (input.getOutputBlockIndex() == 0 && input.getOutputBlockHash() == null) {
+					logger.trace("This is the case when input should come from another transaction from the same block "
+							+ "which is not mined yet but that transaction is not there, input{} transaction {} this block {}", input, transaction, this);
+					inputsValid = false;
+					break;
+				}
 				// this checks that all transactions inputs come from the branch, no other
 				// branches
 				// but there is a possibility that some inputs already used in the branch
