@@ -66,7 +66,9 @@ public class Main {
 		if(!file.exists()) {
 			passwordHelper.createNewPassphrase();
 		} else {
-			if(password != null && !passwordHelper.verifyPassphrase(password)) {
+			if(password == null) {
+				passwordHelper.enterPassphrase();
+			} else if(password != null && !passwordHelper.verifyPassphrase(password)) {
 				passwordHelper.enterPassphrase();
 			}
 		}
