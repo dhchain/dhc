@@ -17,6 +17,7 @@ import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.BucketHashes;
 import org.dhc.blockchain.Trimmer;
+import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.util.Base58;
 import org.dhc.util.BoundedMap;
@@ -78,16 +79,17 @@ public class BlockStore {
 		BucketHashStore.getInstance().saveBucketHashes(block.getIndex(), block.getBlockHash(), block.getBucketHashes());
 		TransactionStore.getInstance().saveTransactions(block.getAllTransactions());
 		
-
-		long minCompeting = getMinCompeting();
-		if(minCompeting != 0) {
-			Blockchain blockchain = Blockchain.getInstance();// blockchain might return null if not initialized yet, so check if it is not null
-			if (blockchain != null && blockchain.getIndex() > minCompeting + 10) {
-				Trimmer.getInstance().runImmediately();
+		
+		if(!ChainSync.getInstance().isRunning()) {
+			long minCompeting = getMinCompeting();
+			if(minCompeting != 0) {
+				Blockchain blockchain = Blockchain.getInstance();// blockchain might return null if not initialized yet, so check if it is not null
+				if (blockchain != null && blockchain.getIndex() > minCompeting + 10) {
+					Trimmer.getInstance().runImmediately();
+				}
 			}
 		}
 
-		
 		Registry.getInstance().getPendingCrossShardTransactions().addCrossShardTransactions(block.getBlockHash());
 		Registry.getInstance().getPendingTransactions().process(block.getIndex());
 		
