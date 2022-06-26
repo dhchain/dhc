@@ -81,8 +81,8 @@ public class MempoolMouseAdapter extends MouseAdapter {
 		form.add(subform);
 		
 		
-		JPanel labelPanel = new JPanel(new GridLayout(9, 1));
-		JPanel fieldPanel = new JPanel(new GridLayout(9, 1));
+		JPanel labelPanel = new JPanel(new GridLayout(11, 1));
+		JPanel fieldPanel = new JPanel(new GridLayout(11, 1));
 		subform.add(labelPanel, BorderLayout.WEST);
 		subform.add(fieldPanel, BorderLayout.CENTER);
 		
@@ -181,6 +181,30 @@ public class MempoolMouseAdapter extends MouseAdapter {
 		fee.setOpaque( false );
 		fee.setEditable( false );
 		p.add(fee);
+		fieldPanel.add(p);
+		
+		label = new JLabel("Application:", JLabel.RIGHT);
+		labelPanel.add(label);
+				
+		p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JTextField app = new JTextField(36);
+		app.setText(transaction.getApp());
+		app.setBorder( null );
+		app.setOpaque( false );
+		app.setEditable( false );
+		p.add(app);
+		fieldPanel.add(p);
+		
+		label = new JLabel("Keywords:", JLabel.RIGHT);
+		labelPanel.add(label);
+				
+		p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JTextField keywords = new JTextField(36);
+		keywords.setText(transaction.getKeywords().toString());
+		keywords.setBorder( null );
+		keywords.setOpaque( false );
+		keywords.setEditable( false );
+		p.add(keywords);
 		fieldPanel.add(p);
 		
 		String data = transaction.getExpiringData() == null ? "": transaction.getExpiringData().getData();
