@@ -13,6 +13,7 @@ import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.BucketHashes;
 import org.dhc.blockchain.MissingBlock;
 import org.dhc.blockchain.MyAddresses;
+import org.dhc.blockchain.SendTransactionMessage;
 import org.dhc.blockchain.Transaction;
 import org.dhc.blockchain.TransactionMemoryPool;
 import org.dhc.network.BucketKey;
@@ -159,6 +160,15 @@ public class Consensus {
 		BucketHash earlierBucketHash = findEarlierBuckethashWithTheSameKey(bucketHash);
 		if(earlierBucketHash != null && earlierBucketHash.isBranchValid()) {
 			logger.trace("initiatePerLastBlock replace with earlier {}", earlierBucketHash.toStringFull());
+			Set<Transaction> transactionsToResend = new HashSet<>(myBranchTransactions);
+			transactionsToResend.removeAll(earlierBucketHash.getTransactions());
+			if(!transactionsToResend.isEmpty()) {
+				logger.info("Found {} transactions to resend from mempool {}", transactionsToResend.size(), transactionsToResend);
+				for(Transaction transaction: transactionsToResend) {
+					network.sendToAllMyPeers(new SendTransactionMessage(transaction));
+				}
+			}
+			
 			bucketHash = earlierBucketHash;
 		}
 

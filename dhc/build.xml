@@ -52,7 +52,7 @@
 	        output="izpack\output\dhc-full-installer.jar"
 	        basedir="izpack\installer"/>
   	    <delete dir="${dir.jarfile}/lib"/>
-  	    <delete file="${dir.jarfile}/dhc.jar"/>
+  	    <!--<delete file="${dir.jarfile}/dhc.jar"/> -->
   </target>
  
 </project> 

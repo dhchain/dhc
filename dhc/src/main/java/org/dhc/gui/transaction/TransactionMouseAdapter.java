@@ -195,17 +195,20 @@ public class TransactionMouseAdapter extends MouseAdapter {
 		p.add(app);
 		fieldPanel.add(p);
 		
-		label = new JLabel("Keywords:", JLabel.RIGHT);
-		labelPanel.add(label);
-				
-		p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		JTextField keywords = new JTextField(36);
-		keywords.setText(transaction.getKeywords().toString());
-		keywords.setBorder( null );
-		keywords.setOpaque( false );
-		keywords.setEditable( false );
-		p.add(keywords);
-		fieldPanel.add(p);
+		if(transaction.getKeywords() != null) {
+			label = new JLabel("Keywords:", JLabel.RIGHT);
+			labelPanel.add(label);
+					
+			p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			JTextArea keywords = new JTextArea();
+			keywords.setText(transaction.getKeywords().toString());
+			keywords.setLineWrap(true);
+			keywords.setWrapStyleWord(true);
+			keywords.setOpaque( false );
+			keywords.setEditable( false );
+			p.add(keywords);
+			fieldPanel.add(p);
+		}
 		
 		String data = transaction.getExpiringData() == null ? "": transaction.getExpiringData().getData();
 		
