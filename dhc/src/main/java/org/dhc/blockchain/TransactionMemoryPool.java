@@ -144,6 +144,10 @@ public class TransactionMemoryPool {
 				result.remove(transaction);
 				remove(transaction);
 			}
+			if (transaction.inputAlreadyUsed()) {
+				result.remove(transaction);
+				remove(transaction);
+			}
 		}
 		return result;
 

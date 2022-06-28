@@ -1028,4 +1028,19 @@ public class Transaction {
 		
 	}
 
+	public boolean inputAlreadyUsed() {
+		long minCompeting = BlockStore.getInstance().getMinCompeting();
+		if(minCompeting != 0) {
+			return false;
+		}
+		
+		for (TransactionInput input : getInputs()) {
+			if(input.inputAlreadyUsed()) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
 }

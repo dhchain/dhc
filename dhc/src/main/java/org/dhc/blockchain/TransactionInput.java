@@ -111,7 +111,7 @@ public class TransactionInput {
 				for (Transaction transaction : transactions) {
 					logger.trace("Transaction {}", transaction);
 				}
-				logger.trace("Duplicate input                      {}", input);
+				logger.trace("Existing input that was already used {}", input);
 				return true;
 			}
 		}
@@ -182,6 +182,29 @@ public class TransactionInput {
 
 	public void findMissingOutput() {
 		Registry.getInstance().getGetTransaction().send(this);
+	}
+
+	/**
+	 * only finds duplicate input if there are no branches
+	 * @return true if there is duplicate input and false otherwise
+	 */
+	public boolean inputAlreadyUsed() {
+		long minCompeting = BlockStore.getInstance().getMinCompeting();
+		if(minCompeting != 0) {
+			return false;
+		}
+		Set<TransactionInput> set = Blockchain.getInstance().getByOutputId(getOutputId());
+		for(TransactionInput input: set) {
+			Set<Transaction> transactions = Blockchain.getInstance().getTransaction(input.getInputTransactionId());
+			logger.trace("Found {} transaction for input transaction id {}", transactions.size(), input.getInputTransactionId());
+			for (Transaction transaction : transactions) {
+				logger.trace("Transaction {}", transaction);
+			}
+			logger.trace("Existing input that was already used {}", input);
+			return true;
+		}
+		
+		return false;
 	}
 
 	
