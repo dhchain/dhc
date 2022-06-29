@@ -108,13 +108,14 @@ public class ChainRest {
 		List<Block> blocks = null;
 		do {
 			List<Block> loopBlocks = BlockStore.getInstance().restore();
-			if(loopBlocks.equals(loopBlocks)) {
+			if(loopBlocks.equals(blocks)) {
 				ThreadExecutor.sleep(Constants.SECOND);
 			}
 			blocks = loopBlocks;
 			for(Block block: blocks) {
 				processBlock(block);
 			}
+			logger.info("networkPower={}, blockchainPower={}", Network.getInstance().getPower(), Blockchain.getInstance().getPower());
 		} while (!blocks.isEmpty());
 	}
 	
