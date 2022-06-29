@@ -115,7 +115,7 @@ public class ChainSync {
 		Blockchain blockchain = Blockchain.getInstance();
 		pendingIndexes.setIndex(blockchain.getIndex());
 		for(Peer peer: list) {
-			peer.send(new SyncMessage(next()));
+			peer.send(new SyncMessage(next(peer)));
 			logger.trace("ChainSynchronizer to peer {}", peer);
 		}
 
@@ -126,6 +126,7 @@ public class ChainSync {
 				long index = blockchain.getIndex();
 				wait(Constants.SECOND * 1);
 				if(blockchain.getIndex() > index) {
+					count = 0; //reset count since blockchain still growing
 					continue;
 				}
 				removedClosed(myPeers);
@@ -161,6 +162,7 @@ public class ChainSync {
 				reason.startsWith("Not my blocks") 
 				|| reason.startsWith("This peer is still synchronizing")
 				|| reason.startsWith("Block is not valid")
+				|| reason.startsWith("Peer timed out getting block")
 		)) {
 			skipPeers.add(peer);
 		}
@@ -184,8 +186,8 @@ public class ChainSync {
 		}
 	}
 
-	public long next() {
-		return pendingIndexes.next();
+	public long next(Peer peer) {
+		return pendingIndexes.next(peer);
 	}
 	
 	public void unRegister(long index) {

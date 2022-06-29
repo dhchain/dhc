@@ -92,7 +92,7 @@ public class SyncReplyMessage extends Message {
 			ThreadExecutor.sleep(10000);
 		}
 		
-		peer.send(new SyncMessage(synchronizer.next()));
+		peer.send(new SyncMessage(synchronizer.next(peer)));
 		
 	}
 
