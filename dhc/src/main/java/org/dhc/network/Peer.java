@@ -371,6 +371,7 @@ public class Peer {
 	}
 	
 	public Message sendSync(Message message, long timeout) {
+		long start = System.currentTimeMillis();
 		String correlationId = message.getCorrelationId();
 		try {
 			PeerLock lock = new PeerLock(timeout, message, this);
@@ -383,6 +384,7 @@ public class Peer {
 			return lock.getResponse();
 		} finally {
 			locks.remove(correlationId);
+			logger.trace("sendSync took {} ms for message {}", System.currentTimeMillis() - start, message);
 		}
 	}
 	

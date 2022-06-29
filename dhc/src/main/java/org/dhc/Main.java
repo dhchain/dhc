@@ -64,7 +64,11 @@ public class Main {
 		passwordHelper = new PasswordHelper(key);
 		File file = new File(key);
 		if(!file.exists()) {
-			passwordHelper.createNewPassphrase();
+			if(password == null) {
+				passwordHelper.createNewPassphrase();
+			} else if(password != null) {
+				passwordHelper.generateKey(password);
+			}
 		} else {
 			if(password == null) {
 				passwordHelper.enterPassphrase();
