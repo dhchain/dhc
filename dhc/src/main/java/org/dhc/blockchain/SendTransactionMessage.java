@@ -21,16 +21,19 @@ public class SendTransactionMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
-		logger.trace("START");
+		logger.trace("START transaction {}", transaction);
 		if(ChainSync.getInstance().isRunning()) {
+			logger.trace("END chainsync is running transaction {}", transaction);
 			return;
 		}
 		
 		if(alreadySent(toString())) {
+			logger.trace("END already sent transaction {}", transaction);
 			return;
 		}
 		
 		if(!transaction.isTransactionDataValid()) {
+			logger.trace("END transaction data is not valid transaction {}", transaction);
 			return;
 		}
 		
@@ -39,6 +42,7 @@ public class SendTransactionMessage extends Message {
 		}
 
 		if(!DhcAddress.getMyDhcAddress().isFromTheSameShard(transaction.getSenderDhcAddress(), Blockchain.getInstance().getPower())) {
+			logger.trace("END not sending because it is cross shard transaction {}", transaction);
 			//returning because this is not a cross shard transaction message
 			return;
 		}
