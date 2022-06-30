@@ -317,7 +317,7 @@ public class Transaction {
 		int power = blockchain == null? 0: Blockchain.getInstance().getPower();
 		return "sender=" + getSenderDhcAddress().getBinary(power) + " receiver=" + getReceiver().getBinary(power)
 				+ " transactionId=" + transactionId + (blockHash == null? "": " blockHash=" + getBlockIndex() + "-" + blockHash)
-				+ (expiringData == null? "": ", expiringData=" + expiringData) + (app == null? "": ", app=" + app)
+				+ (app == null? "": ", app=" + app)
 				+ (keywords == null? "": ", keywords=" + keywords) + (value == null? "": " value=" + value.toNumberOfCoins()) + (fee == null? "": " fee=" + fee.toNumberOfCoins())
 				+ " inputsValue=" + getInputsValue().toNumberOfCoins() + " outputsValue=" + getOutputsValue().toNumberOfCoins()
 				+ " type=" + type + " #inputs=" + inputs.size() + " #outputs=" + outputs.size() + " signatureValid=" + verifySignature()

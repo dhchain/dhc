@@ -41,7 +41,7 @@ public class TransactionMemoryPool {
 				TransactionOutput output = TransactionOutputFinder.getByOutputId(input.getOutputId(), outputs);
 				if (output == null) {
 					dependantTransactions.put(input.getOutputId(), transaction);
-					logger.info("dependency needed for transaction {}", transaction);
+					logger.trace("dependency needed for transaction {}", transaction);
 					return true;
 				}
 			}
