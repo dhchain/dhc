@@ -385,6 +385,7 @@ public class Transaction {
 		
 		if(!first.equals(entry)) {
 			logger.info("First {} != entry {}", first, entry);
+			logger.info("getMerklePath()={}", getMerklePath());
 			return false;
 		}
 		

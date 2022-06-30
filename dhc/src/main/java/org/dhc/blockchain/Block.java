@@ -184,7 +184,6 @@ public class Block {
 		if (!myBranchTransactions.containsAll(allTransactions)) {
 			logger.info("****************************************************************");
 			logger.info("Invalid block, not all transactions have inputs from the branch {}", this);
-			allTransactions.removeAll(myBranchTransactions);
 			new InvalidTransactions(this).process();
 			return false;
 		}
@@ -506,7 +505,7 @@ public class Block {
 				// this checks that all transactions inputs come from the branch, no other
 				// branches
 				// but there is a possibility that some inputs already used in the branch
-				if (input.getOutputBlockIndex() >= branchIndex && !blockhashes.contains(input.getOutputBlockHash())) {
+				if (input.getOutputBlockIndex() <= getIndex() && input.getOutputBlockIndex() >= branchIndex && !blockhashes.contains(input.getOutputBlockHash())) {
 					logger.trace("Input does not come from the branch, input{} transaction {} this block {}", input, transaction, this);
 					logger.trace("branchIndex = {}, blockhashes = {}", branchIndex, blockhashes);
 					logger.trace("Output for the input comes from block {}-{}, it is not from the same branch as this block {}-{}", input.getOutputBlockIndex(), input.getOutputBlockHash(), getIndex(), getBlockHash());
@@ -560,7 +559,7 @@ public class Block {
 	}
 	
 	public boolean hasOutputsForAllInputs() {
-		Set<Transaction>  set = getAllTransactions();
+		Set<Transaction>  set = getTransactions();
 		if(set == null) {
 			return true;
 		}

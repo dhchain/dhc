@@ -153,6 +153,11 @@ public class TransactionInput {
 			}
 			return false;
 		}
+		
+		if(getOutputBlockHash() == null && output.getOutputBlockHash() != null) {
+			setOutputBlockIndex(output.getOutputBlockIndex());
+			setOutputBlockHash(output.getOutputBlockHash());
+		}
 
 		return true;
 	}
