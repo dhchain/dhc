@@ -87,8 +87,8 @@ public class TransactionMemoryPool {
 				for(TransactionOutput output: transaction.getOutputs()) {
 					Transaction dependantTransaction = dependantTransactions.remove(output.getOutputId());
 					if(dependantTransaction != null) {
-						logger.info("found dependantTransaction {}", dependantTransaction);
-						logger.info("it depended on transaction  {}", transaction);
+						logger.trace("found dependantTransaction {}", dependantTransaction);
+						logger.trace("it depended on transaction  {}", transaction);
 						add(dependantTransaction);
 					}
 				}
@@ -149,6 +149,14 @@ public class TransactionMemoryPool {
 				remove(transaction);
 			}
 		}
+		if(!result.isEmpty()) {
+			logger.info("Number of transactions in mempool is {}", result.size());
+			for (Transaction transaction : result) {
+				logger.trace("Pool transaction {}", transaction);
+			}
+		}
+		
+		
 		return result;
 
 	}
