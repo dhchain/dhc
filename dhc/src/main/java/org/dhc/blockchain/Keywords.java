@@ -13,6 +13,7 @@ public class Keywords {
 
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	public static final int KEYWORD_MAX_LENGTH = 64;
+	public static final int MAX_NUMBER_OF_KEYWORDS = 10;
 	
 	private Map<String, String> map = new HashMap<String, String>();
 	private String hash;
