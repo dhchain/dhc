@@ -107,6 +107,7 @@ public class ChainRest {
 		Trimmer.getInstance().runImmediately();
 		List<Block> blocks = null;
 		do {
+			PeerSync.getInstance().executeAndWait();
 			List<Block> loopBlocks = BlockStore.getInstance().restore();
 			if(loopBlocks.equals(blocks)) {
 				ThreadExecutor.sleep(Constants.SECOND);
