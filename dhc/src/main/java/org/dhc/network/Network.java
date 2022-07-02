@@ -49,7 +49,7 @@ public class Network {
 			server.setPort(port);
 			server.start();
 		}
-		PeerSync.getInstance().executeNow();
+		PeerSync.getInstance().executeAndWait();
 	}
 	
 	public void stop() {

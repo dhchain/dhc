@@ -30,6 +30,7 @@ import org.dhc.util.Difficulty;
 import org.dhc.util.Listeners;
 import org.dhc.util.Registry;
 import org.dhc.util.SharedLock;
+import org.dhc.util.ThreadExecutor;
 import org.dhc.util.Wallet;
 
 public class Consensus {
@@ -138,6 +139,10 @@ public class Consensus {
 		
 		if(power < Blockchain.getInstance().getPower()) {
 			ChainRest.getInstance().execute();
+			if(ChainRest.getInstance().isRunning()) {
+				ThreadExecutor.sleep(Constants.SECOND);
+			}
+			logger.info("Network power is less than blockchain power");
 			throw new ResetMiningException("Network power is less than blockchain power");
 			// if previous blocks has higher power (smaller shards) then new mining block might contain inputs that were already spent
 			// in shards that not in our blockchain. So we can not mine a block which have wider shard than any previous blocks

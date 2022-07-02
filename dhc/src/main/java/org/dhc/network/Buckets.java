@@ -122,7 +122,7 @@ public class Buckets {
 			}
 
 			if(currentPower > getPower()) {
-				ChainRest.getInstance().execute();
+				ChainRest.getInstance().executeAsync();
 			}
 			currentPower = getPower();
 

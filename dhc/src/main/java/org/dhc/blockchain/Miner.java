@@ -2,8 +2,6 @@ package org.dhc.blockchain;
 
 import java.util.concurrent.locks.Lock;
 
-import org.dhc.network.ChainRest;
-import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.PeerSync;
 import org.dhc.network.consensus.BlockchainIndexStaleException;
@@ -43,9 +41,6 @@ public class Miner {
 						break;
 					}
 					try {
-						if(!canMine()) {
-							continue;
-						}
 						mine();
 					} catch (BlockchainIndexStaleException e) {
 						logger.trace("\n");
@@ -60,17 +55,6 @@ public class Miner {
 				logger.info("Miner END");
 			}
 		});
-	}
-	
-	private boolean canMine() throws InterruptedException {
-		ChainSync.getInstance().ifRunningThenWait();
-		
-		if(Network.getInstance().getPower() < Blockchain.getInstance().getPower()) {
-			ChainRest.getInstance().execute();
-			ChainRest.getInstance().ifRunningThenWait();
-			return false;
-		}
-		return true;
 	}
 
 	public void mine() {

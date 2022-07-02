@@ -1,9 +1,6 @@
 package org.dhc.network;
 
-import org.dhc.util.Constants;
-import org.dhc.util.ThreadExecutor;
 import org.dhc.util.DhcLogger;
-import org.dhc.util.DhcRunnable;
 
 public class PeerSync {
 
@@ -18,23 +15,6 @@ public class PeerSync {
 	
 	private PeerSync() {
 		
-	}
-	
-	public void start() {
-		schedule();
-	}
-	
-	private void schedule() {
-		ThreadExecutor.getInstance().schedule(new DhcRunnable("PeerSynchronizer") {
-			
-			@Override
-			public void doRun() {
-				schedule();
-				executeNow();
-				
-			}
-		}, Constants.HOUR * 24);
-
 	}
 	
 	public void executeAndWait() {

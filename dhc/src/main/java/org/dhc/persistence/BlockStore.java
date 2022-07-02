@@ -85,7 +85,7 @@ public class BlockStore {
 			if(minCompeting != 0) {
 				Blockchain blockchain = Blockchain.getInstance();// blockchain might return null if not initialized yet, so check if it is not null
 				if (blockchain != null && blockchain.getIndex() > minCompeting + 10) {
-					Trimmer.getInstance().runImmediately();
+					Trimmer.getInstance().runAsync();
 				}
 			}
 		}

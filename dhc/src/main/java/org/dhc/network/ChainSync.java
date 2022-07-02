@@ -20,6 +20,13 @@ public class ChainSync {
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	private static final ChainSync instance = new ChainSync();
 	
+	private Map<Peer, Peer> myPeers = new ConcurrentHashMap<Peer, Peer>();
+	private long lastBlockchainIndex;
+	private PendingIndexes pendingIndexes = new PendingIndexes();
+	private List<Peer> skipPeers = new ArrayList<>();
+	private volatile boolean running;
+	private ReentrantLock lock = MajorRunnerLock.getInstance().getLock();
+	
 	public static ChainSync getInstance() {
 		return instance;
 	}
@@ -28,20 +35,25 @@ public class ChainSync {
 		
 	}
 
-	private Map<Peer, Peer> myPeers = new ConcurrentHashMap<Peer, Peer>();
-	private long lastBlockchainIndex;
-	private PendingIndexes pendingIndexes = new PendingIndexes();
-	private List<Peer> skipPeers = new ArrayList<>();
-	private ReentrantLock lock = new ReentrantLock();
-	
 	public void sync() {
 		if(!lock.tryLock()) {
 			return;
 		}
 		
+		if(running) {
+			return;
+		}
+		
+		running = true;
+		
 		try {
 			Trimmer.getInstance().runImmediately();
 			Network network = Network.getInstance();
+			network.reloadBuckets();
+			if(network.getPower() < Blockchain.getInstance().getPower()) {
+				ChainRest.getInstance().execute();
+			}
+			
 			List<Peer> myPeers;
 			while(true) {
 				network.reloadBuckets();
@@ -60,12 +72,11 @@ public class ChainSync {
 			logger.info("Pending nodes queue size: {}", Blockchain.getInstance().getQueueSize());
 			logger.info("Pending blocks size: {}", Blockchain.getInstance().getNumberOfPendingBlocks());
 			
-			network.reloadBuckets();
-			if(network.getPower() < Blockchain.getInstance().getPower()) {
-				ChainRest.getInstance().execute();
-			}
+			
 		} finally {
+			running = false;
 			lock.unlock();
+			
 			myPeers.clear();
 		}
 	}
@@ -206,11 +217,6 @@ public class ChainSync {
 		}
 		lock.unlock();
 		return false;
-	}
-	
-	public void ifRunningThenWait() {
-		lock.lock();
-		lock.unlock();
 	}
 
 	public long getLastBlockchainIndex() {

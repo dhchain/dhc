@@ -3,16 +3,11 @@ package org.dhc.network;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.BucketHashes;
-import org.dhc.blockchain.Trimmer;
 import org.dhc.persistence.BlockStore;
 import org.dhc.persistence.BucketHashStore;
 import org.dhc.util.BoundedMap;
@@ -29,82 +24,80 @@ public class ChainRest {
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
 	private static final ChainRest instance = new ChainRest();
-	private final BoundedMap<String, Block> map = new BoundedMap<>(10);
 	
-	private volatile boolean running;
+	private final BoundedMap<String, Block> map = new BoundedMap<>(10);
 	private boolean failed;
-
-	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-	private final Condition condition = readWriteLock.writeLock().newCondition();
+	private volatile boolean running;
+	private ReentrantLock lock = MajorRunnerLock.getInstance().getLock();
 
 	public static ChainRest getInstance() {
 		return instance;
 	}
-
+	
+	public void executeAsync() {
+		ThreadExecutor.getInstance().execute(new DhcRunnable("ChainRest") {
+			public void doRun() {
+				execute();
+			}
+		});
+	}
 	
 	public void execute() {
-		if (isRunning()) {
+		if (!lock.tryLock()) {
 			return;
 		}
 		
-		Lock writeLock = readWriteLock.writeLock();
-		writeLock.lock();
-		try {
-			if (isRunning()) {
-				return;
-			}
-			setRunning(true);
-		} finally {
-			writeLock.unlock();
-			
+		if(running) {
+			return;
 		}
+		
+		running = true;
 
-		ThreadExecutor.getInstance().execute(new DhcRunnable("ChainRestorer find") {
-			public void doRun() {
-				Network network = Network.getInstance();
-				long start = System.currentTimeMillis();
-				logger.info("START ChainRestorer networkPower={}, blockchainPower={}", network.getPower(), Blockchain.getInstance().getPower());
-				int attemptNumber = 0;
-				
-				try {
-					
-					while(true) {
-						logger.info("ChainRestorer attempt {}", attemptNumber++);
-						if(attemptNumber > 10) {
-							logger.info("ChainRestorer exiting, too many attempts");
-							PeerSync.getInstance().executeAndWait();
-							break;
-						}
-						network.reloadBuckets();
-						failed = false;
-						doExecute();
-						int networkPower = network.getPower();
-						int maxPower = Blockchain.getInstance().getPower();
-						if(networkPower < maxPower) {
-							PeersFinder.getInstance().findPeers();
-							logger.trace("networkPower {} < maxPower {}", networkPower, maxPower);
-							continue;
-						}
-						if(failed == false) {
-							break;
-						}
-					}
-					Map<Long, Long> map = BlockStore.getInstance().getPowerReport();
-					logger.info("Report for blocks power: {}, networkPower={}, blockchainPower={}", map, network.getPower(), Blockchain.getInstance().getPower());
-					
-				} finally {
-					setRunning(false);
-					logger.info("END ChainRestorer. Took {} ms. Number of attempts {}", System.currentTimeMillis() - start, attemptNumber);
-					Bootstrap.getInstance().navigate(network.getAllPeers(), TAddress.getMyTAddress());
+		try {
+
+			Network network = Network.getInstance();
+			long start = System.currentTimeMillis();
+			logger.info("START ChainRestorer networkPower={}, blockchainPower={}", network.getPower(), Blockchain.getInstance().getPower());
+			int attemptNumber = 0;
+
+			while (true) {
+				logger.info("ChainRestorer attempt {}", attemptNumber++);
+				if (attemptNumber > 10) {
+					logger.info("ChainRestorer exiting, too many attempts");
+					PeerSync.getInstance().executeAndWait();
+					break;
+				}
+				network.reloadBuckets();
+				failed = false;
+				doExecute();
+				int networkPower = network.getPower();
+				int maxPower = Blockchain.getInstance().getPower();
+				if (networkPower < maxPower) {
+					PeersFinder.getInstance().findPeers();
+					logger.trace("networkPower {} < maxPower {}", networkPower, maxPower);
+					continue;
+				}
+				if (failed == false) {
+					break;
 				}
 			}
-		});
+			Map<Long, Long> map = BlockStore.getInstance().getPowerReport();
+			logger.info("Report for blocks power: {}, networkPower={}, blockchainPower={}", map, network.getPower(),
+					Blockchain.getInstance().getPower());
+			logger.info("END ChainRestorer. Took {} ms. Number of attempts {}", System.currentTimeMillis() - start, attemptNumber);
+
+		} finally {
+			running = false;
+			lock.unlock();
+			
+		}
+		
+		Bootstrap.getInstance().navigate(Network.getInstance().getAllPeers(), TAddress.getMyTAddress());
 
 	}
 
 	private void doExecute() {
 		logger.info("ChainRestorer doExecute()");
-		Trimmer.getInstance().runImmediately();
 		List<Block> blocks = null;
 		do {
 			PeerSync.getInstance().executeAndWait();
@@ -262,45 +255,8 @@ public class ChainRest {
 		putFoundBlock(combinedBlock, blocks);
 	}
 
-	public void setRunning(boolean running) {
-		Lock writeLock = readWriteLock.writeLock();
-		writeLock.lock();
-		try {
-			this.running = running;
-			if (running == false) {
-				condition.signalAll();
-			}
-		} finally {
-			writeLock.unlock();
-			
-		}
-
-	}
-	
-	private boolean isRunning() {
-		Lock readLock = readWriteLock.readLock();
-		readLock.lock();
-		try {
-			return running;
-		} finally {
-			readLock.unlock();
-			
-		}
-	}
-	
-	public void ifRunningThenWait() throws InterruptedException {
-		Lock writeLock = readWriteLock.writeLock();
-		writeLock.lock();
-		try {
-			if(isRunning()) {
-				
-				condition.await(Constants.MINUTE, TimeUnit.MILLISECONDS);
-				
-			}
-		} finally {
-			writeLock.unlock();
-			
-		}
+	public boolean isRunning() {
+		return running;
 	}
 
 }

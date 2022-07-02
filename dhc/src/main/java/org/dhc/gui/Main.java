@@ -28,9 +28,7 @@ import javax.swing.border.EmptyBorder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
-import org.dhc.network.ChainRest;
 import org.dhc.network.Network;
-import org.dhc.network.PeerSync;
 import org.dhc.persistence.DBExecutor;
 import org.dhc.util.BlockEvent;
 import org.dhc.util.Coin;
@@ -293,10 +291,9 @@ public class Main {
 		
 		blockchain.start();
 
-		PeerSync.getInstance().start();
-		Registry.getInstance().getMiner().start();
 		network.printBuckets();
-		ChainRest.getInstance().execute();
+		Registry.getInstance().getMiner().start();
+
 		logger.info("Main.start() completed");
 		showMenu();
 	}
