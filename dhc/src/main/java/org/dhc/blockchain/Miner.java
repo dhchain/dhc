@@ -2,6 +2,7 @@ package org.dhc.blockchain;
 
 import java.util.concurrent.locks.Lock;
 
+import org.dhc.network.MajorRunnerLock;
 import org.dhc.network.Network;
 import org.dhc.network.PeerSync;
 import org.dhc.network.consensus.BlockchainIndexStaleException;
@@ -41,6 +42,7 @@ public class Miner {
 						break;
 					}
 					try {
+						MajorRunnerLock.getInstance().ifLockedThenWait();
 						mine();
 					} catch (BlockchainIndexStaleException e) {
 						logger.trace("\n");

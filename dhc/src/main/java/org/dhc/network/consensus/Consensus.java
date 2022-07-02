@@ -30,7 +30,6 @@ import org.dhc.util.Difficulty;
 import org.dhc.util.Listeners;
 import org.dhc.util.Registry;
 import org.dhc.util.SharedLock;
-import org.dhc.util.ThreadExecutor;
 import org.dhc.util.Wallet;
 
 public class Consensus {
@@ -138,10 +137,7 @@ public class Consensus {
 		bucketKeys.add(0, "");
 		
 		if(power < Blockchain.getInstance().getPower()) {
-			ChainRest.getInstance().execute();
-			if(ChainRest.getInstance().isRunning()) {
-				ThreadExecutor.sleep(Constants.SECOND);
-			}
+			ChainRest.getInstance().executeAsync();// At this moment consensus holds shared lock so we don't want to wait long
 			logger.info("Network power is less than blockchain power");
 			throw new ResetMiningException("Network power is less than blockchain power");
 			// if previous blocks has higher power (smaller shards) then new mining block might contain inputs that were already spent

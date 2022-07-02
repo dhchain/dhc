@@ -28,7 +28,7 @@ public class ChainRest {
 	private final BoundedMap<String, Block> map = new BoundedMap<>(10);
 	private boolean failed;
 	private volatile boolean running;
-	private ReentrantLock lock = MajorRunnerLock.getInstance().getLock();
+	private final ReentrantLock lock = MajorRunnerLock.getInstance().getLock();
 
 	public static ChainRest getInstance() {
 		return instance;
@@ -59,6 +59,10 @@ public class ChainRest {
 			long start = System.currentTimeMillis();
 			logger.info("START ChainRestorer networkPower={}, blockchainPower={}", network.getPower(), Blockchain.getInstance().getPower());
 			int attemptNumber = 0;
+			if(network.getPower() < Blockchain.getInstance().getPower()) {
+				PeerSync.getInstance().executeAndWait();
+			}
+			
 
 			while (true) {
 				logger.info("ChainRestorer attempt {}", attemptNumber++);
@@ -100,7 +104,7 @@ public class ChainRest {
 		logger.info("ChainRestorer doExecute()");
 		List<Block> blocks = null;
 		do {
-			PeerSync.getInstance().executeAndWait();
+			
 			List<Block> loopBlocks = BlockStore.getInstance().restore();
 			if(loopBlocks.equals(blocks)) {
 				ThreadExecutor.sleep(Constants.SECOND);
