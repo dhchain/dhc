@@ -187,19 +187,20 @@ public class Peer {
 					return;
 				}
 				localSocket = new Socket();
-
+				long start = System.currentTimeMillis();
 				try {
 					logger.trace("Try to connect to inetSocketAddress = {}, Peer@{}", inetSocketAddress, super.hashCode());
 					localSocket.connect(inetSocketAddress, (int) Constants.MINUTE);
 					
 				} catch (IOException e) {
+					logger.trace("Failed in {} ms to connect to socket inetSocketAddress = {}, Peer@{}", System.currentTimeMillis() - start, inetSocketAddress, super.hashCode());
 					close();
 					throw e;
 				}
 				logger.trace("socket before {}", socket);
 				socket = localSocket;
 				logger.trace("socket after  {}", socket);
-				logger.trace("Connected to socket {}, Peer@{}", socketToString(), super.hashCode());
+				logger.trace("It took {} ms to be connected to socket {}, Peer@{}", System.currentTimeMillis() - start, socketToString(), super.hashCode());
 				
 			} finally {
 				logger.trace("Unlocked connectSocket() for Peer@{}", super.hashCode());
