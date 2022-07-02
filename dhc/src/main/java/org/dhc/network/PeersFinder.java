@@ -48,7 +48,7 @@ public class PeersFinder {
 				}
 				wait(Constants.SECOND * 10);
 				if(!this.peers.isEmpty()) {
-					logger.info("this.peers.size()={}", this.peers.size());
+					logger.info("Number of peers that have not responded to FindNodeRequestMessage within 10 second: {}", this.peers.size());
 					for(Peer peer: this.peers) {
 						logger.info("peer {}", peer);
 					}
@@ -87,7 +87,7 @@ public class PeersFinder {
 				}
 				wait(Constants.SECOND * 10);
 				if(!this.peers.isEmpty()) {
-					logger.info("this.peers.size()={}", this.peers.size());
+					logger.info("Number of peers that have not responded to GetPeersMessage within 10 second: {}", this.peers.size());
 					for(Peer peer: this.peers) {
 						logger.info("peer {}", peer);
 					}
