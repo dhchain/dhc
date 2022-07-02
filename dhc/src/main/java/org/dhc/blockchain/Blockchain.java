@@ -300,13 +300,17 @@ public class Blockchain {
 		}
 		Block block = tree.getByHash(hash);
 		if(block!= null && !block.isValid()) {
-			throw new RuntimeException("getByHash c " + block);
+			throw new RuntimeException("getByHash invalid block " + block);
 		}
 		return block;
 	}
 
 	public List<Block> getByPreviousHash(String previousHash) {
 		return tree.getByPreviousHash(previousHash);
+	}
+	
+	public List<String> getBlockhashesByPreviousHash(String previousHash) {
+		return tree.getBlockhashesByPreviousHash(previousHash);
 	}
 
 	private void sync() {
@@ -325,14 +329,14 @@ public class Blockchain {
 		return tree.getByIndex(index);
 	}
 
-	public void remove(Block block) {
+	public void remove(String blockhash) {
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			tree.remove(block);
-			logger.info("{}-{} Removed block {}", block.getBucketKey(), block.getIndex(), block);
-			Registry.getInstance().getBannedBlockhashes().add(block.getBlockHash());
+			tree.remove(blockhash);
+			logger.info("Removed blockhash {}", blockhash);
+			Registry.getInstance().getBannedBlockhashes().add(blockhash);
 		} finally {
 			writeLock.unlock();
 			long duration = System.currentTimeMillis() - start;
@@ -391,15 +395,14 @@ public class Blockchain {
 		writeLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			Block block = getByHash(blockHash);
-			if(block == null) {
+			if(!contains(blockHash)) {
 				return;
 			}
-			List<Block> blocks = getByPreviousHash(blockHash);
-			for(Block b: blocks) {
-				removeBranch(b.getBlockHash());
+			List<String> blockhashes = getBlockhashesByPreviousHash(blockHash);
+			for(String hash: blockhashes) {
+				removeBranch(hash);
 			}
-			remove(block);
+			remove(blockHash);
 			notifyConsensus();
 		} finally {
 			writeLock.unlock();

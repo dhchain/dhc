@@ -62,13 +62,13 @@ public class Tree {
 			} catch (RuntimeException e) {
 				logger.error(e.getMessage(), e);
 				ConnectionPool.getInstance().rollback();
-				remove(node.getBlock());
+				remove(node.getBlock().getBlockHash());
 				throw e;
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 				ConnectionPool.getInstance().rollback();
 				logger.error("Could not save block {}", node.getBlock());
-				remove(node.getBlock());
+				remove(node.getBlock().getBlockHash());
 				throw new RuntimeException(e);
 			}
 			
@@ -182,14 +182,14 @@ public class Tree {
 		}
 	}
 
-	public void remove(Block block) {
+	public void remove(String blockhash) {
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		long start = System.currentTimeMillis();
 		try {
 			ConnectionPool.getInstance().begin();
-			BlockStore.getInstance().removeBlock(block.getBlockHash());
-			TransactionMemoryPool.getInstance().removeByOutputBlockhash(block.getBlockHash());
+			BlockStore.getInstance().removeBlock(blockhash);
+			TransactionMemoryPool.getInstance().removeByOutputBlockhash(blockhash);
 			ConnectionPool.getInstance().commit();
 			resetLastIndex();
 		} catch (Exception e) {
@@ -338,6 +338,23 @@ public class Tree {
 			//logger.trace("unlock");
 		}
 	}
+	
+	public List<String> getBlockhashesByPreviousHash(String previousHash) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return BlockStore.getInstance().getBlockhashesByPreviousHash(previousHash);
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+	
 	
 	public int getLastAveragePower() {
 		return lastAveragePower;

@@ -204,6 +204,7 @@ public class BlockStore {
 
 	public void removeBlock(String blockHash) throws Exception {
 		logger.trace("START removeBlock() blockHash={}", blockHash);
+		Block block = getByBlockhash(blockHash);
 		new DBExecutor() {
 			public void doWork() throws Exception {
 				String sql = "delete from block where blockhash = ?";
@@ -220,6 +221,7 @@ public class BlockStore {
 		setMinCompeting(-1);
 		invalidateCachedValue(blockHash);
 		logger.trace("END removeBlock() blockHash={}", blockHash);
+		logger.info("{}-{} Removed block {}", block.getBucketKey(), block.getIndex(), block);
 	}
 
 	public List<Block> getByIndex(long index) {
@@ -330,6 +332,28 @@ public class BlockStore {
 			logger.trace("Will call getBucketHashes by {}", block.getBlockHash());
 			BucketHashes bucketHashes = BucketHashStore.getInstance().getBucketHashes(block.getBlockHash());
 			block.setBucketHashes(bucketHashes);
+		}
+
+		return result;
+	}
+	
+	public List<String> getBlockhashesByPreviousHash(String previousHash) {
+		List<String> result = new ArrayList<>();
+
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select blockHash from block where previousHash = ?";
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, previousHash);
+					rs = ps.executeQuery();
+					while (rs.next()) {
+						result.add(rs.getString("blockHash"));
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 		}
 
 		return result;
@@ -903,6 +927,28 @@ public class BlockStore {
 					rs = ps.executeQuery();
 					if (rs.next()) {
 						result[0] = rs.getLong("nextBits");
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		return result[0];
+	}
+	
+	public long getIndexByBlockhash(String blockhash) {
+		long[] result = new long[1];
+		result[0] = 0;
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select index from block where blockHash = ?";
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, blockhash);
+					rs = ps.executeQuery();
+					if (rs.next()) {
+						result[0] = rs.getLong("index");
 					}
 				}
 			}.execute();
