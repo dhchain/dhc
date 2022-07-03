@@ -2,6 +2,7 @@ package org.dhc.network;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
 
@@ -98,7 +99,10 @@ public class ConnectMessage extends Message {
 		Bootstrap.getInstance().getCandidatePeers().remove(peer);
 		logger.trace("Failed to connect to candidate {}", peer.getInetSocketAddress());
 		logger.trace("peer.getSocket()={}", peer.getSocket());
-		logger.trace(e.getMessage(), e);
+		if(!(e instanceof SocketException) && !(e instanceof NullPointerException)) {
+			logger.trace(e.getMessage(), e);
+		}
+		
 	}
 
 }
