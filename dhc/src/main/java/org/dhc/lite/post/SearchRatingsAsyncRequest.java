@@ -10,6 +10,7 @@ import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.Keywords;
 import org.dhc.blockchain.Transaction;
 import org.dhc.blockchain.TransactionMemoryPool;
+import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
 import org.dhc.persistence.TransactionStore;
@@ -45,7 +46,7 @@ public class SearchRatingsAsyncRequest extends Message {
 		logger.trace("process {}", this);
 		Network network = Network.getInstance();
 
-		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(to, Blockchain.getInstance().getPower())) {
+		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(to, Blockchain.getInstance().getPower()) && !ChainSync.getInstance().isRunning()) {
 			List<Rating> list = getPendingRatings();
 			list.addAll(TransactionStore.getInstance().getRatings(account, transactionId));
 			

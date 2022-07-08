@@ -3,6 +3,7 @@ package org.dhc.lite;
 import java.security.PublicKey;
 
 import org.dhc.blockchain.Blockchain;
+import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
 import org.dhc.util.DhcAddress;
@@ -32,7 +33,7 @@ public class GetSenderPublicKeyAsyncRequest extends Message {
 		Network network = Network.getInstance();
 		
 		Blockchain blockchain = Blockchain.getInstance();
-		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(to, blockchain.getPower())) {
+		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(to, blockchain.getPower()) && !ChainSync.getInstance().isRunning()) {
 			PublicKey publicKey = blockchain.getPublicKey(to);
 			GetSenderPublicKeyAsyncReply message  = new GetSenderPublicKeyAsyncReply(from, to, publicKey);
 			message.setCorrelationId(getCorrelationId());

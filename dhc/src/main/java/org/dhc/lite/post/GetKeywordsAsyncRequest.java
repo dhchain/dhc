@@ -6,6 +6,7 @@ import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.Keywords;
 import org.dhc.blockchain.Transaction;
 import org.dhc.blockchain.TransactionMemoryPool;
+import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
 import org.dhc.persistence.KeywordStore;
@@ -39,7 +40,7 @@ public class GetKeywordsAsyncRequest extends Message {
 		Network network = Network.getInstance();
 		DhcAddress dhcAddress = CryptoUtil.getDhcAddressFromString(rateeName);
 
-		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(dhcAddress, Blockchain.getInstance().getPower())) {
+		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(dhcAddress, Blockchain.getInstance().getPower()) && !ChainSync.getInstance().isRunning()) {
 			Keywords keywords = KeywordStore.getInstance().getKeywords(transactionId);
 			if(keywords == null) {
 				keywords = getPendingKeywords();

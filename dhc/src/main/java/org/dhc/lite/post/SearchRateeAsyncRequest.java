@@ -6,6 +6,7 @@ import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.Keywords;
 import org.dhc.blockchain.Transaction;
 import org.dhc.blockchain.TransactionMemoryPool;
+import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
 import org.dhc.persistence.TransactionStore;
@@ -38,7 +39,7 @@ public class SearchRateeAsyncRequest extends Message {
 		logger.trace("process {}", this);
 		Network network = Network.getInstance();
 
-		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(dhcAddress, Blockchain.getInstance().getPower())) {
+		if(DhcAddress.getMyDhcAddress().isFromTheSameShard(dhcAddress, Blockchain.getInstance().getPower()) && !ChainSync.getInstance().isRunning()) {
 			Ratee ratee = TransactionStore.getInstance().getRatee(transactionId);
 			if(ratee == null) {
 				ratee = getPendingRatee();
