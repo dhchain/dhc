@@ -358,7 +358,7 @@ public class Peer {
 		}
 		callbacks.clear();
 		if(trimPeerFuture != null) {
-			trimPeerFuture.cancel(true);
+			trimPeerFuture.cancel(false);
 		}
 	}
 	
