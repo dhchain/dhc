@@ -153,7 +153,7 @@ public class ChainSync {
 				if(lastBlockchainIndex <= blockchain.getIndex()) {
 					break;
 				}
-				if(count++ > 100) {
+				if(count++ > 10) {
 					break;
 				}
 			}
