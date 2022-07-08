@@ -90,9 +90,12 @@ public class ChainSync {
 			for(Peer peer: network.getMyBucketPeers()) {
 				myPeers.put(peer, peer);
 			}
-			for(Peer peer: skipPeers) {
-				myPeers.remove(peer);
+			synchronized (this) {
+				for(Peer peer: skipPeers) {
+					myPeers.remove(peer);
+				}
 			}
+			
 			if(myPeers.size() == 0) {
 				logger.info("myPeers.size()={} network.getMyBucketPeers().size()={} skipPeers.size()={}", myPeers.size(), network.getMyBucketPeers().size(), skipPeers.size());
 				skipPeers.clear();
@@ -120,7 +123,7 @@ public class ChainSync {
 		} 
 	}
 	
-	private synchronized void run() {
+	private synchronized void run() {// it is synchronized but wait inside loop will let other thread call sync methods on this
 		List<Peer> list = new ArrayList<>(myPeers.values());
 		Collections.shuffle(list); //some of the peer might have problems so try a random peer next time
 		Blockchain blockchain = Blockchain.getInstance();
