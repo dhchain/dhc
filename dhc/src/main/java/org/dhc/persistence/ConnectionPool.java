@@ -50,7 +50,7 @@ public class ConnectionPool {
 	
 	public Connection getConnection() throws SQLException {
 		Connection conn = connections.get();
-		if(conn == null) {
+		if(conn == null || conn.isClosed()) {
 			conn = ds.getConnection();
 			connections.set(conn);
 		}

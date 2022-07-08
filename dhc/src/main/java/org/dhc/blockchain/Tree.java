@@ -365,10 +365,16 @@ public class Tree {
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
+			ConnectionPool.getInstance().begin();
 			if(averagePower == -1) {
 				averagePower = BlockStore.getInstance().getAveragePower(lastIndex);
 			}
+			ConnectionPool.getInstance().commit();
 			return averagePower;
+		} catch (Exception e) {
+			ConnectionPool.getInstance().rollback();
+			logger.error(e.getMessage(), e);
+			throw new RuntimeException(e);
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;
@@ -384,7 +390,14 @@ public class Tree {
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			return BlockStore.getInstance().contains(blockhash);
+			ConnectionPool.getInstance().begin();
+			boolean result =  BlockStore.getInstance().contains(blockhash);
+			ConnectionPool.getInstance().commit();
+			return result;
+		} catch (Exception e) {
+			ConnectionPool.getInstance().rollback();
+			logger.error(e.getMessage(), e);
+			throw new RuntimeException(e);
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;
