@@ -3,6 +3,8 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import org.dhc.blockchain.Blockchain;
+
 public class Wallet {
 	
 	private static Wallet instance =  new Wallet();
@@ -19,9 +21,21 @@ public class Wallet {
 	private PublicKey publicKey;
 		
 	public void generateKeyPair() {
-		KeyPair keyPair = CryptoUtil.generateKeyPair();
-		privateKey = keyPair.getPrivate();
-		publicKey = keyPair.getPublic();
+		Blockchain blockchain = Blockchain.getInstance();
+		String bucketKey = blockchain.getLastBlocks().get(0).getBucketKey();
+		while (true) {
+			KeyPair keyPair = CryptoUtil.generateKeyPair();
+			privateKey = keyPair.getPrivate();
+			publicKey = keyPair.getPublic();
+			if(blockchain.getIndex() == 0) {
+				break;
+			}
+			DhcAddress myAddress = DhcAddress.getMyDhcAddress();
+			if(myAddress.getBinary().startsWith(bucketKey)) {
+				break;
+			}
+		}
+		
 	}
 
 	public PrivateKey getPrivateKey() {

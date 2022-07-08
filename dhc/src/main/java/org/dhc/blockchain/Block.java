@@ -140,7 +140,7 @@ public class Block {
 			}
 			BucketHashes hashes = getBucketHashes();
 
-			return getBucketKey() + "-" + index + (index == lastIndex ? "" : "/" + lastIndex) + " power=" + getPower() + " " + Wallet.getInstance().getDhcAddress().getBinary(6)
+			return getBucketKey() + "-" + index + (index == lastIndex ? "" : "/" + lastIndex) + " power=" + getPower() + " " + Wallet.getInstance().getDhcAddress().getBinary(7)
 					+ " hash=" + blockHash + " previous="
 					+ previousHash + " miner=" + getDhcAddress() + " " + hashes
 					+ ", fee=" + (hashes == null ? "": hashes.getFirstBucketHash().getFee().toNumberOfCoins())
