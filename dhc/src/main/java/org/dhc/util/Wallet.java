@@ -1,4 +1,5 @@
 package org.dhc.util;
+import java.io.File;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -21,6 +22,16 @@ public class Wallet {
 	private PublicKey publicKey;
 		
 	public void generateKeyPair() {
+		
+		String dataDir = "data/" + Constants.DATABASE;
+		File file = new File(dataDir);
+		if(!file.exists()) {
+			KeyPair keyPair = CryptoUtil.generateKeyPair();
+			privateKey = keyPair.getPrivate();
+			publicKey = keyPair.getPublic();
+			return;
+		}
+		
 		Blockchain blockchain = Blockchain.getInstance();
 		String bucketKey = blockchain.getLastBlocks().get(0).getBucketKey();
 		while (true) {

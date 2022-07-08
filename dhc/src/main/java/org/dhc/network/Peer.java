@@ -190,7 +190,7 @@ public class Peer {
 				long start = System.currentTimeMillis();
 				try {
 					logger.trace("Try to connect to inetSocketAddress = {}, Peer@{}", inetSocketAddress, super.hashCode());
-					localSocket.connect(inetSocketAddress, (int) Constants.SECOND);
+					localSocket.connect(inetSocketAddress, (int) Constants.SECOND * 5);
 					
 				} catch (IOException e) {
 					logger.trace("Failed in {} ms to connect to socket inetSocketAddress = {}, Peer@{}", System.currentTimeMillis() - start, inetSocketAddress, super.hashCode());

@@ -85,9 +85,9 @@ public class PeersFinder {
 				if(this.peers.isEmpty()) {
 					return;
 				}
-				wait(Constants.SECOND * 20);
+				wait(Constants.SECOND * 30);
 				if(!this.peers.isEmpty()) {
-					logger.info("Number of peers that have not responded to GetPeersMessage within 20 second: {}", this.peers.size());
+					logger.info("Number of peers that have not responded to GetPeersMessage within 30 second: {}", this.peers.size());
 					for(Peer peer: this.peers) {
 						logger.info("peer {}", peer);
 						peer.close();
