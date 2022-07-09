@@ -105,7 +105,7 @@ public class ChainSync {
 				}
 				int i = 0;
 				do {
-					PeersFinder.getInstance().findPeers();
+					Bootstrap.getInstance().navigate(Network.getInstance().getAllPeers(), TAddress.getMyTAddress());
 					logger.info("totalPeerCount={}", Peer.getTotalPeerCount());
 					ThreadExecutor.sleep(Constants.SECOND);
 				} while(totalPeerCount == Peer.getTotalPeerCount() && i++ < 10);
@@ -114,11 +114,11 @@ public class ChainSync {
 			run();
 			synchronized(this) {
 				long index = blockchain.getIndex();
-				if(lastBlockchainIndex <= index) {
+				if(lastBlockchainIndex <= index && !(lastBlockchainIndex == 0 && index != 0)) {
 					logger.info("exit start() because lastBlockchainIndex={} <= blockchain.getIndex()={}", lastBlockchainIndex, index);
 					return;
 				}
-				PeersFinder.getInstance().findPeers();
+				Bootstrap.getInstance().navigate(Network.getInstance().getAllPeers(), TAddress.getMyTAddress());
 			}
 		} 
 	}

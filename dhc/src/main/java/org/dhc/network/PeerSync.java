@@ -1,6 +1,7 @@
 package org.dhc.network;
 
 import org.dhc.util.DhcLogger;
+import org.dhc.util.TAddress;
 
 public class PeerSync {
 
@@ -49,7 +50,7 @@ public class PeerSync {
 			int myPeersCount = network.getMyBucketPeers().size();
 			while(true) {
 				network.reloadBuckets();
-				PeersFinder.getInstance().getPeers();
+				Bootstrap.getInstance().navigate(Network.getInstance().getAllPeers(), TAddress.getMyTAddress());
 				int count = network.getMyBucketPeers().size();
 				if(myPeersCount == count) {
 					break;

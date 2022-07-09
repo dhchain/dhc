@@ -77,7 +77,7 @@ public class ChainRest {
 				int networkPower = network.getPower();
 				int maxPower = Blockchain.getInstance().getPower();
 				if (networkPower < maxPower) {
-					PeersFinder.getInstance().findPeers();
+					Bootstrap.getInstance().navigate(Network.getInstance().getAllPeers(), TAddress.getMyTAddress());
 					logger.trace("networkPower {} < maxPower {}", networkPower, maxPower);
 					continue;
 				}

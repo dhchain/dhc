@@ -175,15 +175,6 @@ public class Buckets {
 	
 	private void checkWithMyPeers() {
 		List<Peer> myPeers = getMyBucketPeers();
-		for(Peer peer: myPeers) {
-			if(peer.getPower() > getPower()) {
-				if(expiringMap.get(peer.getNetworkIdentifier()) != null) {
-					continue;
-				}
-				expiringMap.put(peer.getNetworkIdentifier(), peer.getNetworkIdentifier());
-				peer.send(new GetPeersMessage());
-			}
-		}
 		List<Peer> myToPeers = Network.getInstance().getMyBucketToPeers();
 		for(Peer peer: myPeers) {
 			String key = "mypeers-" + peer.getNetworkIdentifier();
