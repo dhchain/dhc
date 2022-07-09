@@ -26,6 +26,7 @@ public class Buckets {
 	private int possiblePower;
 	private int allPeersCount;
 	private int currentPower;
+	private boolean running;
 
 	public int getPower() {
 		List<Bucket> buckets = this.buckets;
@@ -39,6 +40,10 @@ public class Buckets {
 		if(!writeLock.tryLock()) {
 			return;
 		}
+		if(running) {
+			return;
+		}
+		running = true;
 		long start = System.currentTimeMillis();
 		try {
 			
@@ -127,6 +132,7 @@ public class Buckets {
 			currentPower = getPower();
 
 		} finally {
+			running = false;
 			writeLock.unlock();
 			long duration = System.currentTimeMillis() - start;
 			if(duration > Constants.SECOND * 10) {

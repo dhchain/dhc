@@ -67,6 +67,7 @@ public class ChainSync {
 			
 			start();
 			Bootstrap.getInstance().navigate(network.getAllPeers(), TAddress.getMyTAddress());
+			
 			logger.info("END ChainSynchronizer.sync() power={} # myPeers {} lastBlockchainIndex {} pendingBlocks {}", network.getPower(), myPeers.size(), lastBlockchainIndex, Blockchain.getInstance().getNumberOfPendingBlocks());
 			
 			logger.info("Pending nodes queue size: {}", Blockchain.getInstance().getQueueSize());
@@ -229,7 +230,5 @@ public class ChainSync {
 	public synchronized void refreshMyPeers(Peer peer) {
 		myPeers.put(peer, peer);
 	}
-	
-	
 
 }

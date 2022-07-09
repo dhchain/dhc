@@ -1,5 +1,8 @@
 package org.dhc.network;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dhc.util.DhcLogger;
 import org.dhc.util.TAddress;
 
@@ -63,6 +66,20 @@ public class PeerSync {
 				running = false;
 				logger.info("PeerSynchronizer END took {}ms", System.currentTimeMillis() - start);
 				notifyAll();
+			}
+		}
+	}
+	
+	
+	public void closeUnusedPeers() {
+		List<Peer> peerList = new ArrayList<>(Peer.getPeers());
+		peerList.removeAll(Network.getInstance().getAllPeers());
+		for(Peer peer: peerList) {
+			if(peer.isClosed() && peer.getTAddress() == null) {
+				continue;
+			}
+			if(!peer.getInUse()) {
+				peer.close();
 			}
 		}
 	}
