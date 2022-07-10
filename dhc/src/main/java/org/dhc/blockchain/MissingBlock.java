@@ -44,6 +44,9 @@ public class MissingBlock {
 		if(index < lastIndex) {
 			return;
 		}
+		if(ChainSync.getInstance().isRunning()) {
+			return;
+		}
 		schedule();
 	}
 
@@ -65,6 +68,9 @@ public class MissingBlock {
 		Blockchain blockchain = Blockchain.getInstance();
 		long lastIndex = Math.max(Blockchain.getInstance().getIndex(), ChainSync.getInstance().getLastBlockchainIndex());
 		if(blockchain.contains(blockHash) || index < lastIndex) {
+			return;
+		}
+		if(ChainSync.getInstance().isRunning()) {
 			return;
 		}
 

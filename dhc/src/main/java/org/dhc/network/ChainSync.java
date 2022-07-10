@@ -219,8 +219,11 @@ public class ChainSync {
 		if(!lock.tryLock()) {
 			return true;
 		}
-		lock.unlock();
-		return false;
+		try {
+			return running;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public long getLastBlockchainIndex() {
