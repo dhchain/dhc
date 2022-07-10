@@ -97,6 +97,10 @@ public class Peer {
     private boolean peersPut() {
     	synchronized (peers) {
     		Peer localVarPeer = peers.get(inetSocketAddress);
+    		if(localVarPeer == this) {
+    			logger.trace("peersPut peers already contains me inetSocketAddress = {} Peer@{}", inetSocketAddress, super.hashCode());
+    			return true;
+    		}
     		if(localVarPeer == null) {
     			peers.put(inetSocketAddress, this);
     			logger.trace("peersPut inetSocketAddress = {} Peer@{}", inetSocketAddress, super.hashCode());
@@ -109,7 +113,7 @@ public class Peer {
     private boolean peersRemove() {
     	synchronized (peers) {
     		Peer localVarPeer = peers.get(inetSocketAddress);
-    		if(localVarPeer != null && this == localVarPeer) {
+    		if(this == localVarPeer) {
     			peers.remove(inetSocketAddress);
     			logger.trace("peersRemove inetSocketAddress = {} Peer@{}", inetSocketAddress, super.hashCode());
     			return true;
@@ -180,6 +184,11 @@ public class Peer {
 		synchronized(this) {
 			
 			logger.trace("Locked connectSocket() for Peer@{}", super.hashCode());
+			
+			if(!peersPut()) {
+				logger.info("Another peer is already in peers for inetSocketAddress = {}", inetSocketAddress);
+				return;
+			}
 
 			try {
 				Socket localSocket = socket;
