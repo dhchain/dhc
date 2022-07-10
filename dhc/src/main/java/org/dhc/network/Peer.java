@@ -301,8 +301,8 @@ public class Peer {
 					ReceiverPool.getInstance().process(this, message);
 				}
 				if(!peers.containsKey(inetSocketAddress) && !socket.isClosed()) {
-					logger.info("***************************************************");
-					logger.info("peers do not contain {}, socket.isClosed()={}", inetSocketAddress, socket.isClosed());
+					logger.trace("***************************************************");
+					logger.trace("peers do not contain {}, socket.isClosed()={}", inetSocketAddress, socket.isClosed());
 					peersPut();
 				}
 			}
