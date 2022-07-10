@@ -555,7 +555,7 @@ public class Peer {
 	public static List<Peer> getThinPeers() {
 		List<Peer> result = new ArrayList<Peer>();
 		for(Peer peer: new ArrayList<>(peers.values())) {
-			if(peer.isThin()) {
+			if(peer.isThin() && !peer.isClosed()) {
 				result.add(peer);
 			}
 		}
