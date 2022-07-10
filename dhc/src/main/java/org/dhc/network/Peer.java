@@ -191,7 +191,7 @@ public class Peer {
 			logger.trace("Locked connectSocket() for Peer@{}", super.hashCode());
 			
 			if(!peersPut()) {
-				logger.info("Another peer is already in peers for inetSocketAddress = {}", inetSocketAddress);
+				logger.trace("Another peer is already in peers for inetSocketAddress = {}", inetSocketAddress);
 				return;
 			}
 
