@@ -106,8 +106,13 @@ public class Peer {
     			logger.trace("peersPut inetSocketAddress = {} Peer@{}", inetSocketAddress, super.hashCode());
     			return true;
     		}
+    		logger.trace("peersPut already contains another peer Peer@{} for inetSocketAddress = {}. This is Peer@{}", localVarPeer.getSuperHashCode(), inetSocketAddress, super.hashCode());
     		return false;
 		}
+    }
+    
+    public int getSuperHashCode() {
+    	return super.hashCode();
     }
     
     private boolean peersRemove() {

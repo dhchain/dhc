@@ -146,9 +146,9 @@ public class ChainSync {
 				}
 				removedClosed(myPeers);
 				if(!myPeers.isEmpty()) {
-					logger.info("myPeers {}: ", myPeers.size());
+					logger.trace("myPeers {}: ", myPeers.size());
 					for(Peer peer: myPeers.keySet()) {
-						logger.info("\t peer {}", peer);
+						logger.trace("\t peer {}", peer);
 					}
 				}
 				if(blockchain.getQueueSize() > 0) {

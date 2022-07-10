@@ -583,7 +583,7 @@ public class BucketHash {
 		return true;
 	}
 
-	public Object getRealHashCode() {
+	public int getRealHashCode() {
 		return super.hashCode();
 	}
 	

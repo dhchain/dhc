@@ -25,7 +25,7 @@ public class PendingIndexes {
 			long lastBlockchainIndex = blockchain.getIndex();
 			if(index > lastBlockchainIndex) {
 				if(!blockchain.pendingIndexesHasIndex(index)) {
-					logger.info("PendingIndexes retrying index={}", index);
+					logger.trace("PendingIndexes retrying index={}", index);
 					return register(index, peer);
 				}
 			}
@@ -40,7 +40,7 @@ public class PendingIndexes {
 			@Override
 			public void expire() {
 				ChainSync.getInstance().incNotify(peer, "Peer timed out getting block");
-				logger.info("Peer timed out getting block for index {} peer {}", index, peer);
+				logger.trace("Peer timed out getting block for index {} peer {}", index, peer);
 				addIndex(index);
 				long nextBlockchainIndex = Blockchain.getInstance().getIndex() + 1;
 				if(index > nextBlockchainIndex && !indexes.contains(nextBlockchainIndex)) {
