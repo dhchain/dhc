@@ -133,6 +133,23 @@ public class Bootstrap {
 		logger.info("Connecting to number of peers {}", set.size());
 		List<Callable<Boolean>> calls = new ArrayList<>();
 		for (Peer peer : set) {
+			
+			if(!peer.isClosed()) {
+				logger.trace("connect(Set<Peer> set) - peer Peer@{} already connected: {}", peer.getSuperHashCode(), peer);
+				continue;
+			}
+			String networkIdentifier = peer.getNetworkIdentifier();
+			if(networkIdentifier != null) {
+				if(!Peer.getPeersByNetworkIdentifier(networkIdentifier).isEmpty()) {
+					logger.trace("connect(Set<Peer> set) - peer Peer@{} already exists: {}", peer.getSuperHashCode(), peer);
+					continue;
+				}
+				if(Network.getInstance().getNetworkIdentifier().equals(networkIdentifier)) {
+					logger.trace("connect(Set<Peer> set) - Peer@{} cannot connect to yourself: {}", peer.getSuperHashCode(), peer);
+					continue;
+				}
+			}
+			
 			calls.add(new Callable<Boolean>() {
 
 				@Override
