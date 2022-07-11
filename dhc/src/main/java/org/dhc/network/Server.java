@@ -66,6 +66,7 @@ public class Server {
 	private void reply(Socket clientSocket) {
 /*		InetSocketAddress iNetAddress  = new InetSocketAddress( clientSocket.getInetAddress(), clientSocket.getPort());
 		logger.debug("Connection from {}", iNetAddress);*/
+		logger.trace("Server received connection with socket {}", clientSocket);
 		Peer fromPeer = Peer.getInstance(clientSocket);
 		fromPeer.setType(PeerType.FROM);
 		fromPeer.startReceiver();
