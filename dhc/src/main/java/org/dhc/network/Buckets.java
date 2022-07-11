@@ -57,7 +57,7 @@ public class Buckets {
 				List<Peer> list = getBucketPeers(i++);
 				if (list.size() >= Constants.k) {
 					Bucket bucket = new Bucket(this);
-					bucket.addAll(list.subList(0, Math.min(Constants.k, list.size())));
+					bucket.addAll(list.subList(0, Math.min(Constants.k * 2, list.size())));
 					buckets.add(bucket);
 				} else {
 					i--;
@@ -210,20 +210,21 @@ public class Buckets {
 			logger.info("\n");
 			
 			
-			logger.info("Non bucket peers");
+			
 			List<Peer> peers = Peer.getPeers();
 			peers.removeAll(network.getAllPeers());
+			peers.removeIf(p -> p.getTAddress() == null);
+			
+			logger.info("Non bucket peers #peers={}", peers.size());
 			
 			for (Peer peer : peers) {
-				if(peer.getTAddress() == null) {
-					continue;
-				}
 				logger.info("\t{} {}", peer.getTAddress().getBinary(), peer);
 			}
+			
 			logger.info("\n");
 			
 			for (Bucket bucket : buckets) {
-				logger.info("bucket index={} key={}", bucket.getIndex(), bucket.getBucketKey());
+				logger.info("bucket index={} key={} #peer={}", bucket.getIndex(), bucket.getBucketKey(), bucket.getPeers().size());
 				for (Peer peer : bucket.getPeers()) {
 					logger.info("\t{} {}", peer.getTAddress().getBinary(), peer);
 				}

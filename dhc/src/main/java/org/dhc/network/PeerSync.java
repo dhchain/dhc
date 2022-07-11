@@ -3,6 +3,7 @@ package org.dhc.network;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dhc.blockchain.Blockchain;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.TAddress;
 
@@ -45,7 +46,7 @@ public class PeerSync {
 			}
 			running = true;
 		}
-		logger.info("PeerSynchronizer START");
+		logger.info("PeerSynchronizer START networkPower={}, blockchainPower={}", Network.getInstance().getPower(), Blockchain.getInstance().getPower());
 		long start = System.currentTimeMillis();
 		try {
 			Network network = Network.getInstance();
@@ -64,7 +65,7 @@ public class PeerSync {
 		} finally {
 			synchronized (this) {
 				running = false;
-				logger.info("PeerSynchronizer END took {}ms", System.currentTimeMillis() - start);
+				logger.info("PeerSynchronizer END took {}ms networkPower={}, blockchainPower={}", System.currentTimeMillis() - start, Network.getInstance().getPower(), Blockchain.getInstance().getPower());
 				notifyAll();
 			}
 		}
