@@ -136,7 +136,7 @@ public class Peer {
 				trimPeer();
 				
 			}
-		}, Constants.MINUTE * 1);
+		}, Constants.MINUTE * 5);
 	}
 
 	private void trimPeer() {

@@ -8,7 +8,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
 import org.dhc.network.Network;
-import org.dhc.network.PeerSync;
 import org.dhc.persistence.DBExecutor;
 import org.dhc.util.Coin;
 import org.dhc.util.Constants;
@@ -100,8 +99,7 @@ public class Main {
 		Registry.getInstance().getCompactor().pruneBlockchain();
 		
 		blockchain.start();
-		
-		PeerSync.getInstance().closeUnusedPeers();
+
 		network.printBuckets();
 		Registry.getInstance().getMiner().start();
 		
