@@ -46,7 +46,7 @@ public class PeerLock extends ReentrantLock {
 		time = System.currentTimeMillis() - time;
 		if (time >= timeout) {
 			logger.info("Wait time greater than " + timeout + " ms for peer {} message={}", peer, request);
-			peer.close();
+			peer.close("Long wait time");
 		}
 		return response;
 	}

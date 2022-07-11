@@ -85,7 +85,7 @@ public class SenderPool {
 					logger.info("Peer hanged on message {}", message);
 					String str = message.getClass().getSimpleName() + "@" + message.hashCode() + " " + peer.socketToString();
 					logger.info("SenderPool hanged on message {}", str);
-					peer.close();
+					peer.close("Close peer because it hanged");
 					break;
 				}
 			}

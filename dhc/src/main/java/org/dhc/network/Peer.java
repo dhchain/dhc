@@ -85,7 +85,7 @@ public class Peer {
     public static void closeAllPeers() {
     	synchronized (peers) {
 	    	for(Peer peer: peers.values()) {
-	    		peer.close();
+	    		peer.close("Close peer because of closeAllPeers()");
 	    	}
     	}
     }
@@ -142,23 +142,23 @@ public class Peer {
 	private void trimPeer() {
 		//logger.info("trimPeer() peer: {}", this);
 		if(isClosed()) {
-			close();
+			close("Close peer because it is already closed");
 			return;
 		}
 		
 		if(!peers.values().contains(this)) {
-			close();
+			close("Peers does not contain this peer");
 			return;
 		}
 		if(getTAddress() == null) {
-			close();
+			close("TAdress is null");
 			return;
 		}
 		
 		if(isThin()) {
 			long ago = System.currentTimeMillis() - getLastSeen();
 			if(ago > Constants.HOUR) {
-				close();
+				close("Thin peer was seen over one hour ago");
 				return;
 			}
 			if(ago > Constants.MINUTE * 10) {
@@ -170,7 +170,7 @@ public class Peer {
 		
 		Network network = Network.getInstance();
 		if(!network.getAllPeers().contains(this) && !getInUse()) {
-			close();
+			close("Network does not contain this peer and it is not in use");
 			return;
 		}
 		scheduleTrim();
@@ -208,7 +208,7 @@ public class Peer {
 					
 				} catch (IOException e) {
 					logger.trace("Failed in {} ms to connect to socket inetSocketAddress = {}, Peer@{}", System.currentTimeMillis() - start, inetSocketAddress, super.hashCode());
-					close();
+					close("Failed to connect");
 					throw e;
 				}
 				logger.trace("socket before {}", socket);
@@ -263,7 +263,7 @@ public class Peer {
 		}
 		
 		if(isClosed()) {
-			close();
+			close("Close peer because it is already closed");
 			return false;
 		}
 
@@ -282,7 +282,7 @@ public class Peer {
 			
 		} catch (Exception e) {
 			logger.trace(e.getMessage());
-			close();
+			close(e.getMessage());
 			return false;
 		}
 
@@ -307,8 +307,8 @@ public class Peer {
 				}
 			}
 		} catch (Exception e) {
-			//logger.trace(e.getMessage(), e);
-			close();
+			//logger.trace(, e);
+			close(e.getMessage());
 		}
 	}
 	
@@ -325,10 +325,10 @@ public class Peer {
 			callback(message);
 		} catch (DisconnectException e) {
 			//logger.trace(e.getMessage(), e);
-			close();
+			close(e.getMessage());
 		} catch (Exception e) {
 			logger.info(e.getMessage(), e);
-			close();
+			close(e.getMessage());
 		}
 	}
 
@@ -345,7 +345,7 @@ public class Peer {
 		callback.callBack(message);
 	}
 
-	public void close() {
+	public void close(String reason) {
 		
 		try {
 			boolean reload =  false;
@@ -354,7 +354,7 @@ public class Peer {
 				if(socket != null) {
 					if(!socket.isClosed()) {
 						socket.close();
-						logger.trace("Closed socket {} Peer@{}", socketToString(), super.hashCode());
+						logger.trace("Closed socket {} Peer@{} reason {}", socketToString(), super.hashCode(), reason);
 						reload = true;
 					}
 				}
@@ -484,7 +484,7 @@ public class Peer {
 			removeExcessPeer();
 		} catch (Exception e) {
 			//logger.trace(e.getMessage(), e);
-			close();
+			close(e.getMessage());
 			message.failedToSend(this, e);
 		}
 	}
@@ -492,7 +492,7 @@ public class Peer {
 	private void removeExcessPeer() {
 		if(getExcessPeers().contains(this)) {
 			logger.info("Removing excess peer {}", this);
-			close();
+			close("Close peer because it is in excess");
 		}
 	}
 	

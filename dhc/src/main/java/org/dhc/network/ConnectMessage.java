@@ -74,7 +74,7 @@ public class ConnectMessage extends Message {
 				if(candidate.isClosed()) {
 					//logger.info("closed candidate peer {}", candidate);
 					//logger.info("closed inetSocketAddress {}", inetSocketAddress);
-					candidate.close();
+					candidate.close("Close peer because it is closed candidate");
 				}
 				return;
 			}

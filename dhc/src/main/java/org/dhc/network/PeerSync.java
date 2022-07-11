@@ -79,7 +79,7 @@ public class PeerSync {
 				continue;
 			}
 			if(!peer.getInUse()) {
-				peer.close();
+				peer.close("Close peer because it is unused");
 			}
 		}
 	}
