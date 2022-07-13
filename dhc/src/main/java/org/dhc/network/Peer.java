@@ -170,7 +170,7 @@ public class Peer {
 		
 		Network network = Network.getInstance();
 		if(!network.getAllPeers().contains(this) && !getInUse()) {
-			close("Network does not contain this peer and it is not in use");
+			close("Network buckets do not contain this peer and it is not in use");
 			return;
 		}
 		scheduleTrim();
