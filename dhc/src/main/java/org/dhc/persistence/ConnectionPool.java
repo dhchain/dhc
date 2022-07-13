@@ -50,18 +50,9 @@ public class ConnectionPool {
 	
 	public Connection getConnection() throws SQLException {
 		Connection conn = connections.get();
-		if(conn == null || conn.isClosed()) {
-			try {
-				conn = ds.getConnection();
-				connections.set(conn);
-			} catch (SQLException e) {
-				logger.error(e.getMessage(), e);
-				if(e.getMessage().startsWith("Failed to start database")) {
-					System.exit(1);
-				}
-				throw e;
-			}
-			
+		if (conn == null || conn.isClosed()) {
+			conn = ds.getConnection();
+			connections.set(conn);
 		}
 		conn.setAutoCommit(false);
 		return conn;
