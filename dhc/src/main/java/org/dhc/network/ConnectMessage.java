@@ -41,8 +41,12 @@ public class ConnectMessage extends Message {
 		List<Peer> list = Peer.getPeersByNetworkIdentifier(peer.getNetworkIdentifier());
 		list.remove(peer);
 		if(!list.isEmpty()) {
-			logger.trace("ConnectMessage - Already connected to this peer");
-			throw new DisconnectException("ConnectMessage - Already connected to this peer");
+			logger.trace("ConnectMessage - Already connected to this peer {}", peer);
+			for(Peer p: list) {
+				logger.trace("ConnectMessage - reconnection, closing peer {}", peer);
+				p.close("Reconnection request from peer " + peer);
+			}
+			//throw new DisconnectException("ConnectMessage - Already connected to this peer");
 		}
 		if(Math.abs(System.currentTimeMillis() - getTimestamp()) > Constants.MINUTE * 10) {
 			String str = String.format("ConnectMessage - The difference in time is greater than 10 minutes, disconnecting from peer %s", peer);
@@ -90,14 +94,14 @@ public class ConnectMessage extends Message {
 	@Override
 	public void successfullySent(Peer peer) {
 		Bootstrap.getInstance().getCandidatePeers().add(peer);
-		logger.trace("Successfully connected to candidate {}", peer.getInetSocketAddress());
+		logger.trace("Successfully connected to peer {}", peer.getInetSocketAddress());
 	}
 
 	@Override
 	public void failedToSend(Peer peer, Exception e) {
 		//this method will not be triggered by connectCandidate() but can be triggered from Bootstrap.connectPeers()
 		Bootstrap.getInstance().getCandidatePeers().remove(peer);
-		logger.trace("Failed to connect to candidate {}", peer.getInetSocketAddress());
+		logger.info("Failed to connect to peer {}", peer.getInetSocketAddress());
 		logger.trace("peer.getSocket()={}", peer.getSocket());
 		if(!(e instanceof SocketException) && !(e instanceof NullPointerException)) {
 			logger.trace(e.getMessage(), e);

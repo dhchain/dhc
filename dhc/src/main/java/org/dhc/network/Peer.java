@@ -294,6 +294,12 @@ public class Peer {
 			peersPut();
 			while(true) {
 				Message message = gsonUtil.read(reader);
+				if(message == null) {
+					logger.trace("Received null message {}, socket.isClosed()={}", inetSocketAddress, socket.isClosed());
+					logger.trace("Received null message peer {}", this);
+					close("Received null message");
+					return;
+				}
 				if(message != null) {
 					if(message.isThin()) {
 						setType(PeerType.THIN);
@@ -306,9 +312,14 @@ public class Peer {
 					peersPut();
 				}
 			}
+		} catch (NullPointerException e) {
+			logger.trace(e.getMessage(), e);
+			String str = String.format("%s %s", e.getMessage(), e);
+			close(str);
 		} catch (Exception e) {
 			//logger.trace(, e);
-			close(e.getMessage());
+			String str = String.format("%s %s", e.getMessage(), e);
+			close(str);
 		}
 	}
 	
@@ -325,10 +336,16 @@ public class Peer {
 			callback(message);
 		} catch (DisconnectException e) {
 			//logger.trace(e.getMessage(), e);
-			close(e.getMessage());
+			String str = String.format("%s %s", e.getMessage(), e);
+			close(str);
+		} catch (NullPointerException e) {
+			logger.trace(e.getMessage(), e);
+			String str = String.format("%s %s", e.getMessage(), e);
+			close(str);
 		} catch (Exception e) {
 			logger.info(e.getMessage(), e);
-			close(e.getMessage());
+			String str = String.format("%s %s", e.getMessage(), e);
+			close(str);
 		}
 	}
 
@@ -355,6 +372,18 @@ public class Peer {
 					if(!socket.isClosed()) {
 						socket.close();
 						logger.trace("Closed socket {} Peer@{} reason {}", socketToString(), super.hashCode(), reason);
+						if(reason != null && reason.startsWith("java.net.SocketException") && this.type.equals(PeerType.TO)) {
+							ThreadExecutor.getInstance().execute(new DhcRunnable("Restart peer") {
+								public void doRun() {
+									
+									Peer restartPeer = Peer.getInstance(getInetSocketAddress());
+									restartPeer.setType(PeerType.TO);
+									if(Bootstrap.getInstance().connect(restartPeer)) {
+										logger.info("Restarted peer for socket {}, previous was closed because of {}", restartPeer.getSocket(), reason);
+									}
+								}
+							});
+						}
 						reload = true;
 					}
 				}
@@ -482,9 +511,15 @@ public class Peer {
 			gsonUtil.write(message, writer);
 			message.successfullySent(this);
 			removeExcessPeer();
+		} catch (NullPointerException e) {
+			logger.trace(e.getMessage(), e);
+			String str = String.format("%s %s", e.getMessage(), e);
+			close(str);
+			message.failedToSend(this, e);
 		} catch (Exception e) {
-			//logger.trace(e.getMessage(), e);
-			close(e.getMessage());
+			// logger.trace(e.getMessage(), e);
+			String str = String.format("%s %s", e.getMessage(), e);
+			close(str);
 			message.failedToSend(this, e);
 		}
 	}
