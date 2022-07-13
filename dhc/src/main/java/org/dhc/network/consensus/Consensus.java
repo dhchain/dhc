@@ -295,6 +295,10 @@ public class Consensus {
 
 		for(String bucketKey: bucketKeys) {
 			bucketHash = consensuses.get(blockHash, bucketKey);
+			if(bucketHash == null) {
+				String str = String.format("bucketHash is null for blockHash %s and bucketKey %s", blockHash, bucketKey);
+				throw new ResetMiningException(str);
+			}
 			BucketHash left = consensuses.get(blockHash, bucketHash.getKey().getLeftKey().getKey());
 			BucketHash right = consensuses.get(blockHash, bucketHash.getKey().getRightKey().getKey());
 			bucketHash.setLeftRight(left, right);
