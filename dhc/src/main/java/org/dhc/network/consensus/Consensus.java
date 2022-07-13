@@ -697,7 +697,7 @@ public class Consensus {
 			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
 		try {
-			long waitTime = Constants.MINUTE * 1;
+			long waitTime = Constants.MINUTE * 2;
 			logger.trace("Consensus before consensusReadyCondition.await.");
 			boolean waitExpired = false;
 			lock.lock();
