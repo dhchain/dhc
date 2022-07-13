@@ -101,8 +101,7 @@ public class ConnectMessage extends Message {
 	public void failedToSend(Peer peer, Exception e) {
 		//this method will not be triggered by connectCandidate() but can be triggered from Bootstrap.connectPeers()
 		Bootstrap.getInstance().getCandidatePeers().remove(peer);
-		logger.info("Failed to connect to peer {}", peer.getInetSocketAddress());
-		logger.trace("peer.getSocket()={}", peer.getSocket());
+		logger.info("Failed to connect to peer {} {} {}", peer.getSocket(), e.getMessage(), e);
 		if(!(e instanceof SocketException) && !(e instanceof NullPointerException)) {
 			logger.trace(e.getMessage(), e);
 		}

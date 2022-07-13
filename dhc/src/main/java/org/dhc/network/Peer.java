@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -180,10 +181,10 @@ public class Peer {
     	return socket == null || socket.isClosed();
     }
     
-	public void connectSocket() throws Exception {
+	public boolean connectSocket() throws Exception {
 		
 		if(inetSocketAddress.equals(myself)) {
-			return;
+			return false;
 		}
 		
 		synchronized(this) {
@@ -192,13 +193,13 @@ public class Peer {
 			
 			if(!peersPut()) {
 				logger.trace("Another peer is already in peers for inetSocketAddress = {}", inetSocketAddress);
-				return;
+				return false;
 			}
 
 			try {
 				Socket localSocket = socket;
 				if (localSocket != null && !localSocket.isClosed()) {
-					return;
+					return false;
 				}
 				localSocket = new Socket();
 				long start = System.currentTimeMillis();
@@ -209,7 +210,7 @@ public class Peer {
 				} catch (IOException e) {
 					logger.trace("Failed in {} ms to connect to socket inetSocketAddress = {}, Peer@{}", System.currentTimeMillis() - start, inetSocketAddress, super.hashCode());
 					close("Failed to connect");
-					throw e;
+					return false;
 				}
 				logger.trace("socket before {}", socket);
 				socket = localSocket;
@@ -223,6 +224,7 @@ public class Peer {
 		}
 		
 		startReceiver();
+		return true;
 	}
 
 	public String getNetworkIdentifier() {
@@ -515,6 +517,10 @@ public class Peer {
 			logger.trace(e.getMessage(), e);
 			String str = String.format("%s %s", e.getMessage(), e);
 			close(str);
+			message.failedToSend(this, e);
+		} catch (SocketException e) {
+			// logger.trace(e.getMessage(), e);
+			close(e.toString());
 			message.failedToSend(this, e);
 		} catch (Exception e) {
 			// logger.trace(e.getMessage(), e);

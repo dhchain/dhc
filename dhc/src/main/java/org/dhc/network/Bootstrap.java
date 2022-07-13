@@ -169,7 +169,9 @@ public class Bootstrap {
 		logger.trace("Connecting to peer {}", peer);
 		if (peer.isClosed()) {
 			try {
-				peer.connectSocket();
+				if(!peer.connectSocket()) {
+					return false;
+				}
 				peer.connect();
 			} catch (Exception e) {
 				return false;
