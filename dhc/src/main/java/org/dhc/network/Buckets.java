@@ -40,10 +40,16 @@ public class Buckets {
 		if(!writeLock.tryLock()) {
 			return;
 		}
-		if(running) {
-			return;
+		
+		try {
+			if(running) {
+				return;
+			}
+			running = true;
+		} finally {
+			writeLock.unlock();
 		}
-		running = true;
+		
 		long start = System.currentTimeMillis();
 		try {
 			
@@ -133,7 +139,7 @@ public class Buckets {
 
 		} finally {
 			running = false;
-			writeLock.unlock();
+			
 			long duration = System.currentTimeMillis() - start;
 			if(duration > Constants.SECOND * 10) {
 				logger.info("took {} ms", duration);
