@@ -27,6 +27,7 @@ public class Buckets {
 	private int allPeersCount;
 	private int currentPower;
 	private boolean running;
+	private boolean rerun;
 
 	public int getPower() {
 		List<Bucket> buckets = this.buckets;
@@ -38,14 +39,17 @@ public class Buckets {
 		
 		Lock writeLock = readWriteLock.writeLock();
 		if(!writeLock.tryLock()) {
+			rerun = true;
 			return;
 		}
 		
 		try {
 			if(running) {
+				rerun = true;
 				return;
 			}
 			running = true;
+			rerun = false;
 		} finally {
 			writeLock.unlock();
 		}
@@ -115,7 +119,7 @@ public class Buckets {
 				myBucket.fill();
 			}
 			
-			if(allPeersCount != Peer.getTotalPeerCount()) {
+			if(allPeersCount != Peer.getTotalPeerCount() || rerun) {
 				ThreadExecutor.getInstance().schedule(new DhcRunnable("Buckets reload") {
 					
 					@Override
