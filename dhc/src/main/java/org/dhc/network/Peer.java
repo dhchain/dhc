@@ -209,6 +209,7 @@ public class Peer {
 					
 				} catch (IOException e) {
 					logger.trace("Failed in {} ms to connect to socket inetSocketAddress = {}, Peer@{}", System.currentTimeMillis() - start, inetSocketAddress, super.hashCode());
+					Bootstrap.getInstance().getCandidatePeers().remove(this);
 					close("Failed to connect");
 					return false;
 				}
