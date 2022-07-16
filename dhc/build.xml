@@ -17,7 +17,7 @@
         <copy file="${dir.repository}/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.repository}/org/apache/derby/derbytools/10.14.2.0/derbytools-10.14.2.0.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.repository}/args4j/args4j/2.33/args4j-2.33.jar" todir="${dir.jarfile}/lib"/>
-        <copy file="${dir.repository}/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar" todir="${dir.jarfile}/lib"/>
+        <copy file="${dir.repository}/com/google/code/gson/gson/2.9.0/gson-2.9.0.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.repository}/org/bouncycastle/bcprov-jdk15on/1.65.01/bcprov-jdk15on-1.65.01.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.repository}/org/tinylog/tinylog-impl/2.1.2/tinylog-impl-2.1.2.jar" todir="${dir.jarfile}/lib"/>
         <copy file="${dir.repository}/org/tinylog/tinylog-api/2.1.2/tinylog-api-2.1.2.jar" todir="${dir.jarfile}/lib"/>

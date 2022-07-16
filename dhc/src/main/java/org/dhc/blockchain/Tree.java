@@ -306,6 +306,7 @@ public class Tree {
 				ConnectionPool.getInstance().begin();
 				for (String blockHash : list) {
 					BlockStore.getInstance().removeBlock(blockHash);
+					Registry.getInstance().getBannedBlockhashes().add(blockHash);
 				}
 				ConnectionPool.getInstance().commit();
 				resetLastIndex();

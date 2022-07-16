@@ -214,6 +214,7 @@ public class Peer {
 				}
 				logger.trace("socket before {}", socket);
 				socket = localSocket;
+				resetStreams();
 				logger.trace("socket after  {}", socket);
 				logger.trace("It took {} ms to be connected to socket {}, Peer@{}", System.currentTimeMillis() - start, socketToString(), super.hashCode());
 				
@@ -297,8 +298,7 @@ public class Peer {
 			while(true) {
 				Message message = gsonUtil.read(reader);
 				if(message == null) {
-					logger.trace("Received null message {}, socket.isClosed()={}", inetSocketAddress, socket.isClosed());
-					logger.trace("Received null message peer {}", this);
+					logger.trace("Received null message socket.isClosed()={} from Peer@{} {}", socket.isClosed(), this.getSuperHashCode(), this);
 					close("Received null message");
 					return;
 				}
@@ -322,6 +322,8 @@ public class Peer {
 			//logger.trace(, e);
 			String str = String.format("%s %s", e.getMessage(), e);
 			close(str);
+		} finally {
+			resetStreams();
 		}
 	}
 	
@@ -693,6 +695,12 @@ public class Peer {
 
 	public static void setMyself(InetSocketAddress myself) {
 		Peer.myself = myself;
+	}
+	
+	public void resetStreams() {
+		receiverStarted = false;
+		writer = null;
+	    reader = null;
 	}
 
 }

@@ -69,6 +69,7 @@ public class Server {
 		logger.trace("Server received connection with socket {}", clientSocket);
 		Peer fromPeer = Peer.getInstance(clientSocket);
 		fromPeer.setType(PeerType.FROM);
+		fromPeer.resetStreams();
 		fromPeer.startReceiver();
 
 	}
