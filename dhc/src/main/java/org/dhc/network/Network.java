@@ -260,4 +260,25 @@ public class Network {
 		return null;
 	}
 
+	public void removePeer(Peer peer) {
+		if(buckets == null) {
+			return;
+		}
+		buckets.removePeer(peer);
+	}
+
+	public void addPeer(Peer peer) {
+		if(buckets == null) {
+			return;
+		}
+		buckets.addPeer(peer);
+	}
+
+	public boolean shouldAddPeer(TAddress tAddress) {
+		if(tAddress == null) {
+			return true;
+		}
+		return buckets.shouldAddPeer(tAddress);
+	}
+
 }

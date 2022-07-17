@@ -55,12 +55,13 @@ public class Buckets {
 		}
 		
 		long start = System.currentTimeMillis();
+
 		try {
 			
 			allPeersCount = Peer.getTotalPeerCount();
 			TAddress tAddress = TAddress.getMyTAddress();
 
-			buckets.clear();
+			clear();
 
 			int i = 0;
 			while (true) {// this first loop builds all buckets starting with index 0 key length 1 that have at least Constants.k peers
@@ -68,7 +69,7 @@ public class Buckets {
 				if (list.size() >= Constants.k) {
 					Bucket bucket = new Bucket(this);
 					bucket.addAll(list.subList(0, Math.min(Constants.k * 2, list.size())));
-					buckets.add(bucket);
+					add(bucket);
 				} else {
 					i--;
 					break;
@@ -93,7 +94,7 @@ public class Buckets {
 			if (peers.size() >= Constants.k) {//reverting to k instead of k/2
 				Bucket bucket = new Bucket(this);
 				bucket.getPeers().addAll(peers);
-				buckets.add(bucket);
+				add(bucket);
 			} else if (!buckets.isEmpty()) {
 				Bucket bucket = buckets.get(buckets.size() - 1);
 				bucket.getPeers().addAll(peers);
@@ -143,7 +144,6 @@ public class Buckets {
 
 		} finally {
 			running = false;
-			
 			long duration = System.currentTimeMillis() - start;
 			if(duration > Constants.SECOND * 10) {
 				logger.info("took {} ms", duration);
@@ -155,7 +155,7 @@ public class Buckets {
 
 	}
 	
-	private Bucket getMyBucket() {
+	public Bucket getMyBucket() {
 		if(!buckets.isEmpty()) {
 			return buckets.get(buckets.size() - 1);
 		}
@@ -177,7 +177,7 @@ public class Buckets {
 			while (power < getPower()) {
 				Bucket b = buckets.get(power + 1);
 				bucket.addAll(b.getPeers());
-				buckets.remove(power + 1);
+				remove(power + 1);
 			}
 		} finally {
 			writeLock.unlock();
@@ -386,6 +386,9 @@ public class Buckets {
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
+			if(buckets == null || buckets.isEmpty()) {
+				return null;
+			}
 			TAddress myTAddress = TAddress.getMyTAddress();
 			int index = myTAddress.getBucketIndex(tAddress, getPower());
 			if (index < 0) {
@@ -482,5 +485,84 @@ public class Buckets {
 	public int getPossiblePower() {
 		return possiblePower;
 	}
+
+	public void removePeer(Peer peer) {
+		if(peer.getTAddress() == null) {
+			return;
+		}
+		Bucket bucket = find(peer.getTAddress());
+		if(bucket == null) {
+			return;
+		}
+		bucket.removePeer(peer); //that uses shared lock
+		if(bucket.getPeers().size() < Constants.k) {
+			reload();
+		}
+	}
+
+	public void addPeer(Peer peer) {
+		Bucket bucket = find(peer.getTAddress());
+		if(bucket == null) {
+			return;
+		}
+		if(bucket.isMyBucket()) {
+			if(bucket.getPeers().size() < Constants.k * 2 - 1) {
+				bucket.addPeer(peer); //that uses shared lock
+				return;
+			}
+			reload();
+			return;
+		}
+		if(bucket.getPeers().size() < Constants.k * 2) {
+			bucket.addPeer(peer); //that uses shared lock
+		}
+	}
+
+	public boolean shouldAddPeer(TAddress tAddress) {
+		Bucket bucket = find(tAddress);
+		if(bucket == null) {
+			return true;
+		}
+		if(bucket.isMyBucket()) {
+			return true;
+		}
+		if(bucket.getPeers().size() < Constants.k * 2) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private void clear() {
+		Lock writeLock = readWriteLock.writeLock();
+		writeLock.lock();
+		try {
+			buckets.clear();
+		} finally {
+			writeLock.unlock();
+		}
+	}
+	
+	private void remove(int index) {
+		Lock writeLock = readWriteLock.writeLock();
+		writeLock.lock();
+		try {
+			buckets.remove(index);
+		} finally {
+			writeLock.unlock();
+		}
+	}
+	
+	private void add(Bucket bucket) {
+		Lock writeLock = readWriteLock.writeLock();
+		writeLock.lock();
+		try {
+			buckets.add(bucket);
+		} finally {
+			writeLock.unlock();
+		}
+	}
+	
+	
 
 }

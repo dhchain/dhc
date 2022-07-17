@@ -150,6 +150,13 @@ public class Bootstrap {
 				}
 			}
 			
+			if(!Network.getInstance().shouldAddPeer(peer.getTAddress())) {
+				logger.trace("Should not add peer {}", peer);
+				continue;
+			}
+			
+			peer.setTAddress(null);
+			
 			calls.add(new Callable<Boolean>() {
 
 				@Override
@@ -198,6 +205,17 @@ public class Bootstrap {
 				logger.trace("Bootstrap.addPeers() - Cannot connect to yourself");
 				continue;
 			}
+			
+			TAddress tAddress = p.getTAddress();
+			if(tAddress == null) {
+				continue;
+			}
+			
+			if(!Network.getInstance().shouldAddPeer(tAddress)) {
+				logger.trace("Should not add peer {}", p);
+				continue;
+			}
+			
 			Peer foundPeer = Peer.getInstance(p.getInetSocketAddress());
 			foundPeer.setType(PeerType.TO);
 			calls.add(new Callable<Boolean>() {

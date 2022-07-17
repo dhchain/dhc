@@ -122,6 +122,7 @@ public class Peer {
     		if(this == localVarPeer) {
     			peers.remove(inetSocketAddress);
     			logger.trace("peersRemove inetSocketAddress = {} Peer@{}", inetSocketAddress, super.hashCode());
+    			Network.getInstance().removePeer(this);
     			return true;
     		}
     		return false;
@@ -137,7 +138,7 @@ public class Peer {
 				trimPeer();
 				
 			}
-		}, Constants.MINUTE * 5);
+		}, Constants.MINUTE * 3);
 	}
 
 	private void trimPeer() {
@@ -280,8 +281,6 @@ public class Peer {
 					receive();
 				}
 			});
-	
-			reloadBuckets();
 			scheduleTrim();
 			
 		} catch (Exception e) {
@@ -333,8 +332,8 @@ public class Peer {
 			setLastSeen(System.currentTimeMillis());
 			setNetworkIdentifier(message.getNetworkIdentifier());
 			setPower(message.getPower());
-			setInUse(message.isInUse());
 			setPossiblePower(message.getPossiblePower());
+			setInUse(message.isInUse());
 			setTAddress(message.getTAddress());
 			message.process(this);
 			putResponse(message);
@@ -370,7 +369,6 @@ public class Peer {
 	public void close(String reason) {
 		
 		try {
-			boolean reload =  false;
 			synchronized(this) {
 				peersRemove();
 				if(socket != null) {
@@ -389,12 +387,8 @@ public class Peer {
 								}
 							});
 						}
-						reload = true;
 					}
 				}
-			}
-			if(reload) {
-				reloadBuckets();
 			}
 			
 		} catch (IOException e) {
@@ -639,10 +633,6 @@ public class Peer {
 	public void setTimeAdded(long timeAdded) {
 		this.timeAdded = timeAdded;
 	}
-	
-	private static void reloadBuckets() {
-		Network.getInstance().reloadBuckets();
-	}
 
 	public int getPower() {
 		return power;
@@ -691,7 +681,20 @@ public class Peer {
 	}
 
 	public void setTAddress(TAddress tAddress) {
-		this.tAddress = tAddress;
+		if(tAddress == null) {
+			this.tAddress = null;
+			return;
+		}
+		if(this.tAddress == null) {
+			this.tAddress = tAddress;
+			Network.getInstance().addPeer(this);
+			return;
+		}
+		if(!this.tAddress.equals(tAddress)) {
+			RuntimeException e = new RuntimeException("TAddresses are not equal");
+			logger.info(e.getMessage(), e);
+			throw e;
+		}
 	}
 
 	public static void setMyself(InetSocketAddress myself) {

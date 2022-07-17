@@ -163,6 +163,9 @@ public class ChainSync {
 			}
 			logger.trace("ChainSynchronizer was notified by {} peer(s) networkPower={}, blockchainPower={}:", list.size(), Network.getInstance().getPower(), blockchain.getPower());
 			for (Peer peer : list) {
+				if(peer.getTAddress() == null) {
+					continue;
+				}
 				logger.trace("\t{} {}", peer.getTAddress().getBinary(), peer);
 			}
 		} catch (InterruptedException e) {
