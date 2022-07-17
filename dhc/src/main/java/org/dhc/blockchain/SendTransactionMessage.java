@@ -3,11 +3,10 @@ package org.dhc.blockchain;
 import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
+import org.dhc.util.Applications;
+import org.dhc.util.DhcLogger;
 import org.dhc.util.Message;
 import org.dhc.util.Registry;
-import org.dhc.util.Applications;
-import org.dhc.util.DhcAddress;
-import org.dhc.util.DhcLogger;
 
 public class SendTransactionMessage extends Message {
 
@@ -40,12 +39,8 @@ public class SendTransactionMessage extends Message {
 		if(Applications.MESSAGING.equals(transaction.getApp())) {
 			Network.getInstance().sendToAddress(transaction.getReceiver(), new SendSMTransactionMessage(transaction));
 		}
-
-		if(!DhcAddress.getMyDhcAddress().isFromTheSameShard(transaction.getSenderDhcAddress(), Blockchain.getInstance().getPower())) {
-			logger.trace("END not sending because it is cross shard transaction {}", transaction);
-			//returning because this is not a cross shard transaction message
-			return;
-		}
+		
+		Network.getInstance().sendToAllMyPeers(new SendTransactionMessage(transaction));
 		
 		logger.trace("SendTransactionMessage transaction.getBlockHash()={} {}", transaction.getBlockHash(), transaction);
 		Registry.getInstance().getPendingTransactions().processTransaction(transaction);

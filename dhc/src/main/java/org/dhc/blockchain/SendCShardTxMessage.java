@@ -26,7 +26,13 @@ public class SendCShardTxMessage extends Message {
 	@Override
 	public void process(Peer peer) {
 		
+		logger.trace("SendCShardTxMessage process() {} {}", transaction.getBlockHash(), transaction);
+		
 		if (alreadySent(toString())) {
+			return;
+		}
+		
+		if(Registry.getInstance().getBannedBlockhashes().contains(transaction.getBlockHash())) {
 			return;
 		}
 		
@@ -34,12 +40,6 @@ public class SendCShardTxMessage extends Message {
 			return;
 		}
 
-		if(Registry.getInstance().getBannedBlockhashes().contains(transaction.getBlockHash())) {
-			return;
-		}
-		
-		logger.trace("SendCShardTxMessage process() {} {}", transaction.getBlockHash(), transaction);
-		
 		Blockchain.getInstance().addPendingCrossShardTransaction(transaction);
 	}
 
