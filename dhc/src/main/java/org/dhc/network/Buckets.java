@@ -164,21 +164,20 @@ public class Buckets {
 	}
 	
 	private void collapseToPower() {
-		
+		int averagePower = Blockchain.getInstance().getAveragePower();
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			int power = Blockchain.getInstance().getAveragePower();
-			if (getPower() <= power) {
+			if (getPower() <= averagePower) {
 				return;
 			}
 
-			Bucket bucket = buckets.get(power);
-			while (power < getPower()) {
-				Bucket b = buckets.get(power + 1);
+			Bucket bucket = buckets.get(averagePower);
+			while (averagePower < getPower()) {
+				Bucket b = buckets.get(averagePower + 1);
 				bucket.addAll(b.getPeers());
-				remove(power + 1);
+				remove(averagePower + 1);
 			}
 		} finally {
 			writeLock.unlock();
@@ -486,16 +485,30 @@ public class Buckets {
 	public int getPossiblePower() {
 		return possiblePower;
 	}
+	
+	public void setPossiblePower(int possiblePower) {
+		this.possiblePower = possiblePower;
+	}
 
 	public void removePeer(Peer peer) {
 		if(peer.getTAddress() == null) {
 			return;
 		}
-		Bucket bucket = find(peer.getTAddress());
-		if(bucket == null) {
-			reload();
-			return;
+		
+		Bucket bucket;
+		Lock writeLock = readWriteLock.writeLock();
+		writeLock.lock();
+		try {
+			bucket = find(peer.getTAddress());
+			if(bucket == null) {
+				bucket = new Bucket(this);
+				add(bucket);
+				return;
+			}
+		} finally {
+			writeLock.unlock();
 		}
+
 		bucket.removePeer(peer); //that uses shared lock
 		if(bucket.getPeers().size() < Constants.k) {
 			reload();
@@ -503,17 +516,27 @@ public class Buckets {
 	}
 
 	public void addPeer(Peer peer) {
-		Bucket bucket = find(peer.getTAddress());
-		if(bucket == null) {
-			reload();
-			return;
-		}
-		if(bucket.isMyBucket()) {
-			if(bucket.getPeers().size() < Constants.k * 2 - 1) {
-				bucket.addPeer(peer); //that uses shared lock
+		Bucket bucket;
+		Lock writeLock = readWriteLock.writeLock();
+		writeLock.lock();
+		try {
+			bucket = find(peer.getTAddress());
+			if(bucket == null) {
+				bucket = new Bucket(this);
+				add(bucket);
+				bucket.addPeer(peer);
 				return;
 			}
-			reload();
+		} finally {
+			writeLock.unlock();
+		}
+		
+		if(bucket.isMyBucket()) {
+			bucket.addPeer(peer); //that uses shared lock
+			if(bucket.getPeers().size() < Constants.k * 2) {
+				return;
+			}
+			bucket.trySplit();
 			return;
 		}
 		if(bucket.getPeers().size() < Constants.k * 2) {
@@ -546,7 +569,7 @@ public class Buckets {
 		}
 	}
 	
-	private void remove(int index) {
+	public void remove(int index) {
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		try {
@@ -556,7 +579,7 @@ public class Buckets {
 		}
 	}
 	
-	private void add(Bucket bucket) {
+	public void add(Bucket bucket) {
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		try {
@@ -564,6 +587,23 @@ public class Buckets {
 		} finally {
 			writeLock.unlock();
 		}
+	}
+	
+	public void trySplit() {
+		int averagePower = Blockchain.getInstance().getAveragePower();
+		int power = getPower();
+		Lock writeLock = readWriteLock.writeLock();
+		writeLock.lock();
+		try {
+			if(power < getPossiblePower() && power < averagePower) {
+				getMyBucket().trySplit();
+				return;
+			}
+			
+		} finally {
+			writeLock.unlock();
+		}
+		collapseToPower();
 	}
 	
 

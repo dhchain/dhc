@@ -274,4 +274,8 @@ public class Network {
 		return buckets.shouldAddPeer(tAddress);
 	}
 
+	public void trySplit() {
+		buckets.trySplit();
+	}
+
 }

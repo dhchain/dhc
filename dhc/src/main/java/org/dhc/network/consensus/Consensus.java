@@ -131,6 +131,7 @@ public class Consensus {
 	
 	private void init() {
 		clear();
+		network.trySplit();
 		power = network.getPower();
 		bucketKeys =  network.getBucketKeys();
 		bucketKeys.add(0, "");
