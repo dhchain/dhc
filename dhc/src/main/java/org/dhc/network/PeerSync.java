@@ -53,7 +53,6 @@ public class PeerSync {
 			Bootstrap.getInstance().bootstrap();
 			int myPeersCount = network.getMyBucketPeers().size();
 			while(true) {
-				network.reloadBuckets();
 				Bootstrap.getInstance().navigate(Network.getInstance().getAllPeers(), TAddress.getMyTAddress());
 				int count = network.getMyBucketPeers().size();
 				if(myPeersCount == count) {

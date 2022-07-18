@@ -71,7 +71,6 @@ public class ChainRest {
 					PeerSync.getInstance().executeAndWait();
 					break;
 				}
-				network.reloadBuckets();
 				failed = false;
 				doExecute();
 				int networkPower = network.getPower();

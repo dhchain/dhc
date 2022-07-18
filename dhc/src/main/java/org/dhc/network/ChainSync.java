@@ -49,14 +49,12 @@ public class ChainSync {
 		try {
 			Trimmer.getInstance().runImmediately();
 			Network network = Network.getInstance();
-			network.reloadBuckets();
 			if(network.getPower() < Blockchain.getInstance().getPower()) {
 				ChainRest.getInstance().execute();
 			}
 			
 			List<Peer> myPeers;
 			while(true) {
-				network.reloadBuckets();
 				myPeers = network.getMyBucketPeers();
 				logger.info("START ChainSynchronizer.sync() networkPower={} blockchainPower={} # myPeers {}", network.getPower(), Blockchain.getInstance().getPower(), myPeers.size());
 				if(myPeers.size() > 0) {
@@ -171,8 +169,6 @@ public class ChainSync {
 		} catch (InterruptedException e) {
 			
 		}
-		Network.getInstance().reloadBuckets();
-		
 	}
 	
 	public synchronized void incNotify(Peer peer, String reason) {

@@ -59,13 +59,6 @@ public class Network {
 		Peer.closeAllPeers();
 	}
 	
-	public void reloadBuckets() {
-		if(buckets == null) {
-			return;
-		}
-		buckets.reload();
-	}
-	
 	public int getPower() {
 		Buckets buckets = this.buckets;
 		if(buckets == null) {

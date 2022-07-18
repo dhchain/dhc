@@ -9,9 +9,6 @@ public class PrintBucketsMessage extends Message {
 	public void process(Peer peer) {
 		Network network = Network.getInstance();
 		network.printBuckets();
-		network.reloadBuckets();
-		network.printBuckets();
-
 	}
 
 }

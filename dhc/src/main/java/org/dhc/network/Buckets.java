@@ -24,10 +24,11 @@ public class Buckets {
 	private List<Bucket> buckets = new CopyOnWriteArrayList<Bucket>();
 	private final SharedLock readWriteLock = SharedLock.getInstance();
 	private int possiblePower;
-	private int allPeersCount;
 	private int currentPower;
 	private boolean running;
 	private boolean rerun;
+	
+	
 
 	public int getPower() {
 		List<Bucket> buckets = this.buckets;
@@ -35,7 +36,7 @@ public class Buckets {
 		return size == 0 ? 0 : size - 1;
 	}
 
-	public void reload() {
+	private void reload() {
 		
 		Lock writeLock = readWriteLock.writeLock();
 		if(!writeLock.tryLock()) {
@@ -57,8 +58,7 @@ public class Buckets {
 		long start = System.currentTimeMillis();
 
 		try {
-			
-			allPeersCount = Peer.getTotalPeerCount();
+
 			TAddress tAddress = TAddress.getMyTAddress();
 
 			clear();
@@ -120,7 +120,7 @@ public class Buckets {
 				myBucket.fill();
 			}
 			
-			if(allPeersCount != Peer.getTotalPeerCount() || rerun) {
+			if(rerun) {
 				ThreadExecutor.getInstance().schedule(new DhcRunnable("Buckets reload") {
 					
 					@Override
@@ -150,7 +150,8 @@ public class Buckets {
 				logger.info("", new RuntimeException());
 			}
 			//logger.trace("unlock");
-			logger.trace("END Reload buckets power={}, took {} ms", getPower(), System.currentTimeMillis() - start);
+			logger.trace("END Reload buckets # peers {} bucketPeers {} myPeers {} power {}  pp {}, took {} ms", Peer.getTotalPeerCount(), 
+					getAllPeers().size(), getMyBucketPeers().size(), getPower(), getPossiblePower(), System.currentTimeMillis() - start);
 		}
 
 	}
@@ -492,6 +493,7 @@ public class Buckets {
 		}
 		Bucket bucket = find(peer.getTAddress());
 		if(bucket == null) {
+			reload();
 			return;
 		}
 		bucket.removePeer(peer); //that uses shared lock
@@ -503,6 +505,7 @@ public class Buckets {
 	public void addPeer(Peer peer) {
 		Bucket bucket = find(peer.getTAddress());
 		if(bucket == null) {
+			reload();
 			return;
 		}
 		if(bucket.isMyBucket()) {
@@ -562,7 +565,6 @@ public class Buckets {
 			writeLock.unlock();
 		}
 	}
-	
 	
 
 }
