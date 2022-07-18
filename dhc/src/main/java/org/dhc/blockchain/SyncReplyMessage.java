@@ -46,7 +46,7 @@ public class SyncReplyMessage extends Message {
 		if(!myBlocks(blocks)) {
 			// We don't want to unregister here so it will timeout and other peers will try to get blocks for blockchainIndex
 			String blocksKey = blocks.get(0).getBucketKey();
-			logger.info("Not my blocks {}", blocks.get(0));
+			logger.trace("Not my blocks {}", blocks.get(0));
 			synchronizer.incNotify(peer, String.format("Not my blocks blocksKey=%s, peersKey=%s, myKey=%s", blocksKey, peer.getTAddress().getBinary(blocksKey.length()), DhcAddress.getMyDhcAddress().getBinary(blocksKey.length())) );
 			return;
 		}
