@@ -1,7 +1,6 @@
 package org.dhc.network;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -23,137 +22,12 @@ public class Buckets {
 
 	private List<Bucket> buckets = new CopyOnWriteArrayList<Bucket>();
 	private final SharedLock readWriteLock = SharedLock.getInstance();
-	private int possiblePower;
-	private int currentPower;
-	private boolean running;
-	private boolean rerun;
-	
-	
+	private long navigateTime;
 
 	public int getPower() {
 		List<Bucket> buckets = this.buckets;
 		int size = buckets == null ? 0 : buckets.size();
 		return size == 0 ? 0 : size - 1;
-	}
-
-	private void reload() {
-		
-		Lock writeLock = readWriteLock.writeLock();
-		if(!writeLock.tryLock()) {
-			rerun = true;
-			return;
-		}
-		
-		try {
-			if(running) {
-				rerun = true;
-				return;
-			}
-			running = true;
-			rerun = false;
-		} finally {
-			writeLock.unlock();
-		}
-		
-		long start = System.currentTimeMillis();
-
-		try {
-
-			TAddress tAddress = TAddress.getMyTAddress();
-
-			clear();
-
-			int i = 0;
-			while (true) {// this first loop builds all buckets starting with index 0 key length 1 that have at least Constants.k peers
-				List<Peer> list = getBucketPeers(i++);
-				if (list.size() >= Constants.k) {
-					Bucket bucket = new Bucket(this);
-					bucket.addAll(list.subList(0, Math.min(Constants.k * 2, list.size())));
-					add(bucket);
-				} else {
-					i--;
-					break;
-				}
-			}
-			List<Peer> peers = new ArrayList<>();
-
-			while (true) {// the rest of peers, which are closer to my peer go to peers variable
-				List<Peer> list = getBucketPeers(i++);
-				if (!list.isEmpty()) {
-					peers.addAll(list);
-				} else {
-					i--;
-					break;
-				}
-			}
-
-			peers.addAll(getMyBucketPeers(i));
-			
-			Collections.sort(peers, new TimeAddedPeerComparator());
-
-			if (peers.size() >= Constants.k) {//reverting to k instead of k/2
-				Bucket bucket = new Bucket(this);
-				bucket.getPeers().addAll(peers);
-				add(bucket);
-			} else if (!buckets.isEmpty()) {
-				Bucket bucket = buckets.get(buckets.size() - 1);
-				bucket.getPeers().addAll(peers);
-			}
-
-			if(possiblePower > getPower() || possiblePower < Blockchain.getInstance().getLastAveragePower()) {
-				ThreadExecutor.getInstance().execute(new DhcRunnable("navigate") {
-					public void doRun() {
-						Bootstrap.getInstance().navigate(getAllPeers(), tAddress);
-					}
-				});
-				
-				//expiringMap.clear();
-			}
-			
-			possiblePower = getPower();
-			logger.trace("Real Power={}", possiblePower);
-			
-			checkWithMyPeers();
-			
-			if(!buckets.isEmpty()) {
-				Bucket myBucket = buckets.get(buckets.size() - 1);
-				myBucket.fill();
-			}
-			
-			if(rerun) {
-				ThreadExecutor.getInstance().schedule(new DhcRunnable("Buckets reload") {
-					
-					@Override
-					public void doRun() {
-						reload();
-					}
-				}, Constants.SECOND * 1);
-			}
-
-			collapseToPower();
-
-			Bucket myBucket = getMyBucket();
-			if(myBucket != null) {
-				myBucket.trim();
-			}
-
-			if(currentPower > getPower()) {
-				ChainRest.getInstance().executeAsync();
-			}
-			currentPower = getPower();
-
-		} finally {
-			running = false;
-			long duration = System.currentTimeMillis() - start;
-			if(duration > Constants.SECOND * 10) {
-				logger.info("took {} ms", duration);
-				logger.info("", new RuntimeException());
-			}
-			//logger.trace("unlock");
-			logger.trace("END Reload buckets # peers {} bucketPeers {} myPeers {} power {}  pp {}, took {} ms", Peer.getTotalPeerCount(), 
-					getAllPeers().size(), getMyBucketPeers().size(), getPower(), getPossiblePower(), System.currentTimeMillis() - start);
-		}
-
 	}
 	
 	public Bucket getMyBucket() {
@@ -243,56 +117,6 @@ public class Buckets {
 			logger.info("my\t{} {}\n", DhcAddress.getMyDhcAddress().getBinary(), DhcAddress.getMyDhcAddress());
 			logger.info("Print buckets # peers {} bucketPeers {} myPeers {} pp {}\n", Peer.getTotalPeerCount(), getAllPeers().size(), getMyBucketPeers().size(), getPossiblePower());
 
-		} finally {
-			readLock.unlock();
-			long duration = System.currentTimeMillis() - start;
-			if(duration > Constants.SECOND * 10) {
-				logger.info("took {} ms", duration);
-			}
-			//logger.trace("unlock");
-		}
-	}
-
-	private List<Peer> getMyBucketPeers(int i) {
-		Lock readLock = readWriteLock.readLock();
-		readLock.lock();
-		long start = System.currentTimeMillis();
-		try {
-			BucketKey bucketKey = new BucketKey(DhcAddress.getMyDhcAddress().getBinary(i + 1));
-			String key = bucketKey.getKey();
-			List<Peer> list = new ArrayList<>();
-			for (Peer peer : Peer.getPeers()) {
-				if (peer.getTAddress() != null && peer.getTAddress().getBinary().startsWith(key)) {
-					list.add(peer);
-				}
-			}
-			Collections.sort(list, new TimeAddedPeerComparator());
-			return list;
-		} finally {
-			readLock.unlock();
-			long duration = System.currentTimeMillis() - start;
-			if(duration > Constants.SECOND * 10) {
-				logger.info("took {} ms", duration);
-			}
-			//logger.trace("unlock");
-		}
-	}
-
-	private List<Peer> getBucketPeers(int i) {
-		Lock readLock = readWriteLock.readLock();
-		readLock.lock();
-		long start = System.currentTimeMillis();
-		try {
-			BucketKey bucketKey = new BucketKey(DhcAddress.getMyDhcAddress().getBinary(i + 1));
-			String key = bucketKey.getOtherBucketKey().getKey();
-			List<Peer> list = new ArrayList<>();
-			for (Peer peer : Peer.getPeers()) {
-				if (peer.getTAddress() != null && peer.getTAddress().getBinary().startsWith(key)) {
-					list.add(peer);
-				}
-			}
-			Collections.sort(list, new TimeAddedPeerComparator());
-			return list;
 		} finally {
 			readLock.unlock();
 			long duration = System.currentTimeMillis() - start;
@@ -483,11 +307,10 @@ public class Buckets {
 	}
 
 	public int getPossiblePower() {
-		return possiblePower;
-	}
-	
-	public void setPossiblePower(int possiblePower) {
-		this.possiblePower = possiblePower;
+		if(getMyBucket() != null && getMyBucket().canSplit()) {
+			return getPower() + 1;
+		}
+		return getPower();
 	}
 
 	public void removePeer(Peer peer) {
@@ -505,18 +328,36 @@ public class Buckets {
 				add(bucket);
 				return;
 			}
+			bucket.removePeer(peer);
+			if(bucket.getPeers().size() < Constants.k) {
+				while(true) {
+					Bucket b = buckets.remove(buckets.size() - 1);
+					if(bucket == b) {
+						break;
+					}
+					bucket.addAll(b.getPeers());
+				}
+				if(buckets.isEmpty() || bucket.getPeers().size() >= Constants.k) {
+					buckets.add(bucket);
+					return;
+				}
+				buckets.get(buckets.size() - 1).addAll(bucket.getPeers());
+			}
 		} finally {
 			writeLock.unlock();
-		}
-
-		bucket.removePeer(peer); //that uses shared lock
-		if(bucket.getPeers().size() < Constants.k) {
-			reload();
+			if(getPower() < Blockchain.getInstance().getLastAveragePower()) {
+				ThreadExecutor.getInstance().execute(new DhcRunnable("navigate") {
+					public void doRun() {
+						Bootstrap.getInstance().navigate(getAllPeers(), TAddress.getMyTAddress());
+					}
+				});
+			}
 		}
 	}
 
 	public void addPeer(Peer peer) {
 		Bucket bucket;
+		int averagePower = Blockchain.getInstance().getAveragePower();
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		try {
@@ -527,20 +368,20 @@ public class Buckets {
 				bucket.addPeer(peer);
 				return;
 			}
-		} finally {
-			writeLock.unlock();
-		}
-		
-		if(bucket.isMyBucket()) {
-			bucket.addPeer(peer); //that uses shared lock
-			if(bucket.getPeers().size() < Constants.k * 2) {
+			if(bucket.isMyBucket()) {
+				bucket.addPeer(peer); //that uses shared lock
+				if(bucket.getPeers().size() < Constants.k * 2) {
+					return;
+				}
+				bucket.trySplit(averagePower);
 				return;
 			}
-			bucket.trySplit();
-			return;
-		}
-		if(bucket.getPeers().size() < Constants.k * 2) {
-			bucket.addPeer(peer); //that uses shared lock
+			if(bucket.getPeers().size() < Constants.k * 2) {
+				bucket.addPeer(peer); //that uses shared lock
+			}
+		} finally {
+			writeLock.unlock();
+			checkWithMyPeers();
 		}
 	}
 
@@ -557,16 +398,6 @@ public class Buckets {
 		}
 		
 		return false;
-	}
-	
-	private void clear() {
-		Lock writeLock = readWriteLock.writeLock();
-		writeLock.lock();
-		try {
-			buckets.clear();
-		} finally {
-			writeLock.unlock();
-		}
 	}
 	
 	public void remove(int index) {
@@ -592,11 +423,22 @@ public class Buckets {
 	public void trySplit() {
 		int averagePower = Blockchain.getInstance().getAveragePower();
 		int power = getPower();
+		int possiblePower = getPossiblePower();
+		long time = System.currentTimeMillis();
+		if(possiblePower < Blockchain.getInstance().getLastAveragePower() && time - navigateTime > Constants.MINUTE * 10) {
+			navigateTime = time;
+			ThreadExecutor.getInstance().execute(new DhcRunnable("navigate") {
+				public void doRun() {
+					Bootstrap.getInstance().navigate(getAllPeers(), TAddress.getMyTAddress());
+					logger.info("Will navigate");
+				}
+			});
+		}
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		try {
-			if(power < getPossiblePower() && power < averagePower) {
-				getMyBucket().trySplit();
+			if(power < possiblePower && power < averagePower) {
+				getMyBucket().trySplit(averagePower);
 				return;
 			}
 			

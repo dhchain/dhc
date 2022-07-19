@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 
-import org.dhc.blockchain.Blockchain;
 import org.dhc.util.Constants;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
@@ -103,10 +102,16 @@ public class Bucket {
 		}
 	}
 
-	public void trySplit() {
+	public void trySplit(int averagePower) {
 		Lock writeLock = readWriteLock.writeLock();
 		writeLock.lock();
 		try {
+			if(!canSplit()) {
+				return;
+			}
+			if(buckets.getPower() >= averagePower) {
+				return;
+			}
 			BucketKey bucketKey = new BucketKey(getBucketKey());
 			BucketKey left = bucketKey.getLeftKey();
 			List<Peer> leftPeers = new ArrayList<>();
@@ -117,15 +122,8 @@ public class Bucket {
 				} else {
 					rightPeers.add(peer);
 				}
-			}
-			if (leftPeers.size() < Constants.k || rightPeers.size() < Constants.k) {
-				return;
-			}
-			int averagePower = Blockchain.getInstance().getAveragePower();
-			if(buckets.getPower() >= averagePower) {
-				buckets.setPossiblePower(buckets.getPower() + 1);
-				return;
-			}
+			}			
+			
 			Bucket myBucket = new Bucket(buckets);
 			Bucket otherBucket = new Bucket(buckets);
 			if (TAddress.getMyTAddress().isMyKey(left.getKey())) {
@@ -138,10 +136,27 @@ public class Bucket {
 			buckets.remove(getIndex());
 			buckets.add(otherBucket);
 			buckets.add(myBucket);
-			buckets.setPossiblePower(buckets.getPower());
 		} finally {
 			writeLock.unlock();
 		}
+	}
+	
+	public boolean canSplit() {
+		BucketKey bucketKey = new BucketKey(getBucketKey());
+		BucketKey left = bucketKey.getLeftKey();
+		List<Peer> leftPeers = new ArrayList<>();
+		List<Peer> rightPeers = new ArrayList<>();
+		for (Peer peer : peers) {
+			if (peer.getTAddress().isMyKey(left.getKey())) {
+				leftPeers.add(peer);
+			} else {
+				rightPeers.add(peer);
+			}
+		}
+		if (leftPeers.size() >= Constants.k && rightPeers.size() >= Constants.k) {
+			return true;
+		}
+		return false;
 	}
 
 }
