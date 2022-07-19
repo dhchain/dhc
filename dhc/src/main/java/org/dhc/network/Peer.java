@@ -175,6 +175,10 @@ public class Peer {
 			close("Network buckets do not contain this peer and it is not in use");
 			return;
 		}
+		if(!network.getAllPeers().contains(this)) {
+			logger.info("Inform peer that it is not in use {}", this);
+			send(new ClosePeerIfNotInUseMessage());
+		}
 		scheduleTrim();
 	}
 
