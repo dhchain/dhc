@@ -705,6 +705,7 @@ public class Peer {
 		receiverStarted = false;
 		writer = null;
 	    reader = null;
+	    inUse = false;
 	}
 
 }
