@@ -613,7 +613,7 @@ public class Peer {
 				return tAddress.compareDistance(p1.getTAddress(), p2.getTAddress());
 			}
 		});
-		return peers.subList(0, Math.min(Constants.k,peers.size()));
+		return peers.subList(0, Math.min(Constants.k, peers.size()));
 	}
 
 	public static List<Peer> getAllToPeers() {

@@ -1,6 +1,7 @@
 package org.dhc.network;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -77,9 +78,9 @@ public class Bucket {
 		
 	}
 	
-	public void trim() {
-/*		Collections.sort(peers, new TimeAddedPeerComparator());
-		peers = peers.subList(0, Math.min(Constants.k * 2, peers.size()));*/
+	private void trim() {
+		Collections.sort(peers, new TimeAddedPeerComparator());
+		peers = peers.subList(0, Math.min(Constants.k + 3, peers.size()));
 	}
 
 	public void removePeer(Peer peer) {
@@ -134,6 +135,7 @@ public class Bucket {
 				myBucket.addAll(rightPeers);
 			}
 			buckets.remove(getIndex());
+			otherBucket.trim();
 			buckets.add(otherBucket);
 			buckets.add(myBucket);
 		} finally {

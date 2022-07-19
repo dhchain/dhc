@@ -369,15 +369,15 @@ public class Buckets {
 				return;
 			}
 			if(bucket.isMyBucket()) {
-				bucket.addPeer(peer); //that uses shared lock
-				if(bucket.getPeers().size() < Constants.k * 2) {
+				bucket.addPeer(peer);
+				if(bucket.getPeers().size() < Constants.k + 3) {
 					return;
 				}
 				bucket.trySplit(averagePower);
 				return;
 			}
-			if(bucket.getPeers().size() < Constants.k * 2) {
-				bucket.addPeer(peer); //that uses shared lock
+			if(bucket.getPeers().size() < Constants.k + 3) {
+				bucket.addPeer(peer);
 			}
 		} finally {
 			writeLock.unlock();
@@ -393,7 +393,7 @@ public class Buckets {
 		if(bucket.isMyBucket()) {
 			return true;
 		}
-		if(bucket.getPeers().size() < Constants.k * 2) {
+		if(bucket.getPeers().size() < Constants.k + 3) {
 			return true;
 		}
 		
