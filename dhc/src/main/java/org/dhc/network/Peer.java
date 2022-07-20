@@ -301,11 +301,6 @@ public class Peer {
 			peersPut();
 			while(true) {
 				Message message = gsonUtil.read(reader);
-				if(message == null) {
-					logger.trace("Received null message socket.isClosed()={} from Peer@{} {}", socket.isClosed(), this.getSuperHashCode(), this);
-					close("Received null message");
-					return;
-				}
 				if(message != null) {
 					if(message.isThin()) {
 						setType(PeerType.THIN);

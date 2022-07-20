@@ -45,9 +45,6 @@ public class GsonUtil {
 	public Message read(JsonReader reader) {
 		synchronized (reader) {
 			JsonClassMarker marker = getGson().fromJson(reader, JsonClassMarker.class);
-			if(marker == null) {
-				return null;
-			}
 			Class<? extends Message> clazz = marker.getType();
 			if(clazz == null) {
 				return null;
