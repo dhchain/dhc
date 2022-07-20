@@ -85,7 +85,7 @@ Bitcoin white paper mentions possible removing of old spent transaction outputs.
 Installation instructions for full version:
 
 1. Install Java version 8 or 9: <a href="https://www.java.com/en/download/manual.jsp" target="_blank" >Download Java</a>.
-2. Download full DHC installer:  <a href="https://drive.google.com/file/d/1QeGQoQCzm0wR4zcNhhS3duOIlLR6Kphh/view?usp=sharing" target="_blank" download="dhc-installer">DHC Download</a>.
+2. Download full DHC installer:  <a href="http://download.dhcne.org/drive/dhc-full-installer.jar" target="_blank" download="dhc-installer">DHC Download</a>.
 3. Follow installer instructions and install in a directory where you have full access.
 4. If you already have key.csv file with existing keys you can just copy it to keys folder, otherwise it will create new key. 
 5. Start it by running dhc.sh or dhc.bat depending on your operating system. For graphical version run dhcgui.sh or dhcgui.bat
@@ -101,7 +101,7 @@ Installation instructions for for Android client: <a href="https://bitbucket.org
  1. Install IzPack from http://izpack.org/ 
  2. Download the source code from DHC repository 
  3. Run ANT script build.xml 
- 4. The resulting installer.jar will be contained in izpack/output directory
+ 4. The resulting dhc-full-installer.jar will be contained in izpack/output directory
 
 ## Contact
 admin@dhcne.org
