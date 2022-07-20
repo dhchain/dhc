@@ -189,6 +189,7 @@ public class Peer {
 	public boolean connectSocket() throws Exception {
 		
 		if(inetSocketAddress.equals(myself)) {
+			close("Cannot connect to yourself " + myself);
 			return false;
 		}
 		

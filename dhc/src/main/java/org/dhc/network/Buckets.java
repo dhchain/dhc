@@ -97,12 +97,12 @@ public class Buckets {
 			
 			List<Peer> peers = Peer.getPeers();
 			peers.removeAll(network.getAllPeers());
-			peers.removeIf(p -> p.getTAddress() == null);
+			//peers.removeIf(p -> p.getTAddress() == null);
 			
 			logger.info("Non bucket peers #peers={}", peers.size());
 			
 			for (Peer peer : peers) {
-				logger.info("\t{} {}", peer.getTAddress().getBinary(), peer);
+				logger.info("\t{} {}", (peer.getTAddress() == null? "No TAddress                     ": peer.getTAddress().getBinary()), peer);
 			}
 			
 			logger.info("\n");
