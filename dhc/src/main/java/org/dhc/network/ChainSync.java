@@ -194,7 +194,7 @@ public class ChainSync {
 		for(Peer peer: list) {
 			if(peer.isClosed()) {
 				if(peers.remove(peer) != null) {
-					logger.info("ChainSynchronizer removed closed peer {}", peer);
+					logger.trace("ChainSynchronizer removed closed peer {}", peer);
 				}
 			}
 		}
