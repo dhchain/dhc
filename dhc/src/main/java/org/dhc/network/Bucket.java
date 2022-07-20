@@ -62,21 +62,6 @@ public class Bucket {
 	public boolean isEmpty() {
 		return peers.isEmpty();
 	}
-
-	public void fill() {
-		List<Peer> allPeers = Peer.getPeers();
-		String myKey = buckets.getBucketKey(getIndex());//this can happen if the number of buckets changed and this bucket was removed
-		if(myKey == null) {
-			return;
-		}
-		for(Peer peer: allPeers) {
-			TAddress tAddress = peer.getTAddress();
-			if(tAddress != null && tAddress.getBinary().startsWith(myKey) && !peers.contains(peer)) {
-				peers.add(peer);
-			}
-		}
-		
-	}
 	
 	private void trim() {
 		Collections.sort(peers, new TimeAddedPeerComparator());
