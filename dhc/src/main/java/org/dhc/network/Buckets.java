@@ -356,6 +356,9 @@ public class Buckets {
 	}
 
 	public void addPeer(Peer peer) {
+		if(peer.isThin()) {
+			return;
+		}
 		Bucket bucket;
 		int averagePower = Blockchain.getInstance().getAveragePower();
 		Lock writeLock = readWriteLock.writeLock();
