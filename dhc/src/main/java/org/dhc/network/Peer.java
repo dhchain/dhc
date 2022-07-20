@@ -176,7 +176,6 @@ public class Peer {
 			return;
 		}
 		if(!network.getAllPeers().contains(this)) {
-			logger.info("Inform peer that it is not in use {}", this);
 			send(new ClosePeerIfNotInUseMessage());
 		}
 		scheduleTrim();
