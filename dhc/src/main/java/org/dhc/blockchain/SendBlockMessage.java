@@ -1,5 +1,6 @@
 package org.dhc.blockchain;
 
+import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
 import org.dhc.util.Message;
@@ -60,6 +61,10 @@ public class SendBlockMessage extends Message {
 				}
 			});
 			
+			return;
+		}
+		
+		if(ChainSync.getInstance().isRunning()) {
 			return;
 		}
 		

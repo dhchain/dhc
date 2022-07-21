@@ -229,8 +229,9 @@ public class Blockchain {
 			}
 
 			logger.info("'{}'-{} Added block {}", block.getBucketKey(), block.getIndex(), block);
-			Listeners.getInstance().sendEvent(new BlockEvent(block, "Added"));
-
+			if(ChainSync.getInstance().isRunning() && block.getIndex() % 100 == 0) {
+				Listeners.getInstance().sendEvent(new BlockEvent(block, "Added"));
+			}
 			try {
 				queue.put(node);
 			} catch (InterruptedException e) {

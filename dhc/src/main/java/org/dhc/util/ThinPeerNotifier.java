@@ -24,6 +24,9 @@ public class ThinPeerNotifier {
 	}
 	
 	public void notifySecureMessage(Transaction transaction) {
+		if(ChainSync.getInstance().isRunning()) {
+			return;
+		}
 		ThreadExecutor.getInstance().execute(new DhcRunnable("notifyTransaction") {
 			public void doRun() {
 				doNotifySecureMessage(transaction);

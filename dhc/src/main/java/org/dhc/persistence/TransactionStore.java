@@ -28,6 +28,7 @@ import org.dhc.gui.promote.JoinTransactionEvent;
 import org.dhc.lite.SecureMessage;
 import org.dhc.lite.post.Ratee;
 import org.dhc.lite.post.Rating;
+import org.dhc.network.ChainSync;
 import org.dhc.util.Applications;
 import org.dhc.util.Base58;
 import org.dhc.util.Coin;
@@ -149,8 +150,11 @@ public class TransactionStore {
 			logger.trace("Send {} coins to {}", transaction.getValue().toNumberOfCoins(), transaction.getReceiver());
 		}
 		Registry.getInstance().getMissingOutputsForTransaction().process(transaction.getTransactionId(), transaction.getBlockHash());
-		Listeners.getInstance().sendEvent(new JoinTransactionEvent(transaction));
-		Registry.getInstance().getThinPeerNotifier().notifyTransaction(transaction);
+		if(!ChainSync.getInstance().isRunning()) {
+			Listeners.getInstance().sendEvent(new JoinTransactionEvent(transaction));
+			Registry.getInstance().getThinPeerNotifier().notifyTransaction(transaction);
+		}
+		
 		return true;
 	}
 	

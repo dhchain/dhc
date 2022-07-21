@@ -2,13 +2,14 @@ package org.dhc.network.consensus;
 
 import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
+import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.network.Peer;
+import org.dhc.util.DhcLogger;
+import org.dhc.util.DhcRunnable;
 import org.dhc.util.Message;
 import org.dhc.util.Registry;
 import org.dhc.util.ThreadExecutor;
-import org.dhc.util.DhcLogger;
-import org.dhc.util.DhcRunnable;
 
 public class SendBucketHashMessage extends Message {
 
@@ -71,7 +72,9 @@ public class SendBucketHashMessage extends Message {
 		}
 		
 
-
+		if(ChainSync.getInstance().isRunning()) {
+			return;
+		}
 		//should not hold lock on consensus in receiver thread, it will slow it down and potentially cause a deadlock with other threads
 		String str = String.format("SendBucketHashMessage@%s %s-%s '%s'='%s'", hashCode(), index, bucketHash.getPreviousBlockHash().substring(0, 7), 
 				bucketHash.getBinaryStringKey(), bucketHash.getHash().substring(0, Math.min(7, bucketHash.getHash().length())));
