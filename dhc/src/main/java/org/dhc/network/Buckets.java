@@ -346,11 +346,7 @@ public class Buckets {
 		} finally {
 			writeLock.unlock();
 			if(getPower() < Blockchain.getInstance().getLastAveragePower()) {
-				ThreadExecutor.getInstance().execute(new DhcRunnable("navigate") {
-					public void doRun() {
-						Bootstrap.getInstance().navigate(getAllPeers(), TAddress.getMyTAddress());
-					}
-				});
+				PeerSync.getInstance().executeNow();
 			}
 		}
 	}

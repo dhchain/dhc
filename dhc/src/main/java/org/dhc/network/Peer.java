@@ -117,16 +117,20 @@ public class Peer {
     }
     
     private boolean peersRemove() {
+    	boolean result;
     	synchronized (peers) {
     		Peer localVarPeer = peers.get(inetSocketAddress);
     		if(this == localVarPeer) {
     			peers.remove(inetSocketAddress);
     			logger.trace("peersRemove inetSocketAddress = {} Peer@{}", inetSocketAddress, super.hashCode());
-    			Network.getInstance().removePeer(this);
-    			return true;
+    			result = true;
     		}
-    		return false;
+    		result = false;
 		}
+    	if(result) {
+    		Network.getInstance().removePeer(this);
+    	}
+    	return result;
     }
     
     private void scheduleTrim() {

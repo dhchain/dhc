@@ -1,14 +1,16 @@
 package org.dhc.blockchain;
 
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.dhc.network.ChainSync;
 import org.dhc.network.Peer;
-import org.dhc.util.Message;
-import org.dhc.util.ThreadExecutor;
+import org.dhc.util.Constants;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
+import org.dhc.util.Message;
+import org.dhc.util.ThreadExecutor;
 
 public class SyncReplyMessage extends Message {
 
@@ -68,11 +70,20 @@ public class SyncReplyMessage extends Message {
 		synchronizer.unRegister(blockchainIndex);
 
 		String str = String.format("SyncReplyMessage.doIt() blockchainIndex=%s", blockchainIndex);
-		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
-			public void doRun() {
-				doIt(peer);
+		while (true) {
+			try {
+				ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
+					public void doRun() {
+						doIt(peer);
+					}
+				});
+				break;
+			} catch (RejectedExecutionException e) {
+				logger.error(e.getMessage(), e);
+				ThreadExecutor.sleep(Constants.SECOND);
 			}
-		});
+		}
+
 	}
 	
 	private void doIt(Peer peer) {
@@ -82,14 +93,14 @@ public class SyncReplyMessage extends Message {
 		for(Block block: blocks) {
 			blockchain.add(block);
 		}
+		
+		while(blockchain.getNumberOfPendingBlocks() > 1000) {
+			ThreadExecutor.sleep(Constants.SECOND);
+		}
 
 		if(blockchain.getIndex() + 1 >= blockchainIndex && !blockchain.contains(blocks.iterator().next().getBlockHash())) {
 			peer.send(new SyncMessage(blockchainIndex - 1));
 			return;
-		}
-		
-		while(blockchain.getNumberOfPendingBlocks() > 1000) {
-			ThreadExecutor.sleep(10000);
 		}
 		
 		peer.send(new SyncMessage(synchronizer.next(peer)));

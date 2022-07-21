@@ -134,6 +134,9 @@ public class Bucket {
 		List<Peer> leftPeers = new ArrayList<>();
 		List<Peer> rightPeers = new ArrayList<>();
 		for (Peer peer : peers) {
+			if(peer.getTAddress() == null) {
+				continue;
+			}
 			if (peer.getTAddress().isMyKey(left.getKey())) {
 				leftPeers.add(peer);
 			} else {
