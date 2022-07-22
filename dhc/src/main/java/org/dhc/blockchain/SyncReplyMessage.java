@@ -67,8 +67,6 @@ public class SyncReplyMessage extends Message {
 			}
 		}
 
-		synchronizer.unRegister(blockchainIndex);
-
 		String str = String.format("SyncReplyMessage.doIt() blockchainIndex=%s", blockchainIndex);
 
 		try {
@@ -79,7 +77,11 @@ public class SyncReplyMessage extends Message {
 			});
 		} catch (RejectedExecutionException e) {
 			logger.error(e.getMessage(), e);
+			synchronizer.incNotify(peer, e.getMessage());
+			return;
 		}
+		
+		synchronizer.unRegister(blockchainIndex);
 
 	}
 	
