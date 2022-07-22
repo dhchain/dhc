@@ -1,6 +1,7 @@
 package org.dhc.blockchain;
 
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.dhc.network.ChainSync;
 import org.dhc.network.Peer;
@@ -70,11 +71,15 @@ public class SyncReplyMessage extends Message {
 
 		String str = String.format("SyncReplyMessage.doIt() blockchainIndex=%s", blockchainIndex);
 
-		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
-			public void doRun() {
-				doIt(peer);
-			}
-		});
+		try {
+			ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
+				public void doRun() {
+					doIt(peer);
+				}
+			});
+		} catch (RejectedExecutionException e) {
+			logger.error(e.getMessage(), e);
+		}
 
 	}
 	
