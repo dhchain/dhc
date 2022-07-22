@@ -1,7 +1,6 @@
 package org.dhc.blockchain;
 
 import java.util.List;
-import java.util.concurrent.RejectedExecutionException;
 
 import org.dhc.network.ChainSync;
 import org.dhc.network.Peer;
@@ -70,19 +69,12 @@ public class SyncReplyMessage extends Message {
 		synchronizer.unRegister(blockchainIndex);
 
 		String str = String.format("SyncReplyMessage.doIt() blockchainIndex=%s", blockchainIndex);
-		while (true) {
-			try {
-				ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
-					public void doRun() {
-						doIt(peer);
-					}
-				});
-				break;
-			} catch (RejectedExecutionException e) {
-				logger.error(e.getMessage(), e);
-				ThreadExecutor.sleep(Constants.SECOND);
+
+		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
+			public void doRun() {
+				doIt(peer);
 			}
-		}
+		});
 
 	}
 	
@@ -94,8 +86,14 @@ public class SyncReplyMessage extends Message {
 			blockchain.add(block);
 		}
 		
+		int attemptNumber = 0;
 		while(blockchain.getNumberOfPendingBlocks() > 1000) {
 			ThreadExecutor.sleep(Constants.SECOND);
+			if(attemptNumber++ > 30) {
+				logger.info("Number of pending blocks is too large. Peer {}", peer);
+				synchronizer.incNotify(peer, "Number of pending blocks is too large");
+				return;
+			}
 		}
 
 		if(blockchain.getIndex() + 1 >= blockchainIndex && !blockchain.contains(blocks.iterator().next().getBlockHash())) {

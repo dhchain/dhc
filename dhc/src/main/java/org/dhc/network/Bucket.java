@@ -103,7 +103,8 @@ public class Bucket {
 			List<Peer> leftPeers = new ArrayList<>();
 			List<Peer> rightPeers = new ArrayList<>();
 			for (Peer peer : peers) {
-				if (peer.getTAddress().isMyKey(left.getKey())) {
+				TAddress tAddress = peer.getTAddress();
+				if (tAddress != null && tAddress.isMyKey(left.getKey())) {
 					leftPeers.add(peer);
 				} else {
 					rightPeers.add(peer);
@@ -134,10 +135,11 @@ public class Bucket {
 		List<Peer> leftPeers = new ArrayList<>();
 		List<Peer> rightPeers = new ArrayList<>();
 		for (Peer peer : peers) {
-			if(peer.getTAddress() == null) {
+			TAddress tAddress = peer.getTAddress();
+			if(tAddress == null) {
 				continue;
 			}
-			if (peer.getTAddress().isMyKey(left.getKey())) {
+			if (tAddress.isMyKey(left.getKey())) {
 				leftPeers.add(peer);
 			} else {
 				rightPeers.add(peer);
