@@ -56,7 +56,7 @@ public class Main {
 				DBExecutor.shutdownDerby();
 			}
 		});
-		System.setProperty("jvm.name", ManagementFactory.getRuntimeMXBean().getName());
+		System.setProperty("jvm.name", ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
 	}
 	
 	private static final DhcLogger logger = DhcLogger.getLogger();
