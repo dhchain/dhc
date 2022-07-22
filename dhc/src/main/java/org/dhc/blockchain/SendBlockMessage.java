@@ -26,6 +26,11 @@ public class SendBlockMessage extends Message {
 		if (alreadySent(toString())) {
 			return;
 		}
+		Blockchain blockchain = Blockchain.getInstance();
+		if(block.getIndex() < blockchain.getIndex() - 10) {
+			logger.trace("Mined block too old returning {}", block);
+			return;
+		}
 		
 		if(!block.isMined()) {
 			logger.info("*********************************************************");
@@ -42,8 +47,7 @@ public class SendBlockMessage extends Message {
 		Network.getInstance().sendToSomePeers(this, peer);
 		//need to clone because RecoveringBlocks might change shard and we lose coinbase transaction when forwarding to a peer from the same shard as the miner
 		Block block = this.block.clone();
-		
-		Blockchain blockchain = Blockchain.getInstance();
+
 		if(blockchain.getIndex() + 1 < block.getIndex()) {
 			blockchain.syncAsync();
 		}
