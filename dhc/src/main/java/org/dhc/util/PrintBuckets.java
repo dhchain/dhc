@@ -2,6 +2,7 @@ package org.dhc.util;
 
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ public class PrintBuckets {
 	static {
 		Security.setProperty("crypto.policy", "unlimited");
 		Security.addProvider(new BouncyCastleProvider());
+		System.setProperty("jvm.name", ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
 	}
 
 	private static final GsonUtil gsonUtil = GsonUtil.getInstance();
