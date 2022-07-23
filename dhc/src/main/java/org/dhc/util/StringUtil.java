@@ -105,5 +105,16 @@ public class StringUtil {
 	    queryBuilder.append(")");
 	    return queryBuilder.toString();
 	}
+	
+	public static String padRight(String str, int number) {
+		return String.format("%-" + number + "s", str);
+	}
+	
+	public static void main(String[] args) {
+		System.out.println("|" + padRight("test", 100) + "|");
+		
+		System.out.println(String.format("%10s", "foo").replace(' ', '*'));
+		System.out.println(String.format("%-10s", "bar").replace(' ', '*'));
+	}
 
 }

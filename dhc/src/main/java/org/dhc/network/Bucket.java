@@ -30,6 +30,8 @@ public class Bucket {
 		for(Peer peer: peers) {
 			if(!peer.isClosed()) {
 				result.add(peer);
+			} else {
+				peers.remove(peer);
 			}
 		}
 		return result;
@@ -102,7 +104,7 @@ public class Bucket {
 			BucketKey left = bucketKey.getLeftKey();
 			List<Peer> leftPeers = new ArrayList<>();
 			List<Peer> rightPeers = new ArrayList<>();
-			for (Peer peer : peers) {
+			for (Peer peer : getPeers()) {
 				TAddress tAddress = peer.getTAddress();
 				if (tAddress != null && tAddress.isMyKey(left.getKey())) {
 					leftPeers.add(peer);
@@ -134,7 +136,7 @@ public class Bucket {
 		BucketKey left = bucketKey.getLeftKey();
 		List<Peer> leftPeers = new ArrayList<>();
 		List<Peer> rightPeers = new ArrayList<>();
-		for (Peer peer : peers) {
+		for (Peer peer : getPeers()) {
 			TAddress tAddress = peer.getTAddress();
 			if(tAddress == null) {
 				continue;

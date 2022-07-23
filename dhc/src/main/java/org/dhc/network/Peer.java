@@ -26,6 +26,7 @@ import org.dhc.util.DhcRunnable;
 import org.dhc.util.ExpiringMap;
 import org.dhc.util.GsonUtil;
 import org.dhc.util.Message;
+import org.dhc.util.StringUtil;
 import org.dhc.util.TAddress;
 import org.dhc.util.ThreadExecutor;
 
@@ -456,6 +457,7 @@ public class Peer {
 		String result = "/" + socket.getInetAddress().getHostAddress() + ":" + 
 				socket.getPort() + ", localPort=" + 
 				socket.getLocalPort();
+		result  = StringUtil.padRight(result, 40);
 		return result;
 	}
 	
@@ -556,7 +558,7 @@ public class Peer {
 	}
 	
 	public String toString() {
-		return (socket != null? socket: inetSocketAddress) + " \t\t\t\t\t\t" + networkIdentifier + " \t" + tAddress + " \tclosed=" + isClosed() + " \tinUse=" + getInUse() + 
+		return socketToString() + " \t" + StringUtil.padRight("" + networkIdentifier, 45) + " \t" + StringUtil.padRight("" + tAddress, 7) + " \tclosed=" + isClosed() + " \tinUse=" + getInUse() + 
 				" \t\tlastSeen=" + new Date(getLastSeen()) + " \ttimeAdded=" + new Date(getTimeAdded()) + " \t" + getType() + " \t";
 	}
 	
