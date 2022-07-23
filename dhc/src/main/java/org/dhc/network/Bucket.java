@@ -112,7 +112,10 @@ public class Bucket {
 			List<Peer> rightPeers = new ArrayList<>();
 			for (Peer peer : getPeers()) {
 				TAddress tAddress = peer.getTAddress();
-				if (tAddress != null && tAddress.isMyKey(left.getKey())) {
+				if(tAddress == null) {
+					continue;
+				}
+				if (tAddress.isMyKey(left.getKey())) {
 					leftPeers.add(peer);
 				} else {
 					rightPeers.add(peer);
