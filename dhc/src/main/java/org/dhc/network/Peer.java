@@ -509,6 +509,9 @@ public class Peer {
 			} else {
 				message.setInUse(true);
 			}
+			if(message instanceof ConnectMessage) {
+				message.setInUse(true);
+			}
 			
 			message.setPossiblePower(Network.getInstance().getPossiblePower());
 			getWriter();
