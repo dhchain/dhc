@@ -371,9 +371,11 @@ public class Consensus {
 			throw new BlockchainIndexStaleException("Blockchain index is stale");
 		}
 		
+		int pp = network.getPossiblePower();
+		
 		logger.trace("{} ********************* Ready to mine *************************", blockchainIndex);
 		logger.info("'{}'-{} Ready to mine # peers {} bucketPeers {} myPeers {} pp {} #c {} ap {} {}\n", block.getBucketKey(), block.getIndex(), Peer.getTotalPeerCount(), 
-				network.getAllPeers().size(), network.getMyBucketPeers().size(), network.getPossiblePower(), numberOfConsensuses, blockchain.getAveragePower(), block);
+				network.getAllPeers().size(), network.getMyBucketPeers().size(), pp, numberOfConsensuses, blockchain.getAveragePower(), block);
 		Listeners.getInstance().sendEvent(new BlockEvent(block, "Ready to mine"));
 		
 		for(BucketHash b: consensuses.getBySecondKey("").values()) {
