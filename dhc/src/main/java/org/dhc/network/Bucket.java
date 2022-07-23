@@ -30,10 +30,9 @@ public class Bucket {
 		for(Peer peer: peers) {
 			if(!peer.isClosed()) {
 				result.add(peer);
-			} else {
-				peers.remove(peer);
 			}
 		}
+		peers.retainAll(result);
 		return result;
 	}
 
@@ -67,7 +66,14 @@ public class Bucket {
 	
 	private void trim() {
 		Collections.sort(peers, new TimeAddedPeerComparator());
+		List<Peer> peersToClose = new ArrayList<>(peers);
 		peers = peers.subList(0, Math.min(Constants.k + 3, peers.size()));
+		peersToClose.removeAll(peers);
+		for(Peer peer: peersToClose) {
+			if(!peer.getInUse()) {
+				peer.close("Close peer because it is not in use");
+			}
+		}
 	}
 
 	public void removePeer(Peer peer) {
