@@ -65,18 +65,48 @@ public class Buckets {
 	
 	private void checkWithMyPeers() {
 		List<Peer> myPeers = getMyBucketPeers();
-		List<Peer> myToPeers = getMyBucketToPeers();
+		List<Peer> myToPeersInLastTwoBuckets = getToPeersInLastTwoBuckets();//we are sending last two buckets because to help to split a peer would need both last buckets
 		for(Peer peer: myPeers) {
 			String key = "mypeers-" + peer.getNetworkIdentifier();
 			if(expiringMap.get(key) != null) {
 				continue;
 			}
 			expiringMap.put(key, key);
-			peer.send(new SendMyToPeersMessage(myToPeers));
+			peer.send(new SendMyToPeersMessage(myToPeersInLastTwoBuckets));
 		}
 		
 	}
 	
+	private List<Peer> getToPeersInLastTwoBuckets() {
+		List<Peer> result = new ArrayList<Peer>();
+		for(Peer peer: getPeersInLastTwoBuckets()) {
+			if(PeerType.TO.equals(peer.getType())) {
+				result.add(peer);
+			}
+		}
+		return result;
+	}
+	
+	public List<Peer> getPeersInLastTwoBuckets() {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			List<Peer> result = new ArrayList<>();
+			int power = getPower();
+			result.addAll(getAllPeersInBucket(power));
+			result.addAll(getAllPeersInBucket(power - 1));
+			return result;
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
 	public List<Peer> getMyBucketToPeers() {
 		List<Peer> result = new ArrayList<Peer>();
 		for(Peer peer: getMyBucketPeers()) {
@@ -173,13 +203,13 @@ public class Buckets {
 			//logger.trace("unlock");
 		}
 	}
-
+	
 	public List<Peer> getAllPeersInBucket(int index) {
 		Lock readLock = readWriteLock.readLock();
 		readLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			if (buckets.isEmpty() || buckets.size() <= index) {
+			if (buckets.isEmpty() || buckets.size() <= index || index < 0) {
 				return new ArrayList<Peer>();
 			}
 			return buckets.get(index).getPeers();
@@ -379,7 +409,7 @@ public class Buckets {
 			}
 			if(bucket.isMyBucket()) {
 				bucket.addPeer(peer);
-				if(bucket.getPeers().size() < Constants.k + 3) {
+				if(bucket.getPeers().size() < Constants.k * 2) {// my bucket has to have a minimum k * 2 in order to be able to split into two buckets with k number of peers each
 					return;
 				}
 				bucket.trySplit(averagePower);
