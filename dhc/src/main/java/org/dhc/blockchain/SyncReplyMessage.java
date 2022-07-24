@@ -94,7 +94,7 @@ public class SyncReplyMessage extends Message {
 		}
 		
 		int attemptNumber = 0;
-		while(blockchain.getNumberOfPendingBlocks() > 1000) {
+		while(blockchain.getNumberOfPendingBlocks() > 400) {
 			ThreadExecutor.sleep(Constants.SECOND);
 			if(attemptNumber++ > 30) {
 				logger.info("Number of pending blocks is too large. Peer {}", peer);
