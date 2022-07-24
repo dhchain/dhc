@@ -65,7 +65,7 @@ public class Buckets {
 	
 	private void checkWithMyPeers() {
 		List<Peer> myPeers = getMyBucketPeers();
-		List<Peer> myToPeers = Network.getInstance().getMyBucketToPeers();
+		List<Peer> myToPeers = getMyBucketToPeers();
 		for(Peer peer: myPeers) {
 			String key = "mypeers-" + peer.getNetworkIdentifier();
 			if(expiringMap.get(key) != null) {
