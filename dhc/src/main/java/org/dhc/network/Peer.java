@@ -700,7 +700,7 @@ public class Peer {
 		}
 		if(!this.tAddress.equals(tAddress)) {
 			RuntimeException e = new RuntimeException("TAddresses are not equal");
-			logger.info("this.tAddress={}, tAddress={}", this.tAddress, tAddress);
+			logger.info("this.tAddress={}, tAddress={}, peer {}", this.tAddress, tAddress, this);
 			logger.info(e.getMessage(), e);
 			throw e;
 		}
