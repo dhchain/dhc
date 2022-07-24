@@ -76,6 +76,16 @@ public class Buckets {
 		}
 		
 	}
+	
+	public List<Peer> getMyBucketToPeers() {
+		List<Peer> result = new ArrayList<Peer>();
+		for(Peer peer: getMyBucketPeers()) {
+			if(PeerType.TO.equals(peer.getType())) {
+				result.add(peer);
+			}
+		}
+		return result;
+	}
 
 	public void printBuckets() {
 		Lock readLock = readWriteLock.readLock();
