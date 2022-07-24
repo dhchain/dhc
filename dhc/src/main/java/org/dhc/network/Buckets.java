@@ -418,7 +418,7 @@ public class Buckets {
 			if(bucket.getPeers().size() < Constants.k + 3) {
 				bucket.addPeer(peer);
 			} else if(!peer.getInUse()) {
-				peer.close("Close peer because it is not in use");
+				peer.close("Buckets.addPeer() Close peer because it is not in use");
 			}
 		} finally {
 			writeLock.unlock();
