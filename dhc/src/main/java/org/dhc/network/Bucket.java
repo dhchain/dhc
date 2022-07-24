@@ -71,7 +71,7 @@ public class Bucket {
 		peersToClose.removeAll(peers);
 		for(Peer peer: peersToClose) {
 			if(!peer.getInUse()) {
-				peer.close("Close peer because it is not in use");
+				peer.close("Bucket.trim() Close peer because it is not in use");
 			}
 		}
 	}
