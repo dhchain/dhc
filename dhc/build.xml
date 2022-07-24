@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project name="DHC Installer" default="mk_installer" basedir=".">
-	
+
 	<property name="dir.buildfile" value="."/>
 	<property name="dir.workspace" value="${dir.buildfile}/../.."/>
 	<property name="dir.jarfile" value="${dir.buildfile}/target"/>
@@ -10,53 +10,54 @@
 	<property name="image.dir" location="izpack\installer\images" />
 	<property name="izpack.lib" location="Z:\IzPack\lib" />
 	<property name="dir.upload" location="Y:/wildfly/standalone/deployments/dhcweb-0.0.1-SNAPSHOT.war/drive" />
- 
-    <target name="create_run_jar">
-        
-        <delete dir="${dir.jarfile}/lib"/>
-        <mkdir dir="${dir.jarfile}/lib"/>
-        <copy file="${dir.repository}/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar" todir="${dir.jarfile}/lib"/>
-        <copy file="${dir.repository}/org/apache/derby/derbytools/10.14.2.0/derbytools-10.14.2.0.jar" todir="${dir.jarfile}/lib"/>
-        <copy file="${dir.repository}/args4j/args4j/2.33/args4j-2.33.jar" todir="${dir.jarfile}/lib"/>
-        <copy file="${dir.repository}/com/google/code/gson/gson/2.9.0/gson-2.9.0.jar" todir="${dir.jarfile}/lib"/>
-        <copy file="${dir.repository}/org/bouncycastle/bcprov-jdk15on/1.65.01/bcprov-jdk15on-1.65.01.jar" todir="${dir.jarfile}/lib"/>
-        <copy file="${dir.repository}/org/tinylog/tinylog-impl/2.1.2/tinylog-impl-2.1.2.jar" todir="${dir.jarfile}/lib"/>
-        <copy file="${dir.repository}/org/tinylog/tinylog-api/2.1.2/tinylog-api-2.1.2.jar" todir="${dir.jarfile}/lib"/>
-    	<copy file="${dir.repository}/com/miglayout/miglayout-core/5.3/miglayout-core-5.3.jar" todir="${dir.jarfile}/lib"/>
-    	<copy file="${dir.repository}/com/miglayout/miglayout-swing/5.3/miglayout-swing-5.3.jar" todir="${dir.jarfile}/lib"/>
-    	
-    	<path id="classpath">
-    	    <fileset dir="${dir.jarfile}/lib" includes="**/*.jar"/>
-    	</path>
 
-    	<manifestclasspath property="manifest.classpath" jarfile="${dir.jarfile}/dhc.jar">
-    	    <classpath refid="classpath"/>
-    	</manifestclasspath>
-    	
-    	<jar destfile="${dir.jarfile}/dhc.jar">
-            <manifest>
-                <attribute name="Main-Class" value="org.dhc.Main"/>
-            	<attribute name="Class-Path" value=". ${manifest.classpath}"/>
-            </manifest>
-            <fileset dir="${dir.jarfile}/classes"/>
-    	</jar>
-    </target>
-	
-  <taskdef name="mkinstaller" classname="com.izforge.izpack.ant.IzPackTask">
-  	<classpath>
-  	    <fileset dir="${izpack.lib}" includes="*.jar" />
-  	  </classpath>
-  </taskdef>
-	 
-  <target name="mk_installer" depends="create_run_jar">
-	    <mkinstaller input="${install.file}"
-	        output="izpack\output\dhc-full-installer.jar"
-	        basedir="izpack\installer"/>
-  	    <delete dir="${dir.jarfile}/lib"/>
-  	    <!--<delete file="${dir.jarfile}/dhc.jar"/> -->
-  	    <copy file="${dir.jarfile}/dhc.jar" todir="${dir.upload}"/>
-  	    <copy file="izpack/output/dhc-full-installer.jar" todir="${dir.upload}"/>
-  	    
-  </target>
- 
-</project> 
+	<target name="create_run_jar">
+
+		<delete dir="${dir.jarfile}/lib"/>
+		<mkdir dir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/org/apache/derby/derbytools/10.14.2.0/derbytools-10.14.2.0.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/args4j/args4j/2.33/args4j-2.33.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/com/google/code/gson/gson/2.9.0/gson-2.9.0.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/org/bouncycastle/bcprov-jdk15on/1.65.01/bcprov-jdk15on-1.65.01.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/org/tinylog/tinylog-impl/2.1.2/tinylog-impl-2.1.2.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/org/tinylog/tinylog-api/2.1.2/tinylog-api-2.1.2.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/com/miglayout/miglayout-core/5.3/miglayout-core-5.3.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/com/miglayout/miglayout-swing/5.3/miglayout-swing-5.3.jar" todir="${dir.jarfile}/lib"/>
+
+		<path id="classpath">
+			<fileset dir="${dir.jarfile}/lib" includes="**/*.jar"/>
+		</path>
+
+		<manifestclasspath property="manifest.classpath" jarfile="${dir.jarfile}/dhc.jar">
+			<classpath refid="classpath"/>
+		</manifestclasspath>
+
+		<jar destfile="${dir.jarfile}/dhc.jar">
+			<manifest>
+				<attribute name="Main-Class" value="org.dhc.Main"/>
+				<attribute name="Class-Path" value=". ${manifest.classpath}"/>
+			</manifest>
+			<fileset dir="${dir.jarfile}/classes"/>
+		</jar>
+	</target>
+
+	<taskdef name="mkinstaller" classname="com.izforge.izpack.ant.IzPackTask">
+		<classpath>
+			<fileset dir="${izpack.lib}" includes="*.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="mk_installer" depends="create_run_jar">
+		<mkinstaller input="${install.file}" output="izpack\output\dhc-full-installer.jar"
+        basedir="izpack\installer"/>
+		<delete dir="${dir.jarfile}/lib"/>
+		<!-- -->
+		<copy file="${dir.jarfile}/dhc.jar" todir="${dir.upload}"/>
+		<echo>Copied dhc.jar</echo>
+		<delete file="${dir.jarfile}/dhc.jar"/>
+		<copy file="izpack/output/dhc-full-installer.jar" todir="${dir.upload}"/>
+		<echo>Copied dhc-full-installer.jar</echo>
+	</target>
+
+</project>
