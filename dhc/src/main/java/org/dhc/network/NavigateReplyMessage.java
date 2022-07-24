@@ -60,21 +60,9 @@ public class NavigateReplyMessage extends Message {
 				logger.trace("NavigateReplyMessage.doIt() - Cannot connect to yourself");
 				continue;
 			}
-			
-			TAddress tAddress = p.getTAddress();
-			if(tAddress == null) {
-				continue;
-			}
-			
-			if(!Network.getInstance().shouldAddPeer(tAddress)) {
-				logger.trace("Should not add peer {}", p);
-				continue;
-			}
-			
-			Peer foundPeer = Peer.getInstance(p.getInetSocketAddress());
-			foundPeer.setType(PeerType.TO);
-			logger.trace("foundPeer = {}", foundPeer);
-			if(bootstrap.connect(foundPeer)) {
+
+			if(bootstrap.connectIfShouldAdd(p)) {
+				Peer foundPeer = Peer.getInstance(p.getInetSocketAddress());
 				new NavigateMessage(hash, index).send(foundPeer);
 				count++;
 			}
