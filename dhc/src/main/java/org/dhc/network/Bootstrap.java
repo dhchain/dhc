@@ -187,49 +187,28 @@ public class Bootstrap {
 		return true;
 	}
 	
-	public void addPeers(List<Peer> peers) {
-		List<Peer> list = Peer.getPeers();
-		Set<Peer> foundPeers = new HashSet<Peer>(peers);
-		foundPeers.removeAll(list);
-		
-		List<Callable<Boolean>> calls = new ArrayList<>();
-		for (Peer p : foundPeers) {
-			String networkIdentifier = p.getNetworkIdentifier();
-			if(networkIdentifier == null) {
-				continue;
-			}
-			if(!Peer.getPeersByNetworkIdentifier(networkIdentifier).isEmpty()) {
-				continue;
-			}
-			if(networkIdentifier.equals(Network.getInstance().getNetworkIdentifier())) {
-				logger.trace("Bootstrap.addPeers() - Cannot connect to yourself");
-				continue;
-			}
-			
-			TAddress tAddress = p.getTAddress();
-			if(tAddress == null) {
-				continue;
-			}
-			
-			if(!Network.getInstance().shouldAddPeer(tAddress)) {
-				logger.trace("Should not add peer {}", p);
-				continue;
-			}
-			
-			Peer foundPeer = Peer.getInstance(p.getInetSocketAddress());
-			foundPeer.setType(PeerType.TO);
-			calls.add(new Callable<Boolean>() {
-
-				@Override
-				public Boolean call() throws Exception {
-					connect(foundPeer);
-					return null;
-				}
-			});
-			
+	public synchronized boolean connectIfShouldAdd(Peer peer) {
+		TAddress tAddress = peer.getTAddress();
+		if(tAddress == null) {
+			return false;
 		}
-		ForkJoinPool.commonPool().invokeAll(calls);
+		
+		if(!Network.getInstance().shouldAddPeer(tAddress)) {
+			logger.trace("Should not add peer {}", peer);
+			return false;
+		}
+		
+		Peer foundPeer = Peer.getInstance(peer.getInetSocketAddress());
+		foundPeer.setType(PeerType.TO);
+		logger.trace("foundPeer = {}", foundPeer);
+		
+		if(connect(foundPeer)) {
+			foundPeer.setTAddress(tAddress);
+			return true;
+		}
+		return false;
 	}
+	
 
 	public Set<Peer> getCandidatePeers() {
 		return candidatePeers;
