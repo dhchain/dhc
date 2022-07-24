@@ -25,6 +25,7 @@ public class ConnectMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
+		logger.trace("ConnectMessage - START");
 		if(Network.getInstance().getNetworkIdentifier().equals(peer.getNetworkIdentifier())) {
 			//logger.trace("ConnectMessage - Cannot connect to yourself");
 			logger.trace("*********************************************************");

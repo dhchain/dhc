@@ -16,6 +16,7 @@ public class ConnectReplyMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
+		logger.trace("ConnectReplyMessage - START");
 		if(Network.getInstance().getNetworkIdentifier().equals(peer.getNetworkIdentifier())) {
 			logger.info("ConnectReplyMessage - Cannot connect to yourself");
 			logger.info("*********************************************************");

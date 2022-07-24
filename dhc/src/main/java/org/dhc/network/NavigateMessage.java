@@ -30,6 +30,7 @@ public class NavigateMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
+		logger.trace("NavigateMessage - START");
 		String str = String.format("NavigateMessage.process %s-%s-%s", hash, index, peer.getInetSocketAddress());
 		if(alreadySent(str)) {
 			return;

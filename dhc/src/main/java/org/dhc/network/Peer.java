@@ -509,7 +509,7 @@ public class Peer {
 			} else {
 				message.setInUse(true);
 			}
-			if(message instanceof ConnectMessage) {
+			if(message instanceof ConnectMessage || message instanceof NavigateMessage) {
 				message.setInUse(true);
 			}
 			
