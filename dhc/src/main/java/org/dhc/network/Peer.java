@@ -545,6 +545,7 @@ public class Peer {
 	
 	private List<Peer> getExcessPeers() {
 		List<Peer> list = getPeers();
+		list.removeAll(Network.getInstance().getAllPeers());
 		Collections.sort(list, new TimeAddedPeerComparator());
 		if(Constants.MAX_CONN > list.size()) {
 			return new ArrayList<Peer>();
