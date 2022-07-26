@@ -976,9 +976,9 @@ public class TransactionStore {
 		try {
 			new DBExecutor() {
 				public void doWork() throws Exception {
-					String sql = "select t.*, from trans_action t "
+					String sql = "select t.* from trans_action t "
 							+ " join keyword k on k.transactionId = t.transaction_id and k.name = 'ip' "
-							+ " where t.app = ? and t.receiver = ? and k.keyword = ? and timeStamp > ?"
+							+ " where t.app = ? and t.receiver = ? and k.keyword = ? and timeStamp > ? "
 							+ " order by t.id desc FETCH FIRST 100 ROWS ONLY WITH UR";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
@@ -986,6 +986,7 @@ public class TransactionStore {
 					ps.setString(i++, dhcAddress.getAddress());
 					ps.setString(i++, ip);
 					ps.setLong(i++, System.currentTimeMillis() - Constants.HOUR * 24);
+					logger.info("app={}, dhcAddress.getAddress()={}, ip={}, sql={}", Applications.FAUCET, dhcAddress.getAddress(), ip, sql);
 					rs = ps.executeQuery();
 					while (rs.next()) {
 						Transaction transaction = populateTransaction(rs);
@@ -996,6 +997,7 @@ public class TransactionStore {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
+		logger.info("# transactions: {}", transactions.size());
 		return transactions;
 	}
 
