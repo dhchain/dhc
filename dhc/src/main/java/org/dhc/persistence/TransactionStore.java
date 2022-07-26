@@ -32,6 +32,7 @@ import org.dhc.network.ChainSync;
 import org.dhc.util.Applications;
 import org.dhc.util.Base58;
 import org.dhc.util.Coin;
+import org.dhc.util.Constants;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcAddress;
 import org.dhc.util.DhcLogger;
@@ -968,6 +969,34 @@ public class TransactionStore {
 			logger.error(e.getMessage(), e);
 		}
 		return new ArrayList<Rating>(set);
+	}
+
+	public Set<Transaction> getFindFaucetTransactions(DhcAddress dhcAddress, String ip) {
+		Set<Transaction> transactions = new HashSet<>();
+		try {
+			new DBExecutor() {
+				public void doWork() throws Exception {
+					String sql = "select t.*, from trans_action t "
+							+ " join keyword k on k.transactionId = t.transaction_id and k.name = 'ip' "
+							+ " where t.app = ? and t.receiver = ? and k.keyword = ? and timeStamp > ?"
+							+ " order by t.id desc FETCH FIRST 100 ROWS ONLY WITH UR";
+					ps = conn.prepareStatement(sql);
+					int i = 1;
+					ps.setString(i++, Applications.FAUCET);
+					ps.setString(i++, dhcAddress.getAddress());
+					ps.setString(i++, ip);
+					ps.setLong(i++, System.currentTimeMillis() - Constants.HOUR * 24);
+					rs = ps.executeQuery();
+					while (rs.next()) {
+						Transaction transaction = populateTransaction(rs);
+						transactions.add(transaction);
+					}
+				}
+			}.execute();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return transactions;
 	}
 
 

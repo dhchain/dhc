@@ -689,4 +689,20 @@ public class Tree {
 		}
 	}
 
+	public Set<Transaction> getFindFaucetTransactions(DhcAddress dhcAddress, String ip) {
+		Lock readLock = readWriteLock.readLock();
+		readLock.lock();
+		long start = System.currentTimeMillis();
+		try {
+			return TransactionStore.getInstance().getFindFaucetTransactions(dhcAddress, ip);
+		} finally {
+			readLock.unlock();
+			long duration = System.currentTimeMillis() - start;
+			if(duration > Constants.SECOND * 10) {
+				logger.info("took {} ms", duration);
+			}
+			//logger.trace("unlock");
+		}
+	}
+
 }
