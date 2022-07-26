@@ -23,10 +23,6 @@ public abstract class Message {
 	public long getTimestamp() {
 		return timestamp;
 	}
-	
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
 
 	public abstract void process(Peer peer);
 

@@ -36,7 +36,6 @@ public class GsonUtil {
 		synchronized (writer) {
 			JsonClassMarker marker = new JsonClassMarker(message.getClass());
 			getGson().toJson(marker, JsonClassMarker.class, writer);
-			message.setTimestamp(System.currentTimeMillis());
 			getGson().toJson(message, message.getClass(), writer);
 			writer.flush();
 		}

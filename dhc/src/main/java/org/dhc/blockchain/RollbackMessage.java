@@ -29,7 +29,9 @@ public class RollbackMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
+		logger.info("RollbackMessage START");
 		if (!isValid()) {
+			logger.info("Message is invalid");
 			return;
 		}
 		Network.getInstance().sendToAllPeers(this);
@@ -37,11 +39,12 @@ public class RollbackMessage extends Message {
 			return;
 		}
 		Blockchain.getInstance().removeByIndex(index);
+		logger.info("RollbackMessage END");
 	}
 	
 	private boolean isValid() {
 		long timeDifference = Math.abs(System.currentTimeMillis() - getTimestamp());
-		if(timeDifference > Constants.MINUTE) {
+		if(timeDifference > Constants.MINUTE * 10) {
 			return false;
 		}
 		if (alreadySent(toString())) {
@@ -56,6 +59,7 @@ public class RollbackMessage extends Message {
 	private void sign() {
 		Signature dsa = CryptoUtil.getSignature(Wallet.getInstance().getPrivateKey());
 		String data = getDataToSign();
+		logger.info("data={}", data);
 		
 		try {
 			dsa.update(data.getBytes(StandardCharsets.UTF_8));
@@ -68,10 +72,12 @@ public class RollbackMessage extends Message {
 	
 	private boolean verifySignature() {
 		String data = getDataToSign();
+		logger.info("data={}", data);
 		boolean result = CryptoUtil.verifyECDSASig(Constants.PUBLIC_KEY, data, Base58.decode(signature));
 		if(result) {
 			return true;
 		}
+		logger.info("Signature is invalid");
 		return false;
 	}
 	
