@@ -3,7 +3,7 @@ package org.dhc.util;
 import java.math.BigInteger;
 
 /**
- * Truncated DhcAddress. Contains first 4 bites of DhcAddress (first 32 bits)
+ * Truncated DhcAddress. Contains first 4 bytes of DhcAddress (first 32 bits)
  * 
  * 
  * @author dhc
@@ -34,13 +34,16 @@ public class TAddress {
 		return xor(address1).compareTo(xor(address2));
 	}
 	
-	public BigInteger toBigInteger() {
-		byte[] bytes = Base58.decode(address);
-		return new BigInteger(bytes);
-	}
-	
-	public BigInteger xor(TAddress other) {
-		return toBigInteger().xor(other.toBigInteger());
+	public Long xor(TAddress other) {
+		String binary = getBinary();
+		String binaryOther = other.getBinary();
+		String result = "";
+		for(int i = 0; i < binary.length(); i++) {
+			char ch1 = binary.charAt(i);
+			char ch2 = binaryOther.charAt(i);
+			result = result + (ch1 == ch2? '0': '1');
+		}
+		return Long.parseLong(result, 2);
 	}
 	
 	public TAddress xor(int index) {
@@ -49,7 +52,7 @@ public class TAddress {
 			return this;
 		}
 		String xorBinary = binary.substring(0, index);
-		for(int i = index; i< binary.length(); i++) {
+		for(int i = index; i < binary.length(); i++) {
 			xorBinary = xorBinary + (binary.charAt(i) == '0'? "1": "0");
 		}
 		return new TAddress(CryptoUtil.fromBinaryString(xorBinary));

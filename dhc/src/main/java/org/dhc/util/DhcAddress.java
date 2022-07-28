@@ -75,7 +75,15 @@ public class DhcAddress {
 	}
 	
 	private BigInteger xor(DhcAddress other) {
-		return toBigInteger().xor(other.toBigInteger());
+		String binary = getBinary();
+		String binaryOther = other.getBinary();
+		String result = "";
+		for(int i = 0; i < binary.length(); i++) {
+			char ch1 = binary.charAt(i);
+			char ch2 = binaryOther.charAt(i);
+			result = result + (ch1 == ch2? '0': '1');
+		}
+		return new BigInteger(result, 2);
 	}
 	
 	public int compareDistance(DhcAddress dhcAddress1, DhcAddress dhcAddress2) {

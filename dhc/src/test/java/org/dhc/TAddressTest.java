@@ -1,6 +1,5 @@
 package org.dhc;
 
-import java.math.BigInteger;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -70,7 +69,7 @@ public class TAddressTest extends TestCase {
 		logger.info("tAddress.getBinary()  ={}", tAddress.getBinary());
 		for(int i = 0; i < 50; i++) {
 			TAddress xorAddress = tAddress.xor(i);
-			BigInteger distance = tAddress.xor(xorAddress);
+			Long distance = tAddress.xor(xorAddress);
 			logger.info("i={}\t distance={}\t\t\t\t xorAddress.getBinary() = {}", i, distance, xorAddress.getBinary());
 		}
 			

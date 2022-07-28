@@ -1,6 +1,8 @@
 package org.dhc.network;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -149,8 +151,17 @@ public class Buckets {
 			
 			for (Bucket bucket : buckets) {
 				logger.info("bucket index={} key={} #peer={}", bucket.getIndex(), bucket.getBucketKey(), bucket.getPeers().size());
-				for (Peer peer : bucket.getPeers()) {
-					logger.info("\t{} {}", peer.getTAddress().getBinary(), peer);
+				
+				List<Peer> bucketPeers = bucket.getPeers();
+				Collections.sort(bucketPeers, new Comparator<Peer>() {
+					@Override
+					public int compare(Peer p1, Peer p2) {
+						return TAddress.getMyTAddress().compareDistance(p2.getTAddress(), p1.getTAddress());
+					}
+				});
+				for (Peer peer : bucketPeers) {
+					TAddress peerTAddress = peer.getTAddress();
+					logger.info("\t{} \t{} {}", TAddress.getMyTAddress().xor(peerTAddress), peerTAddress.getBinary(), peer);
 				}
 			}
 			logger.info("\n");
