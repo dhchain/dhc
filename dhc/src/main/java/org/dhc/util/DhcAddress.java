@@ -1,7 +1,5 @@
 package org.dhc.util;
 
-import java.math.BigInteger;
-
 public class DhcAddress {
 	
 	private String address;
@@ -17,10 +15,6 @@ public class DhcAddress {
 	
 	public String getBinary(int size) {
 		return getBinary().substring(0, size);
-	}
-	
-	public long toLong(int size) {
-		return new BigInteger(getBinary(size), 2).longValue();
 	}
 
 	@Override
@@ -67,27 +61,6 @@ public class DhcAddress {
 				startsWith(
 						tAddress.
 							getBinary());
-	}
-
-	public BigInteger toBigInteger() {
-		byte[] bytes = Base58.decode(address);
-		return new BigInteger(bytes);
-	}
-	
-	private BigInteger xor(DhcAddress other) {
-		String binary = getBinary();
-		String binaryOther = other.getBinary();
-		String result = "";
-		for(int i = 0; i < binary.length(); i++) {
-			char ch1 = binary.charAt(i);
-			char ch2 = binaryOther.charAt(i);
-			result = result + (ch1 == ch2? '0': '1');
-		}
-		return new BigInteger(result, 2);
-	}
-	
-	public int compareDistance(DhcAddress dhcAddress1, DhcAddress dhcAddress2) {
-		return xor(dhcAddress1).compareTo(xor(dhcAddress2));
 	}
 	
 	public DhcAddress xor(int index) {
