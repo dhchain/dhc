@@ -987,12 +987,13 @@ public class TransactionStore {
 							+ " FETCH FIRST 100 ROWS ONLY WITH UR ";
 					ps = conn.prepareStatement(sql);
 					int i = 1;
+					long searchTimeFrom = System.currentTimeMillis() - Constants.HOUR * 24;
 					ps.setString(i++, Applications.FAUCET);
 					ps.setString(i++, dhcAddress.getAddress());
-					ps.setLong  (i++, System.currentTimeMillis() - Constants.HOUR * 24);
+					ps.setLong  (i++, searchTimeFrom);
 					ps.setString(i++, Applications.FAUCET);
 					ps.setString(i++, ip);
-					ps.setLong  (i++, System.currentTimeMillis() - Constants.HOUR * 24);
+					ps.setLong  (i++, searchTimeFrom);
 					logger.info("app={}, receiver={}, ip={}, sql={}", Applications.FAUCET, dhcAddress.getAddress(), ip, sql);
 					rs = ps.executeQuery();
 					while (rs.next()) {
