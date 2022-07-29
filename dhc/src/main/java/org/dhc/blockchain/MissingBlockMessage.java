@@ -22,7 +22,7 @@ public class MissingBlockMessage extends Message {
 	private long index;
 	private DhcAddress originDhcAddress;
 	private long bits;
-	private long timestamp = System.currentTimeMillis();
+	private long time = System.currentTimeMillis();
 	private int nonce;
 	
 	public MissingBlockMessage(String blockHash, String key, long index, DhcAddress originDhcAddress, long bits) {
@@ -138,16 +138,16 @@ public class MissingBlockMessage extends Message {
 			nonce++;
 			if(nonce == Integer.MAX_VALUE) {
 				nonce = 0;
-				timestamp++;
+				time++;
 			}
 			
-			miningHash = CryptoUtil.getHashBase58Encoded(prehash + timestamp + nonce);
+			miningHash = CryptoUtil.getHashBase58Encoded(prehash + time + nonce);
 		} while(!Difficulty.checkProofOfWork(miningHash, target));
 	}
 	
 	private boolean isMined() {
 		String prehash = blockHash + key + index + originDhcAddress;
-		String miningHash = CryptoUtil.getHashBase58Encoded(prehash + timestamp + nonce);
+		String miningHash = CryptoUtil.getHashBase58Encoded(prehash + time + nonce);
 		return Difficulty.checkProofOfWork(bits, miningHash);
 	}
 

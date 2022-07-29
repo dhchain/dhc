@@ -57,7 +57,9 @@ public class SendRollback {
 	private void process() throws Exception {
 		
 		passwordHelper = new PasswordHelper(key);
-		if(password != null && !passwordHelper.verifyPassphrase(password)) {
+		if(password == null) {
+			passwordHelper.enterPassphrase();
+		} else if(password != null && !passwordHelper.verifyPassphrase(password)) {
 			passwordHelper.enterPassphrase();
 		}
 		
