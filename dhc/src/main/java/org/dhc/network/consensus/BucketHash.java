@@ -645,6 +645,11 @@ public class BucketHash {
 				logger.info("Buckethash is not mined bits={}, testBits={} bucketHash={}", bits, testBits, getKeyHash());
 				return false;
 			}
+		} else {
+			if(bits > Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(Difficulty.INITIAL_BITS) / Math.pow(2, getPower()))) {
+				return false;
+			}
+			
 		}
 		return true;
 	}

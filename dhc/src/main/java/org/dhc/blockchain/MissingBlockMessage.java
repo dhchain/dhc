@@ -37,20 +37,25 @@ public class MissingBlockMessage extends Message {
 	public void process(Peer peer) {
 		logger.info("MissingBlockMessage.process(peer) index={}, key={}, blockHash={}, originDhcAddress={}", index, key, blockHash, originDhcAddress);
 		if (alreadySent(toString())) {
+			logger.info("already sent, returning");
 			return;
 		}
 		if(MissingBlocks.getInstance().getFoundBlocks(blockHash, key) != null) {
+			logger.info("exists in found blocks, returning");
 			return;
 		}
 		
-		if(!isMined() || bits > Difficulty.INITIAL_BITS) {
+		if(!isMined() || bits > Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(Difficulty.INITIAL_BITS) / Math.pow(2, key.length()))) {
+			logger.info("returning");
 			return;
 		}
 
 		Blockchain blockchain = Blockchain.getInstance();
 		
 		long testBits = blockchain.getBits(blockHash);
+		testBits = testBits == 0? 0: Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(testBits) / Math.pow(2, key.length()));
 		if((testBits != 0) && (testBits != bits)) {
+			logger.info("returning");
 			return;
 		}
 		
@@ -60,6 +65,7 @@ public class MissingBlockMessage extends Message {
 		if(block != null) {
 			if(key.startsWith(block.getBucketKey())) {
 				Network.getInstance().sendToAllPeers(new MissingBlockReply(block, key, originDhcAddress), peer);
+				logger.info("returning");
 				return;
 			}
 			if(block.getBucketKey().startsWith(key)) {
@@ -70,6 +76,7 @@ public class MissingBlockMessage extends Message {
 		Network.getInstance().sendToAllPeers(this, peer);
 		
 		if(block == null) {
+			logger.info("returning because block is null");
 			return;
 		}
 		
@@ -91,9 +98,11 @@ public class MissingBlockMessage extends Message {
 
 	private void process() {
 		if(MissingBlocks.getInstance().getMissingBlocks(blockHash, key) == null) {
+			logger.info("returning");
 			return;
 		}
 		if(MissingBlocks.getInstance().getFoundBlocks(blockHash, key) != null) {
+			logger.info("returning");
 			return;
 		}
 		
@@ -102,10 +111,12 @@ public class MissingBlockMessage extends Message {
 		Blockchain blockchain = Blockchain.getInstance();
 		Block block = blockchain.getByHash(blockHash);
 		if(block == null) {
+			logger.info("returning");
 			return;
 		}
 
 		if(block.getIndex() < blockchain.getIndex()) {
+			logger.info("returning");
 			return;
 		}
 		logger.info("MissingBlockMessage removeBranch() index={}, key={}, blockHash={}, originDhcAddress={}", block.getIndex(), key, blockHash, originDhcAddress);

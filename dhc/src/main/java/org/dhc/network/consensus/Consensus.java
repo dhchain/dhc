@@ -606,7 +606,7 @@ public class Consensus {
 			String key = bucketHash.getBinaryStringKey();
 			
 			long bits = bucketHash.getBits();
-			if(bits != 0 && bits <= Difficulty.INITIAL_BITS) {
+			if(bits != 0 && bucketHash.areBitsValid()) {
 				bits = Difficulty.convertDifficultyToBits(Difficulty.getDifficulty(bits) * Math.pow(2, bucketHash.getPower()));
 				new MissingBlock(blockHash, index, bits);
 			}
