@@ -451,7 +451,7 @@ public class Peer {
 	}
 
 	public String socketToString() {
-		if(socket == null) {
+		if(socket == null || socket.getInetAddress() == null) {
 			return inetSocketAddress.toString();
 		}
 		String result = "/" + socket.getInetAddress().getHostAddress() + ":" + 
