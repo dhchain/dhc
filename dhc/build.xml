@@ -20,8 +20,8 @@
 		<copy file="${dir.repository}/args4j/args4j/2.33/args4j-2.33.jar" todir="${dir.jarfile}/lib"/>
 		<copy file="${dir.repository}/com/google/code/gson/gson/2.9.0/gson-2.9.0.jar" todir="${dir.jarfile}/lib"/>
 		<copy file="${dir.repository}/org/bouncycastle/bcprov-jdk15on/1.65.01/bcprov-jdk15on-1.65.01.jar" todir="${dir.jarfile}/lib"/>
-		<copy file="${dir.repository}/org/tinylog/tinylog-impl/2.1.2/tinylog-impl-2.1.2.jar" todir="${dir.jarfile}/lib"/>
-		<copy file="${dir.repository}/org/tinylog/tinylog-api/2.1.2/tinylog-api-2.1.2.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/org/tinylog/tinylog-impl/2.4.1/tinylog-impl-2.4.1.jar" todir="${dir.jarfile}/lib"/>
+		<copy file="${dir.repository}/org/tinylog/tinylog-api/2.4.1/tinylog-api-2.4.1.jar" todir="${dir.jarfile}/lib"/>
 		<copy file="${dir.repository}/com/miglayout/miglayout-core/5.3/miglayout-core-5.3.jar" todir="${dir.jarfile}/lib"/>
 		<copy file="${dir.repository}/com/miglayout/miglayout-swing/5.3/miglayout-swing-5.3.jar" todir="${dir.jarfile}/lib"/>
 
@@ -36,7 +36,7 @@
 		<jar destfile="${dir.jarfile}/dhc.jar">
 			<manifest>
 				<attribute name="Main-Class" value="org.dhc.Main"/>
-				<attribute name="Class-Path" value=". ${manifest.classpath}"/>
+				<attribute name="Class-Path" value=". config/ ${manifest.classpath}"/>
 			</manifest>
 			<fileset dir="${dir.jarfile}/classes"/>
 		</jar>
