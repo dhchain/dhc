@@ -46,6 +46,7 @@
             <fileset dir="../../target/lib" includes="*.jar" targetdir="$INSTALL_PATH/lib" />
             <file src="../../config/dhc.properties" targetdir="$INSTALL_PATH/config"/>
             <file src="../../config/peers.config" targetdir="$INSTALL_PATH/config"/>
+            <file src="../../config/tinylog.properties" targetdir="$INSTALL_PATH/tinylog.properties"/>
             <file src="plugins" targetdir="$INSTALL_PATH"></file>
         </pack>
    </packs>
