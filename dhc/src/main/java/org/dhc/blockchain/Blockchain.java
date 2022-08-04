@@ -425,10 +425,15 @@ public class Blockchain {
 		writeLock.lock();
 		long start = System.currentTimeMillis();
 		try {
-			List<Block> blocks = getBlocks(index);
-			for(Block block: blocks) {
-				removeBranch(block.getBlockHash());
+			long blockchainIndex  = getIndex();
+			while(index <= blockchainIndex) {
+				List<Block> blocks = getBlocks(blockchainIndex);
+				for(Block block: blocks) {
+					removeBranch(block.getBlockHash());
+				}
+				blockchainIndex  = getIndex();
 			}
+			
 		} finally {
 			writeLock.unlock();
 			long duration = System.currentTimeMillis() - start;
