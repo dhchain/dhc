@@ -9,7 +9,7 @@
 	<property name="install.file" location="izpack\installer\install.xml" />
 	<property name="image.dir" location="izpack\installer\images" />
 	<property name="izpack.lib" location="Z:\IzPack\lib" />
-	<property name="dir.upload" location="Y:/wildfly/standalone/deployments/dhcweb-0.0.1-SNAPSHOT.war/drive" />
+	<property name="dir.upload" location="X:" />
 
 	<target name="create_run_jar">
 
