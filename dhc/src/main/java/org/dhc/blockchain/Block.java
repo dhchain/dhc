@@ -280,6 +280,7 @@ public class Block {
 		Transaction coinbase = getCoinbase();
 		
 		if(coinbase == null) {
+			logger.error("Coinbase is null");
 			return false;
 		}
 		
@@ -365,6 +366,24 @@ public class Block {
 		} else {
 			set = otherTransactions;
 		}
+		Block block = clone();
+		block.getBucketHashes().trim(getPower() - 1);
+		block.getBucketHashes().getLastBucketHash().setAllTransactions(set);
+		block.cleanCoinbase();
+		return block;
+	}
+	
+	public Block combine() {
+		
+		BucketHash other = getBucketHashes().getOtherBucketHash();
+		if(other == null || !"".equals(other.getHash())) {
+			return null;
+		}
+		
+		Set<Transaction> set = getAllTransactions();
+		logger.trace("Displaying all transactions for block {}", this);
+		displayTransactions(set);
+
 		Block block = clone();
 		block.getBucketHashes().trim(getPower() - 1);
 		block.getBucketHashes().getLastBucketHash().setAllTransactions(set);

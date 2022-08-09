@@ -61,6 +61,15 @@ public class BucketHashes {
 		return hash;
 	}
 	
+	public BucketHash getOtherBucketHash() {
+		if(getPower() == 0) {
+			return null;
+		}
+		LinkedList<BucketHash> list = new LinkedList<>(bucketHashes.values());
+		BucketHash hash = list.get(list.size() - 2);
+		return hash;
+	}
+	
 	public boolean isValid() {
 		List<BucketHash> list = new ArrayList<>(bucketHashes.values());
 		for(BucketHash hash: list) {

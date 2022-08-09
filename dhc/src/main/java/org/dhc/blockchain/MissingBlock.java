@@ -47,6 +47,9 @@ public class MissingBlock {
 		if(ChainSync.getInstance().isRunning()) {
 			return;
 		}
+		if(ChainRest.getInstance().isRunning()) {
+			return;
+		}
 		schedule();
 	}
 
@@ -71,6 +74,9 @@ public class MissingBlock {
 			return;
 		}
 		if(ChainSync.getInstance().isRunning()) {
+			return;
+		}
+		if(ChainRest.getInstance().isRunning()) {
 			return;
 		}
 

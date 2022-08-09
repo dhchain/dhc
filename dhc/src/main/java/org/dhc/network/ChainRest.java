@@ -145,6 +145,16 @@ public class ChainRest {
 			return;
 		}
 		
+		Block combined = block.combine();
+		if(combined != null && combined.isValid()) {
+			//logger.info("combined.getCoinbase() = {}", combined.getCoinbase()); 
+			Blockchain.getInstance().replace(combined);
+			logger.info("{} Replaced block     {}", block.getBucketKey(), block);
+			logger.info("{}  with combinedBlock {}\n", combined.getBucketKey(), combined);
+			doBlock(combined);
+			return;
+		}
+		
 		String key = block.getBucketKey();
 		String otherKey = new BucketKey(key).getOtherBucketKey().getKey();
 		Block otherBlock;
