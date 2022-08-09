@@ -37,6 +37,7 @@ public class NavigateMessage extends Message {
 		}
 		TAddress searchAddress = hash.xor(index);// not really xor but result gets closer to hash in xor metrics while index gets bigger. For index 32 (32 bits = 4 bytes) searchAddress == hash
 		List<Peer> peers  = Peer.getClosestKPeers(searchAddress);
+		peers.removeIf(p -> p.getInetSocketAddress().toString().contains("127.0.0.1"));
 		Message message = new NavigateReplyMessage(peers, hash, index);
 		peer.send(message);
 		

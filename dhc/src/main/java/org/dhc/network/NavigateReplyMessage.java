@@ -45,6 +45,7 @@ public class NavigateReplyMessage extends Message {
 		Bootstrap bootstrap = Bootstrap.getInstance();
 		List<Peer> list = Peer.getPeers();
 		Set<Peer> foundPeers = new HashSet<Peer>(peers);
+		foundPeers.removeIf(p -> p.getInetSocketAddress().toString().contains("127.0.0.1"));
 		foundPeers.removeAll(list);
 		
 		int count = 0;

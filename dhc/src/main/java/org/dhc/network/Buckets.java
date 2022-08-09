@@ -68,6 +68,7 @@ public class Buckets {
 	private void checkWithMyPeers() {
 		List<Peer> myPeers = getMyBucketPeers();
 		List<Peer> myToPeersInLastTwoBuckets = getToPeersInLastTwoBuckets();//we are sending last two buckets because to help to split a peer would need both last buckets
+		myToPeersInLastTwoBuckets.removeIf(p -> p.getInetSocketAddress().toString().contains("127.0.0.1"));
 		for(Peer peer: myPeers) {
 			String key = "mypeers-" + peer.getNetworkIdentifier();
 			if(expiringMap.get(key) != null) {

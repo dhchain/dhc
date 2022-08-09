@@ -32,6 +32,7 @@ public class SendMyToPeersMessage extends Message {
 		Bootstrap bootstrap = Bootstrap.getInstance();
 		List<Peer> list = Peer.getPeers();
 		Set<Peer> foundPeers = new HashSet<Peer>(myToPeers);
+		foundPeers.removeIf(p -> p.getInetSocketAddress().toString().contains("127.0.0.1"));
 		foundPeers.removeAll(list);
 
 		for (Peer p : foundPeers) {
