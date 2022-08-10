@@ -60,7 +60,7 @@ public class TransactionData {
 	}
 
 	public String toString() {
-		return "{data='" +getData() + "', validForNumberOfBlocks=" + validForNumberOfBlocks + ", transactionId=" + transactionId + "}";
+		return "{data='" +getData() + "', validForNumberOfBlocks=" + validForNumberOfBlocks + ", transactionId=" + transactionId + ", hash=" + hash +"}";
 	}
 	
 	public boolean isValid() {
@@ -79,9 +79,6 @@ public class TransactionData {
 	}
 
 	public void setData(String data) {
-		if(data == null) {
-			throw new NullPointerException("data cannot be null");
-		}
 		this.data = StringUtil.substring(data, 0, DATA_LENGTH);
 	}
 

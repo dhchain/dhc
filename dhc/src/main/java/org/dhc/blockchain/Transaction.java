@@ -121,11 +121,12 @@ public class Transaction {
 			return true;
 		}
 		String preHash = getPreHash();
-		//logger.info("verifySignature() preHash={}", preHash);
+		
 		boolean result = CryptoUtil.verifyECDSASig(sender, preHash, Base58.decode(signature));
 		if(result) {
 			return true;
 		}
+		logger.info("verifySignature() expiringData={}", expiringData);
 		return false;
 	}
 	
