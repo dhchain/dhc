@@ -90,6 +90,7 @@ public class SyncReplyMessage extends Message {
 		Blockchain blockchain = Blockchain.getInstance();
 
 		for(Block block: blocks) {
+			logger.trace("got block {} from peer {}", block.getIndex(), peer.getInetSocketAddress());
 			blockchain.add(block);
 		}
 		

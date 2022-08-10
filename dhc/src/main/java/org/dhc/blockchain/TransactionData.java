@@ -65,11 +65,6 @@ public class TransactionData {
 	
 	public boolean isValid() {
 		
-		if(data == null) {
-			logger.debug("data cannot be null");
-			return false;
-		}
-		
 		if(getData() !=null && !getHash().equals(CryptoUtil.getHashBase58Encoded(getData()))) {
 			logger.debug("Expiring data hash is not valid");
 			return false;
