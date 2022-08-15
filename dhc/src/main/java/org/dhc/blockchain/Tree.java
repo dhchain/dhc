@@ -76,7 +76,12 @@ public class Tree {
 				long index = node.getBlock().getIndex();
 				setLastIndex(index);
 				if(localLastIndex != index - 1) {
-					BlockStore.getInstance().setMinCompeting(-1);
+					long minCompeting = BlockStore.getInstance().getMinCompeting();
+					if(minCompeting == 0) {
+						BlockStore.getInstance().setMinCompeting(index);
+					} else {
+						BlockStore.getInstance().setMinCompeting(Math.min(index, minCompeting));
+					}
 				}
 				Registry.getInstance().getCompactor().pruneBlockchain();
 			}

@@ -21,6 +21,7 @@ import org.dhc.network.ChainSync;
 import org.dhc.network.Network;
 import org.dhc.util.Base58;
 import org.dhc.util.BoundedMap;
+import org.dhc.util.Constants;
 import org.dhc.util.CryptoUtil;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.Difficulty;
@@ -512,13 +513,18 @@ public class BlockStore {
 					public void doWork() throws Exception {
 						String sql = "select index from block group by index HAVING COUNT(*) > 1 order by index";
 						ps = conn.prepareStatement(sql);
-						 long start = System.currentTimeMillis();
+						long start = System.currentTimeMillis();
 						rs = ps.executeQuery();
 						
 						if (rs.next()) {
 							result[0] = rs.getLong("index");
 						}
-						logger.trace("Query getMinCompeting took {} ms. Result = {}, sql = '{}' ", System.currentTimeMillis() - start, result[0], sql);
+						long duration = System.currentTimeMillis() - start;
+						if(duration > Constants.SECOND * 10) {
+							logger.info("Query getMinCompeting took {} ms. Result = {}, sql = '{}' ", duration, result[0], sql);
+						} else {
+							logger.trace("Query getMinCompeting took {} ms. Result = {}, sql = '{}' ", duration, result[0], sql);
+						}
 					}
 				}.execute();
 
@@ -712,6 +718,7 @@ public class BlockStore {
 						int i = 1;
 						ps.setLong(i++, index);
 						ps.setLong(i++, block.getIndex());
+						long start = System.currentTimeMillis();
 						rs = ps.executeQuery();
 						String branchHash = block.getBlockHash();
 						while (rs.next()) {
@@ -720,6 +727,10 @@ public class BlockStore {
 								blockhashes.add(branchHash);
 								branchHash = rs.getString("previousHash");
 							}
+						}
+						long duration = System.currentTimeMillis() - start;
+						if(duration > Constants.SECOND * 10) {
+							logger.info("took {} ms to execute sql={}, index={}, block.getIndex()={}", duration, sql, index, block.getIndex());
 						}
 					}
 				}.execute();
