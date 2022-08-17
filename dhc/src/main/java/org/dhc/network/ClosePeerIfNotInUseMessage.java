@@ -15,7 +15,7 @@ public class ClosePeerIfNotInUseMessage extends Message {
 	public void process(Peer peer) {
 		Network network = Network.getInstance();
 		if(!network.getAllPeers().contains(peer)) {
-			logger.info("Closing not in use peer {}", peer);
+			logger.trace("Closing not in use peer {}", peer);
 			peer.close("Closing because peer is not in use");
 		}
 
