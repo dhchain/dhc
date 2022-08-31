@@ -253,13 +253,13 @@ public class TransactionOutputStore {
 					if (rs.next()) {
 						coin[0] = new Coin(rs.getLong("sumByRecipient"));
 					}
-					logger.trace("Query sumByRecipient took {} ms. '{}'", System.currentTimeMillis() - start, sql);
+					logger.info("Query sumByRecipient took {} ms. '{}'", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
-		logger.trace("Returning balance {}", coin[0].toNumberOfCoins());
+		logger.info("Returning balance {}", coin[0].toNumberOfCoins());
 		return coin[0];
 
 	}
