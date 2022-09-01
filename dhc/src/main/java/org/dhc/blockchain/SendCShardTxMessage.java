@@ -75,6 +75,7 @@ public class SendCShardTxMessage extends Message {
 			public void doRun() {
 				resend(block.getBlockHash());
 				resend(Blockchain.getInstance().getAncestor(block, 10));
+				resend(Blockchain.getInstance().getAncestor(block, 1000));
 			}
 		});
 		
