@@ -79,13 +79,14 @@ public class BlockStore {
 		
 		BucketHashStore.getInstance().saveBucketHashes(block.getIndex(), block.getBlockHash(), block.getBucketHashes());
 		TransactionStore.getInstance().saveTransactions(block.getAllTransactions());
-		
-		
-		if(!ChainSync.getInstance().isRunning()) {
-			long minCompeting = getMinCompeting();
-			if(minCompeting != 0) {
-				Blockchain blockchain = Blockchain.getInstance();// blockchain might return null if not initialized yet, so check if it is not null
-				if (blockchain != null && blockchain.getIndex() > minCompeting + 10) {
+
+		long minCompeting = getMinCompeting();
+		if(minCompeting != 0) {
+			Blockchain blockchain = Blockchain.getInstance();// blockchain might return null if not initialized yet, so check if it is not null
+			if (blockchain != null && blockchain.getIndex() > minCompeting + 10) {
+				if(!ChainSync.getInstance().isRunning()) {
+					Trimmer.getInstance().runAsync();
+				} else if(blockchain.getIndex() > minCompeting + 10000) {
 					Trimmer.getInstance().runAsync();
 				}
 			}
