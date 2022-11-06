@@ -280,7 +280,7 @@ public class Block {
 		Transaction coinbase = getCoinbase();
 		
 		if(coinbase == null) {
-			logger.error("Coinbase is null");
+			logger.error("Coinbase is null index={}", getIndex());
 			return false;
 		}
 		

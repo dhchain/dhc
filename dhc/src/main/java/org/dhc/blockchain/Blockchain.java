@@ -217,6 +217,10 @@ public class Blockchain {
 			}
 			
 			logger.trace("Has coinbase: {}", block.getCoinbase());
+			
+/*			if(block.getCoinbase() == null) {
+				logger.info("Coinbase is null", new RuntimeException());
+			}*/
 
 			Node node = new Node();
 			node.setBlock(block);

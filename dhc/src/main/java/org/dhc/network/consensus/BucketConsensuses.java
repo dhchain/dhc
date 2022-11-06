@@ -222,7 +222,7 @@ public class BucketConsensuses {
 		block.setBucketHashes(hashes); // I suspect this might remove coinbase in some cases so we need to add it back
 		
 		block.cleanCoinbase();
-		if(coinbase != null && coinbase.getReceiver().isMyKey(block.getBucketKey()) && block.getCoinbase() == null) {
+		if(coinbase != null && /*coinbase.getReceiver().isMyKey(block.getBucketKey()) &&*/ block.getCoinbase() == null) {
 			block.addTransaction(coinbase);
 		}
 		
