@@ -253,7 +253,7 @@ public class TransactionOutputStore {
 					if (rs.next()) {
 						coin[0] = new Coin(rs.getLong("sumByRecipient"));
 					}
-					logger.info("Query sumByRecipient took {} ms. '{}'", System.currentTimeMillis() - start, sql);
+					logger.trace("Query sumByRecipient took {} ms. '{}'", System.currentTimeMillis() - start, sql);
 				}
 			}.execute();
 		} catch (Exception e) {
