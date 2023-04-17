@@ -223,7 +223,7 @@ public class Block {
 
 	public boolean isValid() {
 		
-		if(isPruned() && blockHash.equals(calculateHash())) {
+		if(isPruned()) {
 			return true;
 		}
 
@@ -578,6 +578,9 @@ public class Block {
 	}
 	
 	public boolean hasOutputsForAllInputs() {
+		if(isPruned()) {
+			return true;
+		}
 		Set<Transaction>  set = getTransactions();
 		if(set == null) {
 			return true;
