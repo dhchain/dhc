@@ -689,7 +689,7 @@ public class BlockStore {
 					while (rs.next()) {
 						result.add(rs.getString("blockhash"));
 					}
-					logger.trace("Query getOrphants() took {} ms. sql '{}' ", System.currentTimeMillis() - start, sql);
+					logger.trace("Query getOrphants() took {} ms. sql '{}', orphants {}", System.currentTimeMillis() - start, sql, result);
 				}
 			}.execute();
 		} catch (Exception e) {
