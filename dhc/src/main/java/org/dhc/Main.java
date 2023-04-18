@@ -7,6 +7,7 @@ import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.dhc.blockchain.Block;
 import org.dhc.blockchain.Blockchain;
+import org.dhc.blockchain.Trimmer;
 import org.dhc.network.Network;
 import org.dhc.persistence.DBExecutor;
 import org.dhc.util.Coin;
@@ -78,6 +79,8 @@ public class Main {
 		Blockchain blockchain = Blockchain.getInstance();
 		DhcAddress dhcAddress = DhcAddress.getMyDhcAddress();
 		logger.info("My DHC Address: {} \n{}", dhcAddress, dhcAddress.getBinary() + "\n");
+		
+		Trimmer.getInstance().runImmediately();
 
 		for(Block block: blockchain.getLastBlocks()) {
 			logger.info("Last block {}", block);

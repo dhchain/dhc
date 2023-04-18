@@ -53,12 +53,13 @@ public class Trimmer {
 			Blockchain blockchain = Blockchain.getInstance();
 
 			blockchain.pretrim();
+			
+			long minCompeting = BlockStore.getInstance().getMinCompeting();
+			long checkpoint = Math.max(0, minCompeting - 1);
 
-			long checkpoint = Math.max(0, BlockStore.getInstance().getMinCompeting() - 1);
+			logger.info("START checkpoint {}, minCompeting {}", checkpoint, minCompeting);
 
-			logger.trace("START checkpoint {}", checkpoint);
-
-			if (checkpoint == 0) {
+			if (minCompeting <= 0) {
 				return;
 			}
 			Iterator<Block> iterator = blockchain.getLastBlocks().iterator();
