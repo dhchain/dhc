@@ -82,6 +82,7 @@ public class BlockStore {
 
 		long minCompeting = getMinCompeting();
 		if(minCompeting != 0) {
+			logger.info("minCompeting={}", minCompeting);
 			Blockchain blockchain = Blockchain.getInstance();// blockchain might return null if not initialized yet, so check if it is not null
 			if (blockchain != null && blockchain.getIndex() > minCompeting + 10) {
 				if(!ChainSync.getInstance().isRunning()) {
