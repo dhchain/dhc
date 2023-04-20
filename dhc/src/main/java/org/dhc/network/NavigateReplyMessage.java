@@ -3,6 +3,7 @@ package org.dhc.network;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
@@ -33,11 +34,17 @@ public class NavigateReplyMessage extends Message {
 		}
 		
 		String str = String.format("NavigateReplyMessage@%s.doIt() %s %s", this.hashCode(), index, peer.socketToString());
-		ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
-			public void doRun() {
-				doIt(peer);
-			}
-		});
+		
+		try {
+			ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
+				public void doRun() {
+					doIt(peer);
+				}
+			});
+		} catch (RejectedExecutionException e) {
+			logger.error(e.getMessage(), e);
+			return;
+		}
 
 	}
 	

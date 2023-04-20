@@ -3,6 +3,7 @@ package org.dhc.network;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.dhc.util.DhcLogger;
 import org.dhc.util.DhcRunnable;
@@ -21,11 +22,18 @@ public class SendMyToPeersMessage extends Message {
 
 	@Override
 	public void process(Peer peer) {
-		ThreadExecutor.getInstance().execute(new DhcRunnable("SendMyToPeersMessage") {
-			public void doRun() {
-				doIt();
-			}
-		});
+		String str = "SendMyToPeersMessage";
+		
+		try {
+			ThreadExecutor.getInstance().execute(new DhcRunnable(str) {
+				public void doRun() {
+					doIt();
+				}
+			});
+		} catch (RejectedExecutionException e) {
+			logger.error(e.getMessage(), e);
+			return;
+		}
 	}
 	
 	private void doIt() {

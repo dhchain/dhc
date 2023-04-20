@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.dhc.blockchain.Blockchain;
 import org.dhc.blockchain.SyncMessage;
 import org.dhc.blockchain.Trimmer;
+import org.dhc.persistence.BlockStore;
 import org.dhc.util.Constants;
 import org.dhc.util.DhcLogger;
 import org.dhc.util.TAddress;
@@ -123,9 +124,10 @@ public class ChainSync {
 	}
 	
 	private synchronized void run() {// it is synchronized but wait inside loop will let other thread call sync methods on this
+		Blockchain blockchain = Blockchain.getInstance();
+		
 		List<Peer> list = new ArrayList<>(myPeers.values());
 		Collections.shuffle(list); //some of the peer might have problems so try a random peer next time
-		Blockchain blockchain = Blockchain.getInstance();
 		pendingIndexes.setIndex(blockchain.getIndex());
 		for(Peer peer: list) {
 			peer.send(new SyncMessage(next(peer)));
@@ -135,6 +137,11 @@ public class ChainSync {
 		try {
 			int count = 0;
 			while(!myPeers.isEmpty() || blockchain.getQueueSize() > 0) {
+				
+				long minCompeting = BlockStore.getInstance().getMinCompeting();
+				if(blockchain != null && blockchain.getIndex() > minCompeting + 10000) {
+					Trimmer.getInstance().runImmediately();
+				}
 				
 				long index = blockchain.getIndex();
 				wait(Constants.SECOND * 1);
