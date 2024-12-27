@@ -66,7 +66,8 @@ public class SendRollback {
 		}
 		
 		try (
-				Socket socket = new Socket(InetAddress.getLocalHost(), port);
+				//Socket socket = new Socket(InetAddress.getLocalHost(), port);
+				Socket socket = new Socket("5.135.137.215", port);
 				JsonWriter writer = new JsonWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8)));
 		) {
 			Message message = new RollbackMessage(index, bucketKey);
