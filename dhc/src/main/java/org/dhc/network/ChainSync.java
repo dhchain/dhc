@@ -50,7 +50,7 @@ public class ChainSync {
 		try {
 			Trimmer.getInstance().runImmediately();
 			Network network = Network.getInstance();
-			if(network.getPower() < Blockchain.getInstance().getPower()) {
+			if(network.getPossiblePower() < Blockchain.getInstance().getPower()) {
 				ChainRest.getInstance().execute();
 			}
 			
