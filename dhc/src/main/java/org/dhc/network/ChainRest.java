@@ -102,9 +102,7 @@ public class ChainRest {
 	private void doExecute() {
 		logger.info("ChainRestorer doExecute()");
 		List<Block> blocks = null;
-		int attemptNumber = 0;
 		do {
-			attemptNumber = (attemptNumber + 1) % 100 ;
 			List<Block> loopBlocks = BlockStore.getInstance().restore();
 			if(loopBlocks.equals(blocks)) {
 				ThreadExecutor.sleep(Constants.SECOND);
@@ -113,13 +111,8 @@ public class ChainRest {
 			for(Block block: blocks) {
 				processBlock(block);
 			}
-			logger.info("networkPower={}, blockchainPower={}", Network.getInstance().getPower(), Blockchain.getInstance().getPower());
-			if(attemptNumber == 0) {
-				PeerSync.getInstance().executeAndWait();
-				if(Network.getInstance().getPower() >= Blockchain.getInstance().getPower()) {
-					break;
-				}
-			}
+			logger.info("networkPower={}, blockchainPower={}, possible power={}", Network.getInstance().getPower(), 
+					Blockchain.getInstance().getPower(), Network.getInstance().getPossiblePower());
 		} while (!blocks.isEmpty());
 	}
 	
